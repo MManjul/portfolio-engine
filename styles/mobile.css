@@ -104,9 +104,23 @@
   }
 
   /* 5. Mobile In-Page Accordion Deck Styling */
-  .hud-section {
+  .hud-section,
+  .hero-section {
     padding: 0 !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    display: block !important;
     border-bottom: 1px solid rgba(0, 242, 254, 0.18) !important;
+  }
+
+  .hud-section.mobile-collapsed,
+  .hero-section.mobile-collapsed {
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
   }
 
   .mobile-deck-header {
@@ -196,7 +210,7 @@
 
   /* 6. Section 01: Hero Content */
   .hero-section:not(.mobile-collapsed) {
-    min-height: auto !important;
+    min-height: 0 !important;
     display: block !important;
   }
 

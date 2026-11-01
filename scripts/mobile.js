@@ -57,37 +57,37 @@ function initMobileDeck() {
       const isAlreadyOpen = !sec.classList.contains('mobile-collapsed') && btn.classList.contains('active');
 
       if (isAlreadyOpen) {
-        // Toggle collapse
-        sec.classList.add('mobile-collapsed');
-        btn.classList.remove('active');
-        const chev = btn.querySelector('.deck-header-chevron');
-        if (chev) chev.textContent = '▾';
-      } else {
-        // Close all sections
-        sections.forEach(s => {
-          s.classList.add('mobile-collapsed');
-          const b = s.querySelector('.mobile-deck-header');
-          if (b) {
-            b.classList.remove('active');
-            const chev = b.querySelector('.deck-header-chevron');
-            if (chev) chev.textContent = '▾';
-          }
-        });
-
-        // Open this section
-        sec.classList.remove('mobile-collapsed');
-        btn.classList.add('active');
-        const chev = btn.querySelector('.deck-header-chevron');
-        if (chev) chev.textContent = '▴';
-
-        // Position this section header smoothly at top under fixed engine header (48px)
+        // One item is always open: keep active section open and re-align smoothly if tapped
         requestAnimationFrame(() => {
           btn.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
+        return;
+      }
 
-        if (window.soundFX && window.soundFX.playClick) {
-          window.soundFX.playClick();
+      // Close all other sections
+      sections.forEach(s => {
+        s.classList.add('mobile-collapsed');
+        const b = s.querySelector('.mobile-deck-header');
+        if (b) {
+          b.classList.remove('active');
+          const chev = b.querySelector('.deck-header-chevron');
+          if (chev) chev.textContent = '▾';
         }
+      });
+
+      // Open this section
+      sec.classList.remove('mobile-collapsed');
+      btn.classList.add('active');
+      const chev = btn.querySelector('.deck-header-chevron');
+      if (chev) chev.textContent = '▴';
+
+      // Position this section header smoothly at top under fixed engine header (48px)
+      requestAnimationFrame(() => {
+        btn.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+      if (window.soundFX && window.soundFX.playClick) {
+        window.soundFX.playClick();
       }
     });
   });
