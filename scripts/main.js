@@ -244,27 +244,31 @@ function initTacticalCarousel() {
 
   let isHovered = false;
 
-  // Auto rotation every 7s with pause and visual indicator on hover
+  // Auto rotation with pause on hover and prompt resume on leave
   function startAutoTimer() {
     clearInterval(autoTimer);
+    clearTimeout(autoTimer);
     if (isHovered) return;
     autoTimer = setInterval(() => {
       if (!isHovered) {
         showSlide(currentSlide + 1);
       }
-    }, 7000);
+    }, 5000); // 5s interval for smooth, noticeable transitions
   }
 
   function resetAutoTimer() {
     clearInterval(autoTimer);
+    clearTimeout(autoTimer);
     if (!isHovered) {
       startAutoTimer();
     }
   }
 
   function pauseAutoTimer() {
+    if (isHovered) return;
     isHovered = true;
     clearInterval(autoTimer);
+    clearTimeout(autoTimer);
     autoTimer = null;
     frame.classList.add('is-paused');
     const activeDot = document.querySelector('#carousel-indicators .indicator-dot.active');
@@ -272,15 +276,43 @@ function initTacticalCarousel() {
   }
 
   function resumeAutoTimer() {
+    if (!isHovered) return;
     isHovered = false;
     frame.classList.remove('is-paused');
     const activeDot = document.querySelector('#carousel-indicators .indicator-dot.active');
     if (activeDot) activeDot.setAttribute('title', `Slide ${currentSlide + 1} (Active)`);
-    startAutoTimer();
+    clearInterval(autoTimer);
+    clearTimeout(autoTimer);
+    // Rotate to next slide within 1.8s of unhovering so the user gets immediate visual confirmation
+    autoTimer = setTimeout(() => {
+      if (!isHovered) {
+        showSlide(currentSlide + 1);
+        startAutoTimer();
+      }
+    }, 1800);
   }
 
+  // Dual event listeners for ultra-reliable hover detection
   frame.addEventListener('mouseenter', pauseAutoTimer);
   frame.addEventListener('mouseleave', resumeAutoTimer);
+  frame.addEventListener('pointerenter', pauseAutoTimer);
+  frame.addEventListener('pointerleave', resumeAutoTimer);
+
+  // Global cursor boundary fallback: guarantees unpause even if fast gesture exits without pointerleave
+  document.addEventListener('mousemove', (e) => {
+    if (isHovered && frame) {
+      const rect = frame.getBoundingClientRect();
+      const padding = 2; // Tolerance margin
+      if (
+        e.clientX < rect.left - padding ||
+        e.clientX > rect.right + padding ||
+        e.clientY < rect.top - padding ||
+        e.clientY > rect.bottom + padding
+      ) {
+        resumeAutoTimer();
+      }
+    }
+  });
 
   startAutoTimer();
 
