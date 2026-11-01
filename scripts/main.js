@@ -120,17 +120,23 @@ function initAudioControls() {
   function updateDisplay() {
     if (window.soundFX) {
       const active = window.soundFX.isEnabled;
+      const icon = audioBtn.querySelector('.btn-icon');
+      if (icon) {
+        icon.textContent = active ? '🔊' : '🔇';
+      }
       if (audioStatus) {
         audioStatus.textContent = active ? 'ON' : 'MUTED';
         audioStatus.className = active ? 'text-cyan' : 'text-crimson';
       }
-      audioBtn.title = active ? 'Mute Audio FX' : 'Enable Audio FX';
+      audioBtn.title = active ? 'Mute Audio FX (Audio is Playing)' : 'Enable Audio FX (Audio is Muted)';
+      audioBtn.classList.toggle('is-muted', !active);
     }
   }
 
   updateDisplay();
 
-  audioBtn.addEventListener('click', () => {
+  audioBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
     if (window.soundFX) {
       const state = window.soundFX.toggle();
       updateDisplay();

@@ -187,13 +187,17 @@ kbd {
 }
 
 .section-title {
+  font-family: var(--font-display);
   font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 700;
   letter-spacing: 0.05em;
   margin-bottom: 12px;
   line-height: 1.15;
-  background: linear-gradient(135deg, #ffffff 30%, var(--text-secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8), 0 0 20px rgba(var(--theme-accent-rgb), 0.2);
 }
 
 .section-line {

@@ -270,6 +270,16 @@
     animation: hudFadeIn 0.25s ease-out !important;
   }
 
+  .section-title {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background: none !important;
+    font-size: 1.45rem !important;
+    line-height: 1.25 !important;
+    margin-bottom: 10px !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8) !important;
+  }
+
   /* 6. Section 01: Hero Content */
   .hero-section:not(.mobile-collapsed) {
     min-height: 0 !important;
