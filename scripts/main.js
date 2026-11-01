@@ -498,7 +498,15 @@ const projectData = {
     role: 'Senior Game Developer (Unity / Physics Core)',
     timeline: 'July 2017 - February 2019',
     stack: 'Unity 3D, C#, PhysX, Custom Ballistics Engine, Ragdoll Physics, Photon PUN',
-    image: '',
+    image: 'assets/images/sachin-saga/ss1.webp',
+    screenshots: [
+      'assets/images/sachin-saga/ss1.webp',
+      'assets/images/sachin-saga/ss2.webp',
+      'assets/images/sachin-saga/ss3.webp',
+      'assets/images/sachin-saga/ss4.webp',
+      'assets/images/sachin-saga/ss5.webp',
+      'assets/images/sachin-saga/sachin-saga-1.jpg'
+    ],
     trailerUrl: 'https://www.youtube.com/watch?v=OG-pipnXsZE',
     content: `
       <h4>Physics Engineering &amp; Ballistics Simulation:</h4>
@@ -810,15 +818,117 @@ function initProjectMediaAndTrailers() {
     // Check media banner on project card
     const bannerEl = document.querySelector(`.card-media-banner[data-media-for="${projId}"]`);
     if (bannerEl) {
-      const img = bannerEl.querySelector('img');
-      if (data.image && data.image.trim() !== '') {
-        if (img) {
-          img.src = data.image;
-          img.onerror = () => { bannerEl.style.display = 'none'; };
-        }
+      const shots = (data.screenshots && data.screenshots.length > 0) ? data.screenshots : (data.image ? [data.image] : []);
+      if (shots.length === 0) {
+        bannerEl.style.display = 'none';
+      } else if (shots.length === 1) {
+        bannerEl.innerHTML = `
+          <img src="${shots[0]}" alt="${data.title}" class="project-banner-img" loading="lazy" onerror="this.parentElement.style.display='none';">
+          <div class="media-overlay-scanline"></div>
+        `;
         bannerEl.style.display = 'block';
       } else {
-        bannerEl.style.display = 'none';
+        // Multi-image Carousel
+        bannerEl.classList.add('is-carousel');
+        bannerEl.innerHTML = `
+          <div class="carousel-slides-container">
+            ${shots.map((src, i) => `
+              <div class="carousel-slide ${i === 0 ? 'active' : ''}" data-index="${i}">
+                <img src="${src}" alt="${data.title} slide ${i + 1}" class="project-banner-img" loading="lazy">
+              </div>
+            `).join('')}
+          </div>
+          <div class="media-overlay-scanline"></div>
+          <div class="carousel-counter-badge">01 / ${String(shots.length).padStart(2, '0')}</div>
+          <button type="button" class="carousel-nav-btn prev" aria-label="Previous slide">‹</button>
+          <button type="button" class="carousel-nav-btn next" aria-label="Next slide">›</button>
+          <div class="carousel-pips">
+            ${shots.map((_, i) => `
+              <button type="button" class="carousel-pip ${i === 0 ? 'active' : ''}" data-index="${i}" aria-label="Slide ${i + 1}"></button>
+            `).join('')}
+          </div>
+        `;
+        bannerEl.style.display = 'block';
+
+        // Setup Carousel Logic
+        let currentIndex = 0;
+        const slides = bannerEl.querySelectorAll('.carousel-slide');
+        const pips = bannerEl.querySelectorAll('.carousel-pip');
+        const counter = bannerEl.querySelector('.carousel-counter-badge');
+        const prevBtn = bannerEl.querySelector('.carousel-nav-btn.prev');
+        const nextBtn = bannerEl.querySelector('.carousel-nav-btn.next');
+        let autoplayTimer = null;
+
+        function goToSlide(idx, playSfx = true) {
+          if (idx < 0) idx = shots.length - 1;
+          if (idx >= shots.length) idx = 0;
+          currentIndex = idx;
+
+          slides.forEach((s, i) => {
+            if (i === currentIndex) s.classList.add('active');
+            else s.classList.remove('active');
+          });
+
+          pips.forEach((p, i) => {
+            if (i === currentIndex) p.classList.add('active');
+            else p.classList.remove('active');
+          });
+
+          if (counter) {
+            counter.textContent = `${String(currentIndex + 1).padStart(2, '0')} / ${String(shots.length).padStart(2, '0')}`;
+          }
+
+          if (playSfx && window.soundFX) window.soundFX.playClick();
+        }
+
+        function startAutoplay() {
+          stopAutoplay();
+          autoplayTimer = setInterval(() => {
+            goToSlide(currentIndex + 1, false);
+          }, 4200);
+        }
+
+        function stopAutoplay() {
+          if (autoplayTimer) {
+            clearInterval(autoplayTimer);
+            autoplayTimer = null;
+          }
+        }
+
+        if (prevBtn) {
+          prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            goToSlide(currentIndex - 1);
+            startAutoplay();
+          });
+        }
+
+        if (nextBtn) {
+          nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            goToSlide(currentIndex + 1);
+            startAutoplay();
+          });
+        }
+
+        pips.forEach(pip => {
+          pip.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            const targetIdx = parseInt(pip.getAttribute('data-index'), 10);
+            goToSlide(targetIdx);
+            startAutoplay();
+          });
+        });
+
+        // Pause on hover so user can inspect slide
+        bannerEl.addEventListener('mouseenter', stopAutoplay);
+        bannerEl.addEventListener('mouseleave', startAutoplay);
+
+        // Start initial auto rotation
+        startAutoplay();
       }
     }
 
