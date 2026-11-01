@@ -1,5 +1,6 @@
 /**
  * Unreal Engine 5 StateTree & Gameplay Tag Interactive Visualizer
+ * Models Mayank's AAA ECricket Batsman Locomotion & Authoritative StateTree Architecture.
  * Simulates runtime state transitions, tag evaluation, and displays low-level C++ delegates.
  */
 class StateTreeVisualizer {
@@ -10,80 +11,84 @@ class StateTreeVisualizer {
     this.snippetBox = document.getElementById('snippet-code-box');
 
     this.states = {
-      idle: {
+      stance: {
         activeNodes: ['node-root', 'node-locomotion', 'node-idle'],
         activeCables: ['cable-root-loco', 'cable-loco-idle'],
-        code: `// StateTree Task: Evaluates Idle State Transitions (TDD/ECRICKET-7884)
-EStateTreeRunStatus FECricketLocomotionTask::EnterState(FStateTreeExecutionContext& Context)
+        code: `// StateTree Task: Crease Stance & Bowler Release Synchronization (UE5 / ECricket)
+EStateTreeRunStatus FECricketBattingStanceTask::EnterState(FStateTreeExecutionContext& Context)
 {
-    UECricketCharacterMovementComponent* MoveComp = Context.GetExternalData(MoveCompHandle);
-    if (!MoveComp) return EStateTreeRunStatus::Failed;
+    UECricketBatsmanComponent* BatsmanComp = Context.GetExternalData(BatsmanCompHandle);
+    if (!BatsmanComp) return EStateTreeRunStatus::Failed;
 
-    // Reset Locomotion tags to Idle state
-    MoveComp->RemoveGameplayTag(TAG_Locomotion_Sprint);
-    MoveComp->AddGameplayTag(TAG_Locomotion_Idle);
+    // Reset stroke tags and bind batsman crease stance gaze tracking
+    BatsmanComp->RemoveGameplayTag(TAG_State_StrokeExecution);
+    BatsmanComp->AddGameplayTag(TAG_State_Batting_CreaseStance);
 
-    // Bind idle animation blend weights with zero allocation
-    MoveComp->SetMaxWalkSpeed(0.0f);
+    // Lock batsman root orientation toward pitch delivery vector (Server-Authoritative)
+    BatsmanComp->SetBattingStanceBlendWeights(1.0f);
+    return EStateTreeRunStatus::Running;
+}`
+      },
+      stroke: {
+        activeNodes: ['node-root', 'node-abilities', 'node-dodge'],
+        activeCables: ['cable-root-abilities', 'cable-abilities-dodge', 'cable-rep-sync'],
+        code: `// StateTree Task: Real-Time Ballistics Collision & Server-Authoritative Stroke (UE5)
+EStateTreeRunStatus FECricketStrokeExecutionTask::EnterState(FStateTreeExecutionContext& Context)
+{
+    UECricketBatsmanComponent* BatsmanComp = Context.GetExternalData(BatsmanCompHandle);
+    if (!BatsmanComp) return EStateTreeRunStatus::Failed;
+
+    // Evaluate incoming ball trajectory from server ballistics pipeline
+    const FVector ImpactPoint = BatsmanComp->GetCalculatedImpactPoint();
+    BatsmanComp->AddGameplayTag(TAG_State_StrokeExecution);
+
+    // Execute root-motion stroke and dispatch server RPC verification
+    BatsmanComp->Server_ReportAuthoritativeImpact(ImpactPoint, BatsmanComp->GetBatVelocity());
     return EStateTreeRunStatus::Running;
 }`
       },
       sprint: {
         activeNodes: ['node-root', 'node-locomotion', 'node-sprint'],
         activeCables: ['cable-root-loco', 'cable-loco-sprint'],
-        code: `// StateTree Task: Sprint Activation & Server Prediction Verification
-EStateTreeRunStatus FECricketSprintTask::EnterState(FStateTreeExecutionContext& Context)
+        code: `// StateTree Task: Sprint Between Wickets & Crease Grounding (UE5 / ECricket)
+EStateTreeRunStatus FECricketRunningBetweenWicketsTask::EnterState(FStateTreeExecutionContext& Context)
 {
-    UECricketCharacterMovementComponent* MoveComp = Context.GetExternalData(MoveCompHandle);
-    if (!MoveComp || !MoveComp->HasValidStamina(10.0f)) 
-        return EStateTreeRunStatus::Failed;
-
-    // Transition Gameplay Tags
-    MoveComp->AddGameplayTag(TAG_Locomotion_Sprint);
-    MoveComp->SetMaxWalkSpeed(750.0f);
-
-    // Dispatch Server-Authoritative Prediction Payload
-    MoveComp->Server_SendPredictionPayload(MoveComp->GetLastTimestamp(), TAG_Locomotion_Sprint);
-    return EStateTreeRunStatus::Running;
-}`
-      },
-      dodge: {
-        activeNodes: ['node-root', 'node-abilities', 'node-dodge'],
-        activeCables: ['cable-root-abilities', 'cable-abilities-dodge', 'cable-rep-sync'],
-        code: `// StateTree Task: Invulnerability Frames & Root Motion Dodge
-EStateTreeRunStatus FECricketDodgeTask::EnterState(FStateTreeExecutionContext& Context)
-{
-    UECricketCharacterMovementComponent* MoveComp = Context.GetExternalData(MoveCompHandle);
+    UECricketMovementComponent* MoveComp = Context.GetExternalData(MoveCompHandle);
     if (!MoveComp) return EStateTreeRunStatus::Failed;
 
-    // Grant temporary Invulnerability Gameplay Tag
-    MoveComp->AddGameplayTag(TAG_State_Invulnerable);
-    MoveComp->PlayRootMotionMontage(DodgeMontage);
+    // Accelerate between stumps with root-motion momentum
+    MoveComp->AddGameplayTag(TAG_Locomotion_SprintBetweenWickets);
+    MoveComp->SetMaxWalkSpeed(840.0f); // 8.4 m/s athletic sprint
 
-    // Schedule automatic state rollback delegate after 0.35s
-    Context.ScheduleStateTreeTransition(0.35f, TAG_Locomotion_Idle);
+    // Dispatch server-authoritative prediction payload for crease crossing
+    MoveComp->Server_SendPredictionPayload(MoveComp->GetLastTimestamp(), TAG_Locomotion_SprintBetweenWickets);
     return EStateTreeRunStatus::Running;
 }`
       },
-      ability: {
+      defense: {
         activeNodes: ['node-root', 'node-abilities', 'node-abilitycast'],
         activeCables: ['cable-root-abilities', 'cable-abilities-cast', 'cable-rep-sync'],
-        code: `// StateTree Task: Cast Ability RPC & Network Replication Sync
-EStateTreeRunStatus FECricketAbilityCastTask::EnterState(FStateTreeExecutionContext& Context)
+        code: `// StateTree Task: Soft-Hands Forward Defense & Bounce Evasion (UE5 / ECricket)
+EStateTreeRunStatus FECricketDefensiveBlockTask::EnterState(FStateTreeExecutionContext& Context)
 {
-    UECricketCombatComponent* CombatComp = Context.GetExternalData(CombatCompHandle);
-    if (!CombatComp) return EStateTreeRunStatus::Failed;
+    UECricketBatsmanComponent* BatsmanComp = Context.GetExternalData(BatsmanCompHandle);
+    if (!BatsmanComp) return EStateTreeRunStatus::Failed;
 
-    // Validate ability cooldown & stamina
-    if (!CombatComp->CanExecuteAbility(TAG_Ability_CastPrimary))
-        return EStateTreeRunStatus::Failed;
+    // Dampen bat restitution coefficient to drop ball softly into pitch
+    BatsmanComp->AddGameplayTag(TAG_State_DefensiveBlock);
+    BatsmanComp->SetBatRestitutionCoefficient(0.18f); // Soft hands mechanics
 
-    // Fire Replicated Multicast for Audio/VFX synchronization
-    CombatComp->Server_ExecuteAbilityRPC(TAG_Ability_CastPrimary);
+    // Transition back to Crease Stance once ball is dead
+    Context.ScheduleStateTreeTransition(0.65f, TAG_State_Batting_CreaseStance);
     return EStateTreeRunStatus::Running;
 }`
       }
     };
+
+    // Aliases for compatibility
+    this.states.idle = this.states.stance;
+    this.states.dodge = this.states.stroke;
+    this.states.ability = this.states.defense;
 
     this.init();
   }
@@ -101,10 +106,10 @@ EStateTreeRunStatus FECricketAbilityCastTask::EnterState(FStateTreeExecutionCont
     this.nodes.forEach(node => {
       node.addEventListener('click', () => {
         const id = node.id;
-        if (id === 'node-idle' || id === 'node-locomotion') this.selectState('idle');
+        if (id === 'node-idle' || id === 'node-locomotion') this.selectState('stance');
         else if (id === 'node-sprint') this.selectState('sprint');
-        else if (id === 'node-dodge') this.selectState('dodge');
-        else if (id === 'node-abilitycast' || id === 'node-abilities') this.selectState('ability');
+        else if (id === 'node-dodge' || id === 'node-abilities') this.selectState('stroke');
+        else if (id === 'node-abilitycast') this.selectState('defense');
         if (window.soundFX) window.soundFX.playLaserChime();
       });
     });
@@ -114,9 +119,13 @@ EStateTreeRunStatus FECricketAbilityCastTask::EnterState(FStateTreeExecutionCont
     const config = this.states[stateKey];
     if (!config) return;
 
+    // Normalize key
+    const primaryKey = (stateKey === 'idle') ? 'stance' : (stateKey === 'dodge') ? 'stroke' : (stateKey === 'ability') ? 'defense' : stateKey;
+
     // Update buttons
     this.buttons.forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.state === stateKey);
+      const bState = btn.dataset.state;
+      btn.classList.toggle('active', bState === primaryKey || bState === stateKey);
     });
 
     // Update nodes
@@ -138,8 +147,8 @@ EStateTreeRunStatus FECricketAbilityCastTask::EnterState(FStateTreeExecutionCont
   highlightCode(code) {
     return code
       .replace(/(\/\/.*)/g, '<span class="code-comment">$1</span>')
-      .replace(/\b(EStateTreeRunStatus|FStateTreeExecutionContext|UECricketCharacterMovementComponent|FGameplayTagContainer|UECricketCombatComponent)\b/g, '<span class="code-type">$1</span>')
-      .replace(/\b(if|return|bool|void|float)\b/g, '<span class="code-keyword">$1</span>')
+      .replace(/\b(EStateTreeRunStatus|FStateTreeExecutionContext|UECricketBatsmanComponent|UECricketMovementComponent|FGameplayTagContainer|FVector|TAG_State_StrokeExecution|TAG_State_Batting_CreaseStance|TAG_Locomotion_SprintBetweenWickets|TAG_State_DefensiveBlock)\b/g, '<span class="code-type">$1</span>')
+      .replace(/\b(if|return|bool|void|float|const)\b/g, '<span class="code-keyword">$1</span>')
       .replace(/(\b\d+(\.\d+)?f?\b)/g, '<span class="code-number">$1</span>');
   }
 }
