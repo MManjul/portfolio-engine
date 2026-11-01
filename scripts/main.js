@@ -436,11 +436,9 @@ function initGoogleDriveResume() {
   const modalDownloadBtn = document.getElementById('modal-gdrive-download');
   const editLinkBtn = document.getElementById('btn-edit-gdrive-link');
 
-  // Load configured or fallback resume link (defaults to hosted resume.pdf)
-  let gdriveUrl = localStorage.getItem('manjul_gdrive_resume_url');
-  if (!gdriveUrl) {
-    gdriveUrl = 'resume.pdf';
-  }
+  // Official live Google Drive resume link
+  const OFFICIAL_GDRIVE_URL = 'https://drive.google.com/file/d/1rQcI8EHY2sCMNXN2j-Doxnb8eUOrDM6y/view?usp=sharing';
+  let gdriveUrl = localStorage.getItem('manjul_gdrive_resume_url') || OFFICIAL_GDRIVE_URL;
 
   function updateDownloadLinks(url) {
     if (heroDownloadBtn) heroDownloadBtn.href = url;

@@ -1,7 +1,7 @@
 # Cloudflare Pages Redirects
-# Allows clean vanity URLs (e.g. yoursite.com/resume -> Google Drive or local PDF)
+# Allows clean vanity URLs (e.g. mayankmanjul.com/resume -> Google Drive Resume PDF)
 
-# Vanity redirect for resume (Replace with your direct Google Drive or hosted PDF URL)
-/resume       /resume.pdf                   302
-/download     /resume.pdf                   302
-/cv           /resume.pdf                   302
+# Vanity redirects directly to live Google Drive Resume
+/resume       https://drive.google.com/file/d/1rQcI8EHY2sCMNXN2j-Doxnb8eUOrDM6y/view?usp=sharing                   302
+/download     https://drive.google.com/file/d/1rQcI8EHY2sCMNXN2j-Doxnb8eUOrDM6y/view?usp=sharing                   302
+/cv           https://drive.google.com/file/d/1rQcI8EHY2sCMNXN2j-Doxnb8eUOrDM6y/view?usp=sharing                   302
