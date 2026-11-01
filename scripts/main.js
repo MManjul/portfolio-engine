@@ -436,11 +436,10 @@ function initGoogleDriveResume() {
   const modalDownloadBtn = document.getElementById('modal-gdrive-download');
   const editLinkBtn = document.getElementById('btn-edit-gdrive-link');
 
-  // Load configured or fallback Google Drive link
+  // Load configured or fallback resume link (defaults to hosted resume.pdf)
   let gdriveUrl = localStorage.getItem('manjul_gdrive_resume_url');
   if (!gdriveUrl) {
-    // Default placeholder or public resume URL
-    gdriveUrl = 'https://drive.google.com/file/d/1Bxxxx/view?usp=sharing';
+    gdriveUrl = 'resume.pdf';
   }
 
   function updateDownloadLinks(url) {
