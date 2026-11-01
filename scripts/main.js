@@ -927,6 +927,32 @@ function initProjectMediaAndTrailers() {
         bannerEl.addEventListener('mouseenter', stopAutoplay);
         bannerEl.addEventListener('mouseleave', startAutoplay);
 
+        // Mobile touch swipe gestures
+        let touchStartX = 0;
+        let touchStartY = 0;
+        bannerEl.addEventListener('touchstart', (e) => {
+          if (e.touches && e.touches.length > 0) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+          }
+        }, { passive: true });
+
+        bannerEl.addEventListener('touchend', (e) => {
+          if (e.changedTouches && e.changedTouches.length > 0) {
+            const diffX = e.changedTouches[0].clientX - touchStartX;
+            const diffY = e.changedTouches[0].clientY - touchStartY;
+            // Only trigger if horizontal swipe is dominant and exceeds 35px
+            if (Math.abs(diffX) > 35 && Math.abs(diffX) > Math.abs(diffY)) {
+              if (diffX < 0) {
+                goToSlide(currentIndex + 1); // Swiped left -> next
+              } else {
+                goToSlide(currentIndex - 1); // Swiped right -> prev
+              }
+              startAutoplay();
+            }
+          }
+        }, { passive: true });
+
         // Start initial auto rotation
         startAutoplay();
       }

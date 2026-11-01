@@ -233,10 +233,27 @@ class PhysicsSandboxEngine {
       });
     }
 
-    // Canvas Mouse Interaction
+    // Canvas Mouse & Touch Interaction
     this.canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
     window.addEventListener('mousemove', (e) => this.onMouseMove(e));
     window.addEventListener('mouseup', () => this.onMouseUp());
+
+    // Mobile Touch Bindings
+    this.canvas.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches.length > 0) {
+        const touch = e.touches[0];
+        this.onMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches.length > 0) {
+        const touch = e.touches[0];
+        this.onMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => this.onMouseUp(), { passive: true });
 
     // Keyboard bindings
     window.addEventListener('keydown', (e) => {
@@ -264,10 +281,14 @@ class PhysicsSandboxEngine {
 
   resize() {
     const rect = this.canvas.getBoundingClientRect();
-    const displayW = (rect && rect.width > 50) ? rect.width : 960;
-    this.canvas.width = displayW * (window.devicePixelRatio || 1);
-    this.canvas.height = 460 * (window.devicePixelRatio || 1);
-    this.scale = window.devicePixelRatio || 1;
+    const displayW = (rect && rect.width > 50) ? rect.width : (this.canvas.parentElement ? this.canvas.parentElement.clientWidth : 960);
+    const isMobile = window.innerWidth <= 600;
+    const targetH = isMobile ? 350 : 460;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2x for smooth mobile GPU performance
+    this.canvas.width = displayW * dpr;
+    this.canvas.height = targetH * dpr;
+    this.scale = dpr;
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform before scaling
     this.ctx.scale(this.scale, this.scale);
   }
 

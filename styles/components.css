@@ -265,6 +265,7 @@
   height: 440px;
   display: block;
   cursor: crosshair;
+  touch-action: none;
 }
 
 .canvas-instructions {
@@ -653,6 +654,12 @@
 
 .card-media-banner:hover .carousel-nav-btn {
   opacity: 0.85;
+}
+
+@media (hover: none), (max-width: 768px) {
+  .carousel-nav-btn {
+    opacity: 0.85;
+  }
 }
 
 .carousel-nav-btn:hover {
@@ -1508,6 +1515,21 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+
+@media (max-width: 600px) {
+  .hud-modal {
+    padding: 8px;
+  }
+  .modal-dialog {
+    max-height: 95vh;
+  }
+  .modal-body {
+    padding: 16px 14px;
+  }
+  .card-media-banner {
+    height: 175px;
+  }
 }
 
 .hud-modal.active,

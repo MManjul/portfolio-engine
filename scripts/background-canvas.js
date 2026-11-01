@@ -16,8 +16,12 @@ class BackgroundCanvasEngine {
   }
 
   init() {
+    this.maxParticles = window.innerWidth < 768 ? 28 : 65;
     this.resize();
-    window.addEventListener('resize', () => this.resize());
+    window.addEventListener('resize', () => {
+      this.maxParticles = window.innerWidth < 768 ? 28 : 65;
+      this.resize();
+    });
 
     window.addEventListener('mousemove', (e) => {
       this.mouse.x = e.clientX;
@@ -28,6 +32,26 @@ class BackgroundCanvasEngine {
       this.mouse.x = -1000;
       this.mouse.y = -1000;
     });
+
+    // Mobile touch interaction for background matrix
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches.length > 0) {
+        this.mouse.x = e.touches[0].clientX;
+        this.mouse.y = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches.length > 0) {
+        this.mouse.x = e.touches[0].clientX;
+        this.mouse.y = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      this.mouse.x = -1000;
+      this.mouse.y = -1000;
+    }, { passive: true });
 
     // Populate particles
     this.particles = [];
