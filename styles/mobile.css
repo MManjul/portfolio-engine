@@ -403,94 +403,34 @@
     font-size: 0.75rem !important;
   }
 
-  /* 8. Section 03: Playground (Disabled on Mobile -> Replaced with Coming Soon card) */
-  #sandbox .sandbox-container {
+  /* 8. Section 03: Playground (Disabled & Replaced with Calibration Card) */
+  .sandbox-section .sandbox-container {
     display: none !important;
   }
 
-  .mobile-playground-coming-soon {
-    background: rgba(14, 22, 36, 0.95) !important;
-    border: 1px solid rgba(0, 242, 254, 0.25) !important;
-    border-left: 4px solid #ffaa00 !important;
+  .playground-calibration-card {
     padding: 20px 16px !important;
-    border-radius: 6px !important;
-    margin-top: 14px !important;
-    display: flex !important;
-    flex-direction: column !important;
     gap: 14px !important;
+    margin-top: 10px !important;
   }
 
-  .coming-soon-badge {
-    font-family: var(--font-mono) !important;
-    font-size: 0.72rem !important;
-    color: #ffaa00 !important;
-    letter-spacing: 0.08em !important;
-    font-weight: 700 !important;
+  .calibration-title {
+    font-size: 1.25rem !important;
   }
 
-  .coming-soon-title {
-    font-family: var(--font-tech) !important;
-    font-size: 1.12rem !important;
-    color: #e6f1ff !important;
-    margin: 0 !important;
-    letter-spacing: 0.04em !important;
+  .calibration-desc {
+    font-size: 0.88rem !important;
+    line-height: 1.5 !important;
   }
 
-  .coming-soon-desc {
-    font-size: 0.84rem !important;
-    line-height: 1.55 !important;
-    color: #94a3b8 !important;
-    margin: 0 !important;
+  .calibration-grid {
+    grid-template-columns: 1fr !important;
+    padding: 12px 14px !important;
+    gap: 10px !important;
   }
 
-  .coming-soon-card {
-    background: rgba(0, 242, 254, 0.06) !important;
-    border: 1px solid rgba(0, 242, 254, 0.2) !important;
-    border-radius: 4px !important;
-    padding: 14px !important;
-    display: flex !important;
-    gap: 12px !important;
-    align-items: flex-start !important;
-  }
-
-  .coming-soon-card .cs-card-icon {
-    font-size: 1.4rem !important;
-    flex-shrink: 0 !important;
-  }
-
-  .coming-soon-card strong {
-    font-family: var(--font-tech) !important;
-    font-size: 0.85rem !important;
-    color: var(--theme-accent) !important;
-    display: block !important;
-    margin-bottom: 4px !important;
-    letter-spacing: 0.04em !important;
-  }
-
-  .coming-soon-card p {
-    font-size: 0.8rem !important;
-    line-height: 1.45 !important;
-    color: #c4d7ec !important;
-    margin: 0 !important;
-  }
-
-  .coming-soon-specs {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 6px !important;
-    padding-top: 10px !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-  }
-
-  .spec-chip {
-    font-family: var(--font-mono) !important;
-    font-size: 0.72rem !important;
-    color: #94a3b8 !important;
-  }
-
-  .spec-chip span {
-    color: var(--theme-accent) !important;
-    font-weight: 700 !important;
+  .calibration-actions .btn {
+    width: 100% !important;
   }
 
   /* 9. Section 04: Projects Grid */

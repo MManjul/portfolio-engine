@@ -1087,3 +1087,132 @@ body.theme-crimson-red {
   font-size: 0.68rem;
   color: var(--text-muted);
 }
+
+
+/* ==========================================================================
+   PLAYGROUND CALIBRATION / OFFLINE STATUS CARD (DESKTOP & MOBILE)
+   ========================================================================== */
+.sandbox-section .sandbox-container {
+  display: none !important;
+}
+
+.playground-calibration-card {
+  background: rgba(11, 18, 30, 0.94);
+  border: 1px solid rgba(0, 242, 254, 0.28);
+  border-left: 4px solid #ffb800;
+  border-radius: 6px;
+  padding: 30px 28px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 184, 0, 0.12);
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.calibration-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #ffb800;
+  letter-spacing: 0.08em;
+}
+
+.pulse-dot-amber {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffb800;
+  box-shadow: 0 0 8px #ffb800;
+  animation: pulseDotAmber 2s infinite ease-in-out;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+@keyframes pulseDotAmber {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.calibration-title {
+  font-family: var(--font-tech);
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.calibration-desc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #c4d7ec;
+  max-width: 860px;
+  margin: 0;
+}
+
+.calibration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  background: rgba(5, 9, 16, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 16px 20px;
+  margin: 4px 0;
+}
+
+.calib-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.calib-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.calib-val {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: #e6f1ff;
+  font-weight: 600;
+}
+
+.calibration-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.nav-badge-soon {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: #ffb800;
+  background: rgba(255, 184, 0, 0.15);
+  border: 1px solid rgba(255, 184, 0, 0.4);
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-left: 6px;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+}
+
+.badge-calibrating {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: #ffb800;
+  background: rgba(255, 184, 0, 0.2);
+  border: 1px solid rgba(255, 184, 0, 0.4);
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-left: 6px;
+  font-weight: 700;
+  vertical-align: middle;
+}

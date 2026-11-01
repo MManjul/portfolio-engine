@@ -27,9 +27,9 @@
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="styles/main.css?v=1.1.0">
-  <link rel="stylesheet" href="styles/hud-theme.css?v=2.2.0">
+  <link rel="stylesheet" href="styles/hud-theme.css?v=2.3.0">
   <link rel="stylesheet" href="styles/components.css?v=1.1.0">
-  <link rel="stylesheet" href="styles/mobile.css?v=2.2.0" media="(max-width: 768px)">
+  <link rel="stylesheet" href="styles/mobile.css?v=2.3.0" media="(max-width: 768px)">
 </head>
 <body class="theme-unreal-cyan">
   <!-- Scanline & Ambient Grid Overlay -->
@@ -117,7 +117,7 @@
       </a>
       <a href="#sandbox" class="nav-item" data-nav="sandbox">
         <span class="nav-index">03</span>
-        <span class="nav-label">GAMEPLAY_SANDBOX</span>
+        <span class="nav-label">PLAYGROUND <span class="nav-badge-soon">SOON</span></span>
       </a>
       <a href="#projects" class="nav-item" data-nav="projects">
         <span class="nav-index">04</span>
@@ -195,7 +195,7 @@
           <div class="hero-actions">
             <a href="#sandbox" class="btn hud-btn primary">
               <span class="btn-glow"></span>
-              <span class="btn-text">LAUNCH GAMEPLAY SANDBOX</span>
+              <span class="btn-text">GAMEPLAY PLAYGROUND <span class="badge-calibrating">SOON</span></span>
               <span class="btn-chevron">▶</span>
             </a>
             <a id="hero-download-resume-btn" href="https://drive.google.com/file/d/1rQcI8EHY2sCMNXN2j-Doxnb8eUOrDM6y/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="btn hud-btn highlight-download" title="Open Official Resume PDF via Google Drive">
@@ -495,6 +495,41 @@
           <h2 class="section-title">INTERACTIVE GAMEPLAY SIMULATOR &amp; PHYSICS ENGINE</h2>
           <div class="section-line"></div>
           <p class="section-desc">Real-time low-level runtime simulator demonstrating Hydrodynamics &amp; Wave Buoyancy (<em>Dhoom 3 Jet Speed</em>), Cricket Ballistics (<em>Sachin Saga</em>), Server Replication with Client Prediction, and Articulated Verlet Ragdolls.</p>
+        </div>
+
+        <!-- Playground Subsystem Calibration Card (Active while playground is offline) -->
+        <div class="playground-calibration-card">
+          <div class="calibration-badge">
+            <span class="pulse-dot-amber"></span>
+            <span>SUBSYSTEM CALIBRATION IN PROGRESS // TEMPORARILY OFFLINE</span>
+          </div>
+          <h3 class="calibration-title">PHYSICS ENGINE &amp; GAMEPLAY PLAYGROUND</h3>
+          <p class="calibration-desc">
+            The real-time interactive physics engine (Hydrodynamics Wave Buoyancy, 150+ km/h Cricket Ballistics, and Server Replication with Client Prediction) is currently undergoing low-level architecture upgrades, multi-threaded ECS refactoring, and GPU performance profiling for an upcoming release.
+          </p>
+          <div class="calibration-grid">
+            <div class="calib-item">
+              <span class="calib-label">CORE ARCHITECTURE:</span>
+              <span class="calib-val">Unreal Engine 5 / Modern C++ / Box2D Physics Harness</span>
+            </div>
+            <div class="calib-item">
+              <span class="calib-label">CURRENT PIPELINE:</span>
+              <span class="calib-val">Multi-threaded Job System &amp; Shader Calibration</span>
+            </div>
+            <div class="calib-item">
+              <span class="calib-label">SUBSYSTEM STATUS:</span>
+              <span class="calib-val text-amber">COMING SOON // NEXT ENGINE RELEASE</span>
+            </div>
+          </div>
+          <div class="calibration-actions">
+            <a href="#projects" class="btn hud-btn primary">
+              <span class="btn-text">INSPECT SHIPPED TITLES &amp; ARCHITECTURE</span>
+              <span class="btn-chevron">▶</span>
+            </a>
+            <a href="#statetree" class="btn hud-btn secondary">
+              <span class="btn-text">EXPLORE STATETREE NODE GRAPH</span>
+            </a>
+          </div>
         </div>
 
         <div class="sandbox-container">
@@ -1848,7 +1883,7 @@
   <script src="scripts/background-canvas.js?v=1.1.0"></script>
   <script src="scripts/physics-sandbox.js?v=1.1.0"></script>
   <script src="scripts/statetree-visualizer.js?v=1.1.0"></script>
-  <script src="scripts/main.js?v=2.2.0"></script>
-  <script src="scripts/mobile.js?v=2.2.0"></script>
+  <script src="scripts/main.js?v=2.3.0"></script>
+  <script src="scripts/mobile.js?v=2.3.0"></script>
 </body>
 </html>

@@ -1572,6 +1572,10 @@ class PhysicsSandboxEngine {
      MAIN SIMULATION LOOP
      ========================================================================== */
   loop(currentTime) {
+    if (!this.canvas || this.canvas.offsetParent === null) {
+      requestAnimationFrame(this.loop);
+      return;
+    }
     const delta = (currentTime - this.lastTime) / 1000;
     this.lastTime = currentTime;
 

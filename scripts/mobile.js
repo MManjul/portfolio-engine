@@ -114,43 +114,6 @@ function initMobileDeck() {
 }
 
 function initMobileBanners() {
-  const sandboxSec = document.getElementById('sandbox');
-  if (sandboxSec) {
-    const container = sandboxSec.querySelector('.section-container');
-    if (container && !container.querySelector('.mobile-playground-coming-soon')) {
-      const comingSoon = document.createElement('div');
-      comingSoon.className = 'mobile-playground-coming-soon';
-      comingSoon.innerHTML = `
-        <div class="coming-soon-badge">◈ CALIBRATING RUNTIME // MOBILE OPTIMIZATION ACTIVE</div>
-        <h3 class="coming-soon-title">PLAYGROUND OPTIMIZATION IN PROGRESS</h3>
-        <p class="coming-soon-desc">
-          The interactive Box2D / UE5 physics simulation (Hydrodynamic buoyancy, ballistics drag equations, client-side prediction, and articulated ragdolls) is currently undergoing GPU shader profiling & touch-gesture calibration for mobile devices.
-        </p>
-        
-        <div class="coming-soon-card">
-          <div class="cs-card-icon">🖥️</div>
-          <div class="cs-card-content">
-            <strong>EXPERIENCE THE FULL ENGINE ON PC</strong>
-            <p>For live unthrottled 60 FPS physics simulation, real-time waveform slider tuning, and network telemetry graphs, kindly access Mayank's portfolio on a <strong>Desktop PC browser</strong>.</p>
-          </div>
-        </div>
-
-        <div class="coming-soon-specs">
-          <div class="spec-chip"><span>SUBSYSTEM:</span> 03 // PLAYGROUND</div>
-          <div class="spec-chip"><span>MOBILE STATUS:</span> OPTIMIZING TOUCH HARNESS</div>
-          <div class="spec-chip"><span>DESKTOP RUNTIME:</span> 100% OPERATIONAL (SHIPPING)</div>
-        </div>
-      `;
-
-      const heading = container.querySelector('.section-heading');
-      if (heading && heading.nextSibling) {
-        container.insertBefore(comingSoon, heading.nextSibling);
-      } else {
-        container.appendChild(comingSoon);
-      }
-    }
-  }
-
   const statetreeSec = document.getElementById('statetree');
   if (statetreeSec) {
     const container = statetreeSec.querySelector('.section-container');
