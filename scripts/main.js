@@ -628,7 +628,13 @@ const projectData = {
     role: 'Lead Game Developer (Unity / Apple Arcade)',
     timeline: 'January 2023 - May 2024',
     stack: 'Apple Arcade, Unity 3D, tvOS, macOS, iOS, iPadOS, MFi/Bluetooth Controllers, CloudKit, Game Center, WebSockets',
-    image: '',
+    image: 'assets/images/hanx-trivia/hanx-banner.webp',
+    screenshots: [
+      'assets/images/hanx-trivia/hanx-banner.webp',
+      'assets/images/hanx-trivia/hanx-map-progress.webp',
+      'assets/images/hanx-trivia/hanx-gameplay.webp',
+      'assets/images/hanx-trivia/hanx-promo.webp'
+    ],
     trailerUrl: 'https://www.youtube.com/watch?v=-1Wb6gzZYFw',
     content: `
       <h4>Apple Arcade Multi-Device Ecosystem Architecture:</h4>

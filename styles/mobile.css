@@ -522,7 +522,13 @@
     -webkit-overflow-scrolling: touch !important;
     position: relative !important;
     max-width: 100% !important;
-    background: radial-gradient(circle at 50% 50%, #0e1a2c 0%, #06090e 100%) !important;
+    background-color: #11141a !important;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px) !important;
+    background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px !important;
   }
 
   .node-graph-svg {

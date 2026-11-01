@@ -27,9 +27,9 @@
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="styles/main.css?v=1.1.0">
-  <link rel="stylesheet" href="styles/hud-theme.css?v=2.4.0">
+  <link rel="stylesheet" href="styles/hud-theme.css?v=2.5.0">
   <link rel="stylesheet" href="styles/components.css?v=1.1.0">
-  <link rel="stylesheet" href="styles/mobile.css?v=2.4.0" media="(max-width: 768px)">
+  <link rel="stylesheet" href="styles/mobile.css?v=2.5.0" media="(max-width: 768px)">
 </head>
 <body class="theme-unreal-cyan">
   <!-- Scanline & Ambient Grid Overlay -->
@@ -887,8 +887,8 @@
             <div class="card-glow-edge"></div>
             
             <!-- Optional Project Media Preview -->
-            <div class="card-media-banner" data-media-for="hanx-trivia" style="display: none;">
-              <img src="" alt="Hanx Trivia Apple Arcade Visual" class="project-banner-img" loading="lazy">
+            <div class="card-media-banner" data-media-for="hanx-trivia">
+              <img src="assets/images/hanx-trivia/hanx-banner.webp" alt="Hanx Trivia Apple Arcade Visual" class="project-banner-img" loading="lazy">
               <div class="media-overlay-scanline"></div>
             </div>
 
@@ -943,7 +943,7 @@
                 <span>INSPECT TECHNICAL SPEC</span>
                 <span class="arrow">→</span>
               </button>
-              <a class="btn-card-trailer" data-trailer-for="hanx-trivia" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">
+              <a class="btn-card-trailer" data-trailer-for="hanx-trivia" href="https://www.youtube.com/watch?v=-1Wb6gzZYFw" target="_blank" rel="noopener noreferrer">
                 <span class="trailer-icon">▶</span>
                 <span>WATCH TRAILER</span>
               </a>
@@ -1167,6 +1167,14 @@
           <div class="node-graph-viewport">
             <svg id="statetree-svg" class="node-graph-svg" viewBox="0 0 1000 520" preserveAspectRatio="xMidYMid meet">
               <defs>
+                <!-- UE5 Editor Graph Dual-Grid Pattern -->
+                <pattern id="ue5-grid-small" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255, 255, 255, 0.04)" stroke-width="1" />
+                </pattern>
+                <pattern id="ue5-grid-large" width="100" height="100" patternUnits="userSpaceOnUse">
+                  <rect width="100" height="100" fill="url(#ue5-grid-small)" />
+                  <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1.2" />
+                </pattern>
                 <linearGradient id="wire-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stop-color="#00f2fe" />
                   <stop offset="100%" stop-color="#4facfe" />
@@ -1179,6 +1187,10 @@
                   </feMerge>
                 </filter>
               </defs>
+
+              <!-- UE5 Graph Canvas Background Grid -->
+              <rect width="100%" height="100%" fill="#11141a" />
+              <rect width="100%" height="100%" fill="url(#ue5-grid-large)" />
 
               <!-- Connection Bezier Cables -->
               <g class="graph-cables">
@@ -1198,7 +1210,7 @@
               <!-- Node: Root StateTree -->
               <g class="graph-node-group" id="node-root" transform="translate(40, 180)">
                 <rect class="node-rect root" width="180" height="90" rx="6" />
-                <rect class="node-header root" width="180" height="24" rx="6" />
+                <rect class="node-header header-root" width="180" height="24" rx="6" />
                 <text class="node-title" x="12" y="17">Root StateTree</text>
                 <text class="node-body-line" x="12" y="45">Context: UECricketBatsman</text>
                 <text class="node-body-line text-cyan" x="12" y="65">Tick Group: TG_PrePhysics</text>
@@ -1208,7 +1220,7 @@
               <!-- Node: Locomotion State (Crease & Stance) -->
               <g class="graph-node-group active-node" id="node-locomotion" transform="translate(420, 90)">
                 <rect class="node-rect" width="200" height="110" rx="6" />
-                <rect class="node-header" width="200" height="24" rx="6" />
+                <rect class="node-header header-loco" width="200" height="24" rx="6" />
                 <text class="node-title" x="12" y="17">State: CreaseLocomotion</text>
                 <circle class="pin in" cx="0" cy="50" r="5" />
                 <text class="node-body-line" x="12" y="45">Tag: State.Locomotion.Crease</text>
@@ -1221,7 +1233,7 @@
               <!-- Sub-Node: Batting Stance State -->
               <g class="graph-node-group active-node" id="node-idle" transform="translate(780, 30)">
                 <rect class="node-rect" width="180" height="80" rx="6" />
-                <rect class="node-header" width="180" height="22" rx="6" />
+                <rect class="node-header header-stance" width="180" height="22" rx="6" />
                 <text class="node-title" x="10" y="16">SubState: CreaseStance</text>
                 <circle class="pin in" cx="0" cy="40" r="5" />
                 <text class="node-body-line" x="10" y="44">Speed &lt;= 0.1 m/s (Tapping)</text>
@@ -1231,7 +1243,7 @@
               <!-- Sub-Node: Sprint Between Wickets State -->
               <g class="graph-node-group" id="node-sprint" transform="translate(780, 130)">
                 <rect class="node-rect" width="180" height="80" rx="6" />
-                <rect class="node-header" width="180" height="22" rx="6" />
+                <rect class="node-header header-sprint" width="180" height="22" rx="6" />
                 <text class="node-title" x="10" y="16">SubState: SprintRun</text>
                 <circle class="pin in" cx="0" cy="40" r="5" />
                 <text class="node-body-line" x="10" y="44">Tag: Locomotion.SprintWickets</text>
@@ -1241,7 +1253,7 @@
               <!-- Node: Stroke Execution State -->
               <g class="graph-node-group" id="node-abilities" transform="translate(420, 290)">
                 <rect class="node-rect" width="200" height="110" rx="6" />
-                <rect class="node-header" width="200" height="24" rx="6" />
+                <rect class="node-header header-action" width="200" height="24" rx="6" />
                 <text class="node-title" x="12" y="17">State: BattingStrokeExecution</text>
                 <circle class="pin in" cx="0" cy="50" r="5" />
                 <text class="node-body-line" x="12" y="45">Tag: Action.Batting.Stroke</text>
@@ -1254,7 +1266,7 @@
               <!-- Sub-Node: Stroke Play (Power Drive) -->
               <g class="graph-node-group" id="node-dodge" transform="translate(780, 240)">
                 <rect class="node-rect" width="180" height="80" rx="6" />
-                <rect class="node-header" width="180" height="22" rx="6" />
+                <rect class="node-header header-stroke" width="180" height="22" rx="6" />
                 <text class="node-title" x="10" y="16">SubState: CoverDrive</text>
                 <circle class="pin in" cx="0" cy="40" r="5" />
                 <text class="node-body-line" x="10" y="44">Tag: Stroke.CoverDrive</text>
@@ -1264,7 +1276,7 @@
               <!-- Sub-Node: Defensive Block -->
               <g class="graph-node-group" id="node-abilitycast" transform="translate(780, 350)">
                 <rect class="node-rect" width="180" height="80" rx="6" />
-                <rect class="node-header" width="180" height="22" rx="6" />
+                <rect class="node-header header-defense" width="180" height="22" rx="6" />
                 <text class="node-title" x="10" y="16">SubState: DefensiveBlock</text>
                 <circle class="pin in" cx="0" cy="40" r="5" />
                 <text class="node-body-line" x="10" y="44">Tag: Defensive.SoftHands</text>
@@ -1879,11 +1891,11 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="scripts/sound-fx.js?v=2.2.0"></script>
+  <script src="scripts/sound-fx.js?v=2.5.0"></script>
   <script src="scripts/background-canvas.js?v=1.1.0"></script>
   <script src="scripts/physics-sandbox.js?v=1.1.0"></script>
-  <script src="scripts/statetree-visualizer.js?v=2.4.0"></script>
-  <script src="scripts/main.js?v=2.4.0"></script>
-  <script src="scripts/mobile.js?v=2.4.0"></script>
+  <script src="scripts/statetree-visualizer.js?v=2.5.0"></script>
+  <script src="scripts/main.js?v=2.5.0"></script>
+  <script src="scripts/mobile.js?v=2.5.0"></script>
 </body>
 </html>
