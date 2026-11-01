@@ -640,6 +640,10 @@ body.theme-crimson-red {
   padding: 0;
   cursor: pointer;
   transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .indicator-dot:hover {
@@ -648,10 +652,29 @@ body.theme-crimson-red {
 }
 
 .indicator-dot.active {
-  width: 22px;
+  width: 24px;
+  height: 11px;
   border-radius: 5px;
   background: var(--accent-emerald);
   box-shadow: 0 0 10px var(--accent-emerald);
+}
+
+/* Pause indicator symbol on active dot when mouse is hovering the carousel */
+.hud-panel-frame.is-paused .indicator-dot.active {
+  background: var(--accent-emerald);
+  box-shadow: 0 0 12px rgba(0, 240, 144, 0.9);
+  cursor: default;
+}
+
+.hud-panel-frame.is-paused .indicator-dot.active::before,
+.hud-panel-frame.is-paused .indicator-dot.active::after {
+  content: '';
+  display: inline-block;
+  width: 2.5px;
+  height: 6.5px;
+  background: #070a0f;
+  border-radius: 0.5px;
+  margin: 0 1px;
 }
 
 /* Tactical Carousel Slides & Viewport */

@@ -196,7 +196,13 @@ function initTacticalCarousel() {
     });
 
     indicatorDots.forEach((dot, idx) => {
-      dot.classList.toggle('active', idx === currentSlide);
+      const isActive = (idx === currentSlide);
+      dot.classList.toggle('active', isActive);
+      if (isActive) {
+        dot.setAttribute('title', isHovered ? 'PAUSED [HOVERING] - Release cursor to resume' : `Slide ${idx + 1} (Active)`);
+      } else {
+        dot.setAttribute('title', `Navigate to Slide ${idx + 1}`);
+      }
     });
 
     const activeSlide = slides[currentSlide];
@@ -236,20 +242,45 @@ function initTacticalCarousel() {
     });
   });
 
-  // Auto rotation every 7s with pause on hover
+  let isHovered = false;
+
+  // Auto rotation every 7s with pause and visual indicator on hover
   function startAutoTimer() {
+    clearInterval(autoTimer);
+    if (isHovered) return;
     autoTimer = setInterval(() => {
-      showSlide(currentSlide + 1);
+      if (!isHovered) {
+        showSlide(currentSlide + 1);
+      }
     }, 7000);
   }
 
   function resetAutoTimer() {
     clearInterval(autoTimer);
+    if (!isHovered) {
+      startAutoTimer();
+    }
+  }
+
+  function pauseAutoTimer() {
+    isHovered = true;
+    clearInterval(autoTimer);
+    autoTimer = null;
+    frame.classList.add('is-paused');
+    const activeDot = document.querySelector('#carousel-indicators .indicator-dot.active');
+    if (activeDot) activeDot.setAttribute('title', 'PAUSED [HOVERING] - Release cursor to resume auto-cycle');
+  }
+
+  function resumeAutoTimer() {
+    isHovered = false;
+    frame.classList.remove('is-paused');
+    const activeDot = document.querySelector('#carousel-indicators .indicator-dot.active');
+    if (activeDot) activeDot.setAttribute('title', `Slide ${currentSlide + 1} (Active)`);
     startAutoTimer();
   }
 
-  frame.addEventListener('mouseenter', () => clearInterval(autoTimer));
-  frame.addEventListener('mouseleave', () => startAutoTimer());
+  frame.addEventListener('mouseenter', pauseAutoTimer);
+  frame.addEventListener('mouseleave', resumeAutoTimer);
 
   startAutoTimer();
 
