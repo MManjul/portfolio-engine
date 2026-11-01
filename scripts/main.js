@@ -612,7 +612,7 @@ const projectData = {
     timeline: 'February 2014 - January 2016',
     stack: 'Unity 3D, C#, Hydrodynamics, PhysX, Mobile Optimization',
     image: '',
-    trailerUrl: '',
+    trailerUrl: 'https://www.youtube.com/watch?v=yPFqbdfkBu4',
     content: `
       <h4>Hydrodynamics &amp; Arcade Racing Mechanics:</h4>
       <p>Engineered buoyant surface physics and high-speed jet-ski drifting for the official Bollywood blockbuster video game adaptation.</p>
