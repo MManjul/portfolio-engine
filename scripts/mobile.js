@@ -18,7 +18,7 @@ function initMobileDeck() {
   const sectionMeta = {
     'hero': { index: '01', title: 'COMMAND_CENTER' },
     'about': { index: '02', title: 'ARCHITECT_PROFILE' },
-    'sandbox': { index: '03', title: 'GAMEPLAY_SANDBOX' },
+    'sandbox': { index: '03', title: 'PLAYGROUND', badge: 'COMING SOON' },
     'projects': { index: '04', title: 'TITLES_&_SYSTEMS' },
     'statetree': { index: '05', title: 'STATETREE_NODE_GRAPH' },
     'experience': { index: '06', title: 'CAREER_XP_LOG' },
@@ -43,10 +43,13 @@ function initMobileDeck() {
       sec.classList.add('mobile-collapsed');
     }
 
+    const badgeHtml = meta.badge ? `<span class="deck-badge-offline">${meta.badge}</span>` : '';
+
     btn.innerHTML = `
       <div class="deck-header-left">
         <span class="deck-header-index">${meta.index}</span>
         <span class="deck-header-title">${meta.title}</span>
+        ${badgeHtml}
       </div>
       <span class="deck-header-chevron">${isHero ? '▴' : '▾'}</span>
     `;
@@ -114,17 +117,37 @@ function initMobileBanners() {
   const sandboxSec = document.getElementById('sandbox');
   if (sandboxSec) {
     const container = sandboxSec.querySelector('.section-container');
-    if (container && !container.querySelector('.mobile-demo-notice')) {
-      const notice = document.createElement('div');
-      notice.className = 'mobile-demo-notice';
-      notice.innerHTML = `
-        <span class="notice-icon">🖥️</span>
-        <div class="notice-text">
-          <strong>DESKTOP BENCHMARK RECOMMENDED</strong>
-          Physics simulation & low-level telemetry run with full multi-threaded performance on PC desktop browsers.
+    if (container && !container.querySelector('.mobile-playground-coming-soon')) {
+      const comingSoon = document.createElement('div');
+      comingSoon.className = 'mobile-playground-coming-soon';
+      comingSoon.innerHTML = `
+        <div class="coming-soon-badge">◈ CALIBRATING RUNTIME // MOBILE OPTIMIZATION ACTIVE</div>
+        <h3 class="coming-soon-title">PLAYGROUND OPTIMIZATION IN PROGRESS</h3>
+        <p class="coming-soon-desc">
+          The interactive Box2D / UE5 physics simulation (Hydrodynamic buoyancy, ballistics drag equations, client-side prediction, and articulated ragdolls) is currently undergoing GPU shader profiling & touch-gesture calibration for mobile devices.
+        </p>
+        
+        <div class="coming-soon-card">
+          <div class="cs-card-icon">🖥️</div>
+          <div class="cs-card-content">
+            <strong>EXPERIENCE THE FULL ENGINE ON PC</strong>
+            <p>For live unthrottled 60 FPS physics simulation, real-time waveform slider tuning, and network telemetry graphs, kindly access Mayank's portfolio on a <strong>Desktop PC browser</strong>.</p>
+          </div>
+        </div>
+
+        <div class="coming-soon-specs">
+          <div class="spec-chip"><span>SUBSYSTEM:</span> 03 // PLAYGROUND</div>
+          <div class="spec-chip"><span>MOBILE STATUS:</span> OPTIMIZING TOUCH HARNESS</div>
+          <div class="spec-chip"><span>DESKTOP RUNTIME:</span> 100% OPERATIONAL (SHIPPING)</div>
         </div>
       `;
-      container.insertBefore(notice, container.firstChild);
+
+      const heading = container.querySelector('.section-heading');
+      if (heading && heading.nextSibling) {
+        container.insertBefore(comingSoon, heading.nextSibling);
+      } else {
+        container.appendChild(comingSoon);
+      }
     }
   }
 
