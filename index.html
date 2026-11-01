@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="styles/main.css?v=1.1.0">
   <link rel="stylesheet" href="styles/hud-theme.css?v=1.1.0">
   <link rel="stylesheet" href="styles/components.css?v=1.1.0">
+  <link rel="stylesheet" href="styles/mobile.css?v=2.0.0" media="(max-width: 768px)">
 </head>
 <body class="theme-unreal-cyan">
   <!-- Scanline & Ambient Grid Overlay -->
@@ -99,34 +100,11 @@
         </div>
       </div>
 
-      <!-- Quick Dev Terminal Trigger -->
-      <button id="btn-open-terminal" class="hud-control-btn btn-terminal-pill" title="Toggle Developer Terminal [~]">
-        <span class="btn-icon">⌨</span>
-        <span class="btn-text">CONSOLE <kbd>~</kbd></span>
-      </button>
+
     </div>
   </header>
 
-  <!-- Interactive Terminal Overlay (Quake / UE5 Editor Style Console) -->
-  <section id="dev-terminal" class="terminal-drawer" aria-label="Developer Console" style="display: none;" hidden>
-    <div class="terminal-header">
-      <div class="terminal-title">
-        <span class="terminal-icon">❯_</span>
-        <span>MAYANK_MANJUL // IN-ENGINE COMMAND CONSOLE (Type 'help' for commands)</span>
-      </div>
-      <button type="button" id="btn-close-terminal" class="terminal-close-btn" aria-label="Close Terminal">✕</button>
-    </div>
-    <div class="terminal-body" id="terminal-output">
-      <div class="terminal-line system">Antigravity Runtime v5.4.4 Initialized. Type <span class="cmd-highlight">help</span> to view available debugger commands.</div>
-      <div class="terminal-line hint">Quick shortcuts: <span class="cmd-highlight">skills</span> | <span class="cmd-highlight">projects</span> | <span class="cmd-highlight">experience</span> | <span class="cmd-highlight">contact</span> | <span class="cmd-highlight">statetree</span></div>
-    </div>
-    <div class="terminal-input-bar">
-      <span class="terminal-prompt">cmd&gt;</span>
-      <input type="text" id="terminal-input" placeholder="Enter command (e.g. 'help', 'skills', 'benchmark', 'clear')..." autocomplete="off" spellcheck="false">
-    </div>
-  </section>
-
-  <!-- Navigation Bar (HUD Deck) -->
+<!-- Navigation Bar (HUD Deck) -->
   <nav class="hud-nav" role="navigation" aria-label="Primary Navigation">
     <div class="nav-container">
       <a href="#hero" class="nav-item active" data-nav="hero">
@@ -1856,7 +1834,7 @@
       <span>MAYANK MANJUL // PRINCIPAL GAMEPLAY ENGINEER</span>
     </div>
     <div class="bottom-center hide-mobile">
-      <span>SHORTCUTS: <kbd>~</kbd> Console | <kbd>Space</kbd> Sim Action | <kbd>Esc</kbd> Close Windows</span>
+      <span>SHORTCUTS: <kbd>Space</kbd> Sim Action | <kbd>Esc</kbd> Close Windows</span>
     </div>
     <div class="bottom-right">
       <span>FOUNDER: UNITY DEVELOPERS INDIA</span>
@@ -1870,7 +1848,7 @@
   <script src="scripts/background-canvas.js?v=1.1.0"></script>
   <script src="scripts/physics-sandbox.js?v=1.1.0"></script>
   <script src="scripts/statetree-visualizer.js?v=1.1.0"></script>
-  <script src="scripts/terminal.js?v=1.1.0"></script>
   <script src="scripts/main.js?v=1.1.0"></script>
+  <script src="scripts/mobile.js?v=2.0.0"></script>
 </body>
 </html>

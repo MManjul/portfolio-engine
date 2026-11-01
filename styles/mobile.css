@@ -1,0 +1,544 @@
+/* ==========================================================================
+   MAYANK MANJUL PORTFOLIO - MOBILE DEDICATED STYLESHEET
+   Active strictly on viewports <= 768px (Phones and compact tablets)
+   Desktop / PC mode is 100% isolated and never loads these rules.
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* 1. Global Viewport & Reset */
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    position: relative !important;
+    -webkit-overflow-scrolling: touch !important;
+    background: #070a0f !important;
+    padding-top: 56px !important;
+    padding-bottom: 34px !important;
+  }
+
+  /* 2. Eliminate Dark Screen Overlays & Heavy GPU Canvas on Mobile */
+  .hud-scanlines,
+  .hud-vignette {
+    display: none !important;
+  }
+
+  .background-canvas,
+  #bg-canvas {
+    display: none !important;
+  }
+
+  .hide-mobile {
+    display: none !important;
+  }
+
+  /* 3. Top Engine Bar: Single Line Header (No Cutoff, No 3-Line Wrap) */
+  .engine-top-bar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 48px !important;
+    background: rgba(7, 10, 15, 0.98) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 12px !important;
+    z-index: 100 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .engine-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    flex-shrink: 0 !important;
+  }
+
+  .engine-brand .highlight,
+  .engine-brand .build-badge {
+    display: none !important;
+  }
+
+  .telemetry-group.left {
+    gap: 6px !important;
+  }
+
+  .telemetry-group.right {
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .telemetry-pill.live-indicator,
+  .telemetry-group.right .telemetry-pill {
+    display: none !important;
+  }
+
+  .hud-control-btn {
+    padding: 6px 9px !important;
+    font-size: 0.85rem !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .btn-terminal-pill {
+    display: none !important;
+  }
+
+  /* 4. Hide Desktop Top Nav on Mobile (Accordion Deck replaces it) */
+  .hud-nav {
+    display: none !important;
+  }
+
+  /* 5. Mobile In-Page Accordion Deck Styling */
+  .hud-section {
+    padding: 0 !important;
+    border-bottom: 1px solid rgba(0, 242, 254, 0.18) !important;
+  }
+
+  .mobile-deck-header {
+    scroll-margin-top: 50px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    min-height: 52px !important;
+    padding: 0 16px !important;
+    background: rgba(12, 18, 30, 0.96) !important;
+    border: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5) !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-tech) !important;
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    cursor: pointer !important;
+    text-align: left !important;
+    transition: background 0.15s ease !important;
+    -webkit-tap-highlight-color: transparent !important;
+    user-select: none !important;
+    box-sizing: border-box !important;
+  }
+
+  .mobile-deck-header .deck-header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  .mobile-deck-header .deck-header-index {
+    font-family: var(--font-mono) !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    color: var(--theme-accent) !important;
+    background: rgba(var(--theme-accent-rgb), 0.14) !important;
+    border: 1px solid rgba(var(--theme-accent-rgb), 0.35) !important;
+    padding: 2px 7px !important;
+    border-radius: 3px !important;
+  }
+
+  .mobile-deck-header .deck-header-title {
+    color: #e6f1ff !important;
+  }
+
+  .mobile-deck-header .deck-header-chevron {
+    font-size: 1.15rem !important;
+    color: var(--theme-accent) !important;
+  }
+
+  .mobile-deck-header:active {
+    background: rgba(18, 28, 48, 0.98) !important;
+  }
+
+  .mobile-deck-header.active {
+    background: linear-gradient(90deg, rgba(var(--theme-accent-rgb), 0.2) 0%, rgba(10, 16, 26, 0.98) 100%) !important;
+    border-left: 4px solid var(--theme-accent) !important;
+  }
+
+  .mobile-deck-header.active .deck-header-title {
+    color: var(--theme-accent) !important;
+    text-shadow: 0 0 10px rgba(var(--theme-accent-rgb), 0.4) !important;
+  }
+
+  /* Content area inside sections on mobile */
+  .hud-section.mobile-collapsed > .section-container,
+  .hud-section.mobile-collapsed > .section-heading,
+  .hud-section.mobile-collapsed > .sandbox-container,
+  .hud-section.mobile-collapsed > .statetree-editor-window,
+  .hud-section.mobile-collapsed > .manifesto-grid,
+  .hud-section.mobile-collapsed > .projects-grid,
+  .hud-section.mobile-collapsed > .timeline-xp-wrapper,
+  .hud-section.mobile-collapsed > .arsenal-grid,
+  .hud-section.mobile-collapsed > .contact-deck-grid,
+  .hud-section.mobile-collapsed > .hud-platform-banner {
+    display: none !important;
+  }
+
+  .hud-section:not(.mobile-collapsed) > .section-container {
+    padding: 24px 14px 36px 14px !important;
+    display: block !important;
+    animation: hudFadeIn 0.25s ease-out !important;
+  }
+
+  /* 6. Section 01: Hero Content */
+  .hero-section:not(.mobile-collapsed) {
+    min-height: auto !important;
+    display: block !important;
+  }
+
+  .hero-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 24px !important;
+  }
+
+  .hero-name {
+    font-size: clamp(2.1rem, 8.5vw, 3.2rem) !important;
+    margin-bottom: 12px !important;
+    line-height: 1.05 !important;
+  }
+
+  .hero-tagline {
+    font-size: 1.1rem !important;
+    line-height: 1.4 !important;
+    margin-bottom: 14px !important;
+  }
+
+  .hero-bio {
+    font-size: 0.96rem !important;
+    line-height: 1.55 !important;
+    margin-bottom: 20px !important;
+  }
+
+  .quick-metrics-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 22px !important;
+  }
+
+  .metric-card {
+    padding: 10px 12px !important;
+  }
+
+  .metric-value {
+    font-size: 1.45rem !important;
+  }
+
+  .hero-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+
+  .hero-actions .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 12px 14px !important;
+    font-size: 0.88rem !important;
+  }
+
+  .hero-tactical-viewport,
+  .hud-panel-frame {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .avatar-photo-frame {
+    width: 82px !important;
+    height: 82px !important;
+  }
+
+  .avatar-ring-outer {
+    width: 104px !important;
+    height: 104px !important;
+  }
+
+  .avatar-ring-inner {
+    width: 92px !important;
+    height: 92px !important;
+  }
+
+  /* 7. Section 02: Manifesto */
+  .manifesto-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+
+  .pillar-card {
+    padding: 14px 16px !important;
+    gap: 14px !important;
+  }
+
+  /* Mobile Demo Notice / Warning Banner */
+  .mobile-demo-notice {
+    background: rgba(0, 242, 254, 0.08) !important;
+    border: 1px solid rgba(0, 242, 254, 0.3) !important;
+    border-left: 4px solid var(--theme-accent) !important;
+    padding: 10px 14px !important;
+    border-radius: 4px !important;
+    margin-bottom: 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    font-size: 0.78rem !important;
+    line-height: 1.4 !important;
+    color: #c4d7ec !important;
+  }
+
+  .mobile-demo-notice .notice-icon {
+    font-size: 1.3rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .mobile-demo-notice strong {
+    color: var(--theme-accent) !important;
+    display: block !important;
+    margin-bottom: 2px !important;
+    font-family: var(--font-tech) !important;
+    letter-spacing: 0.05em !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* 8. Section 03: Physics Sandbox */
+  #physics-canvas {
+    touch-action: pan-y !important;
+  }
+
+  .sandbox-controls-deck {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 12px !important;
+  }
+
+  #ctrl-group-buoyancy-freq,
+  #ctrl-group-cricket-length,
+  #ctrl-group-cricket-line,
+  #ctrl-group-cricket-speed,
+  #netcode-delay-box,
+  #netcode-loss-box {
+    display: none !important;
+  }
+
+  .sandbox-telemetry-strip {
+    display: none !important;
+  }
+
+  .control-actions {
+    display: flex !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .control-actions .btn {
+    flex: 1 !important;
+    padding: 12px 10px !important;
+    font-size: 0.82rem !important;
+  }
+
+  /* 9. Section 04: Projects Grid */
+  .filter-controls {
+    display: flex !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    flex-wrap: nowrap !important;
+    padding-bottom: 6px !important;
+    margin-bottom: 18px !important;
+    gap: 8px !important;
+  }
+
+  .filter-controls::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .filter-btn {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    font-size: 0.74rem !important;
+    padding: 6px 12px !important;
+  }
+
+  .projects-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 18px !important;
+  }
+
+  .project-card {
+    padding: 16px 14px !important;
+  }
+
+  .card-media-banner {
+    height: 185px !important;
+  }
+
+  .card-actions-row {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .card-actions-row .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* 10. Section 05: StateTree Node Graph */
+  .editor-toolbar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    padding: 10px 12px !important;
+  }
+
+  .editor-file-info {
+    font-size: 0.68rem !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .editor-actions {
+    display: flex !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    width: 100% !important;
+    gap: 6px !important;
+    padding-bottom: 4px !important;
+  }
+
+  .editor-actions::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .node-state-btn {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    font-size: 0.72rem !important;
+    padding: 5px 10px !important;
+  }
+
+  .node-graph-viewport {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    position: relative !important;
+    max-width: 100% !important;
+    background: radial-gradient(circle at 50% 50%, #0e1a2c 0%, #06090e 100%) !important;
+  }
+
+  .node-graph-svg {
+    width: 960px !important;
+    min-width: 960px !important;
+    height: 460px !important;
+    display: block !important;
+  }
+
+  /* 11. Section 06: Experience Timeline */
+  .xp-event-card {
+    grid-template-columns: 1fr !important;
+    padding: 16px 14px !important;
+    gap: 10px !important;
+  }
+
+  .timeline-xp-wrapper::before {
+    display: none !important;
+  }
+
+  /* 12. Section 07: Arsenal / Skills */
+  .arsenal-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .arsenal-card {
+    padding: 16px 14px !important;
+  }
+
+  /* 13. Section 08: Contact */
+  .contact-deck-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .contact-info-panel,
+  .contact-form-panel {
+    padding: 16px 14px !important;
+  }
+
+  /* 14. Bottom Bar */
+  .engine-bottom-bar {
+    padding: 0 10px !important;
+    height: 32px !important;
+    font-size: 0.65rem !important;
+  }
+
+  .bottom-center,
+  .bottom-right {
+    display: none !important;
+  }
+
+  .bottom-left {
+    width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    font-size: 0.65rem !important;
+  }
+
+  /* 15. Modals on Mobile */
+  .hud-modal {
+    padding: 6px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .modal-dialog {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 94vh !important;
+  }
+
+  .modal-header {
+    padding: 10px 12px !important;
+  }
+
+  .modal-actions-right {
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .modal-body {
+    padding: 12px 10px !important;
+  }
+}
+
+@keyframes hudFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
