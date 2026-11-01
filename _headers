@@ -15,6 +15,10 @@
 /scripts/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
+# High-Performance Image Caching (Cloudflare Edge CDN)
+/assets/images/*
+  Cache-Control: public, max-age=31536000, immutable
+
 # PDF Resume direct download handling
 /resume.pdf
   Content-Type: application/pdf
