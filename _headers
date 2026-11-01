@@ -1,0 +1,27 @@
+# Cloudflare Pages Headers Configuration
+# Ensures optimal security, caching, and clean PDF delivery
+
+# Global security & asset headers
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Web Fonts & Assets Caching
+/styles/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/scripts/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+# PDF Resume direct download handling
+/resume.pdf
+  Content-Type: application/pdf
+  Content-Disposition: inline; filename="Mayank_Manjul_Principal_Gameplay_Engineer_Resume.pdf"
+  Cache-Control: public, max-age=3600
+
+/assets/*.pdf
+  Content-Type: application/pdf
+  Content-Disposition: inline; filename="Mayank_Manjul_Resume.pdf"
+  Cache-Control: public, max-age=3600

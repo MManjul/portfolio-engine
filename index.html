@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mayank Manjul | Principal Gameplay Engineer & Lead Game Developer</title>
+  <meta name="description" content="Portfolio of Mayank Manjul - Principal Gameplay Engineer & Lead Game Developer with 12+ years of experience in Unreal Engine 5, Modern C++, Unity, Multiplayer Replication, and Performance Optimization.">
+  <meta name="keywords" content="Mayank Manjul, Game Developer, Principal Gameplay Engineer, Unreal Engine 5, UE5, C++, Unity, Multiplayer Replication, Game Architecture, StateTree, Physics">
+  <meta name="author" content="Mayank Manjul">
+
+  <!-- Open Graph / Meta -->
+  <meta property="og:title" content="Mayank Manjul | Principal Gameplay Engineer">
+  <meta property="og:description" content="12+ Years architecting AAA gameplay frameworks, StateTrees, server-authoritative multiplayer, and low-level C++ runtime systems.">
+  <meta property="og:type" content="website">
+
+  <!-- Google Fonts for Futuristic Cyber/Engine Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/hud-theme.css">
+  <link rel="stylesheet" href="styles/components.css">
+</head>
+<body class="theme-unreal-cyan">
+  <!-- Scanline & Ambient Grid Overlay -->
+  <div class="hud-scanlines" aria-hidden="true"></div>
+  <div class="hud-vignette" aria-hidden="true"></div>
+
+  <!-- Background WebGL/Canvas Particle Mesh -->
+  <canvas id="bg-canvas" class="background-canvas" aria-hidden="true"></canvas>
+
+  <!-- Top Engine Telemetry Bar -->
+  <header class="engine-top-bar" role="banner">
+    <div class="telemetry-group left">
+      <div class="engine-brand">
+        <span class="engine-logo-glyph">◈</span>
+        <span class="engine-title">MAYANK MANJUL <span class="highlight">// ENGINE</span></span>
+        <span class="build-badge">v5.4.4-SHIPPING</span>
+      </div>
+      <div class="telemetry-pill live-indicator">
+        <span class="pulse-dot"></span>
+        <span class="pill-label">RUNTIME:</span>
+        <span class="pill-value" id="hud-uptime">00:00:00</span>
+      </div>
+      <div class="telemetry-pill hide-mobile">
+        <span class="pill-label">STACK:</span>
+        <span class="pill-value text-cyan">MODERN C++20 // UE 5.4</span>
+      </div>
+    </div>
+
+    <div class="telemetry-group center hide-tablet">
+      <div class="telemetry-pill">
+        <span class="pill-label">FPS:</span>
+        <span class="pill-value text-emerald" id="hud-fps">60.0</span>
+      </div>
+      <div class="telemetry-pill">
+        <span class="pill-label">FRAME TIME:</span>
+        <span class="pill-value" id="hud-frametime">16.6 ms</span>
+      </div>
+      <div class="telemetry-pill">
+        <span class="pill-label">MEM POOL:</span>
+        <span class="pill-value text-amber" id="hud-memory">18.4 MB</span>
+      </div>
+    </div>
+
+    <div class="telemetry-group right">
+      <!-- Direct Resume Download Button -->
+      <a id="topbar-download-resume" href="#" target="_blank" rel="noopener noreferrer" class="hud-control-btn resume-quick-link" title="Download Resume PDF from Google Drive">
+        <span class="btn-icon">📥</span>
+        <span class="btn-text hide-mobile">RESUME PDF</span>
+      </a>
+
+      <!-- Audio Synthesizer Control -->
+      <button id="btn-audio-toggle" class="hud-control-btn" title="Toggle Synthesizer Audio FX" aria-label="Toggle Audio">
+        <span class="btn-icon">🔊</span>
+        <span class="btn-text hide-mobile">AUDIO: <span id="audio-status" class="text-cyan">ON</span></span>
+      </button>
+
+      <!-- Theme Switcher -->
+      <div class="theme-dropdown-wrapper">
+        <button id="btn-theme-selector" class="hud-control-btn" title="Switch HUD Color Theme" aria-label="Color Palette">
+          <span class="btn-icon">🎨</span>
+          <span class="btn-text hide-mobile">PALETTE</span>
+        </button>
+        <div class="theme-menu" id="theme-menu" hidden>
+          <button data-theme="theme-unreal-cyan" class="active"><span class="swatch cyan"></span> UE5 Slate & Cyan</button>
+          <button data-theme="theme-amber-gold"><span class="swatch amber"></span> ECricket Amber Gold</button>
+          <button data-theme="theme-matrix-green"><span class="swatch green"></span> Matrix Zenject Green</button>
+          <button data-theme="theme-crimson-red"><span class="swatch red"></span> Overdrive Crimson</button>
+        </div>
+      </div>
+
+      <!-- Quick Dev Terminal Trigger -->
+      <button id="btn-open-terminal" class="hud-control-btn btn-terminal-pill" title="Toggle Developer Terminal [~]">
+        <span class="btn-icon">⌨</span>
+        <span class="btn-text">CONSOLE <kbd>~</kbd></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Interactive Terminal Overlay (Quake / UE5 Editor Style Console) -->
+  <section id="dev-terminal" class="terminal-drawer" aria-label="Developer Console" style="display: none;" hidden>
+    <div class="terminal-header">
+      <div class="terminal-title">
+        <span class="terminal-icon">❯_</span>
+        <span>MAYANK_MANJUL // IN-ENGINE COMMAND CONSOLE (Type 'help' for commands)</span>
+      </div>
+      <button type="button" id="btn-close-terminal" class="terminal-close-btn" aria-label="Close Terminal">✕</button>
+    </div>
+    <div class="terminal-body" id="terminal-output">
+      <div class="terminal-line system">Antigravity Runtime v5.4.4 Initialized. Type <span class="cmd-highlight">help</span> to view available debugger commands.</div>
+      <div class="terminal-line hint">Quick shortcuts: <span class="cmd-highlight">skills</span> | <span class="cmd-highlight">projects</span> | <span class="cmd-highlight">experience</span> | <span class="cmd-highlight">contact</span> | <span class="cmd-highlight">statetree</span></div>
+    </div>
+    <div class="terminal-input-bar">
+      <span class="terminal-prompt">cmd&gt;</span>
+      <input type="text" id="terminal-input" placeholder="Enter command (e.g. 'help', 'skills', 'benchmark', 'clear')..." autocomplete="off" spellcheck="false">
+    </div>
+  </section>
+
+  <!-- Navigation Bar (HUD Deck) -->
+  <nav class="hud-nav" role="navigation" aria-label="Primary Navigation">
+    <div class="nav-container">
+      <a href="#hero" class="nav-item active" data-nav="hero">
+        <span class="nav-index">01</span>
+        <span class="nav-label">COMMAND_CENTER</span>
+      </a>
+      <a href="#about" class="nav-item" data-nav="about">
+        <span class="nav-index">02</span>
+        <span class="nav-label">ARCHITECT_PROFILE</span>
+      </a>
+      <a href="#sandbox" class="nav-item" data-nav="sandbox">
+        <span class="nav-index">03</span>
+        <span class="nav-label">GAMEPLAY_SANDBOX</span>
+      </a>
+      <a href="#projects" class="nav-item" data-nav="projects">
+        <span class="nav-index">04</span>
+        <span class="nav-label">TITLES_&amp;_SYSTEMS</span>
+      </a>
+      <a href="#statetree" class="nav-item" data-nav="statetree">
+        <span class="nav-index">05</span>
+        <span class="nav-label">STATETREE_NODE_GRAPH</span>
+      </a>
+      <a href="#experience" class="nav-item" data-nav="experience">
+        <span class="nav-index">06</span>
+        <span class="nav-label">CAREER_XP_LOG</span>
+      </a>
+      <a href="#skills" class="nav-item" data-nav="skills">
+        <span class="nav-index">07</span>
+        <span class="nav-label">TECH_LOADOUT</span>
+      </a>
+      <a href="#contact" class="nav-item" data-nav="contact">
+        <span class="nav-index">08</span>
+        <span class="nav-label">COMMS_LINK</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main Viewport Content -->
+  <main class="hud-main-content">
+
+    <!-- SECTION 01: HERO / COMMAND CENTER -->
+    <section id="hero" class="hud-section hero-section">
+      <div class="section-container hero-grid">
+        <div class="hero-identity">
+          <div class="bracket-tag">
+            <span class="bracket">[</span>
+            <span class="tag-content">CLASS: PRINCIPAL GAMEPLAY ENGINEER // LEVEL 4</span>
+            <span class="bracket">]</span>
+          </div>
+
+          <h1 class="hero-name">
+            MAYANK <span class="name-accent">MANJUL</span>
+          </h1>
+
+          <h2 class="hero-tagline">
+            Architecting High-Performance Runtime Systems, Modular Locomotion &amp; Server-Authoritative Netcode for AAA &amp; Scale.
+          </h2>
+
+          <p class="hero-bio">
+            Lead Game Developer and Principal Gameplay Engineer with <strong>12+ years of battle-tested experience</strong> architecting low-level C++ runtime systems in <strong>Unreal Engine 5</strong>, enterprise-scale <strong>Unity</strong> frameworks, and multiplayer replication pipelines across PC, Console (Xbox), and Mobile.
+          </p>
+
+          <!-- Key Quick Metrics Deck -->
+          <div class="quick-metrics-grid">
+            <div class="metric-card">
+              <span class="metric-val">12+</span>
+              <span class="metric-unit">YEARS</span>
+              <span class="metric-desc">Systems Architecture</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-val">UE5</span>
+              <span class="metric-unit">MODERN C++</span>
+              <span class="metric-desc">Flagship: ECricket</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-val">10M+</span>
+              <span class="metric-unit">PLAYERS REACHED</span>
+              <span class="metric-desc">Global Concurrent Scale</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-val">FOUNDER</span>
+              <span class="metric-unit">COMMUNITY</span>
+              <span class="metric-desc">Unity Developers India</span>
+            </div>
+          </div>
+
+          <!-- Hero Actions -->
+          <div class="hero-actions">
+            <a href="#sandbox" class="btn hud-btn primary">
+              <span class="btn-glow"></span>
+              <span class="btn-text">LAUNCH GAMEPLAY SANDBOX</span>
+              <span class="btn-chevron">▶</span>
+            </a>
+            <a id="hero-download-resume-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn hud-btn highlight-download" title="Download Official Resume PDF via Google Drive">
+              <span class="btn-icon">📥</span>
+              <span class="btn-text">DOWNLOAD RESUME (PDF)</span>
+            </a>
+            <a href="#projects" class="btn hud-btn secondary">
+              <span class="btn-text">INSPECT SHIPPED TITLES</span>
+            </a>
+            <button type="button" id="btn-quick-resume" class="btn hud-btn outline">
+              <span class="btn-icon">📄</span>
+              <span class="btn-text">TDD RESUME SPEC</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hero Right: Interactive Tactical Viewport / Character Wireframe HUD -->
+        <div class="hero-tactical-viewport">
+          <div class="hud-panel-frame" id="hero-carousel-frame">
+            <div class="panel-header">
+              <span class="panel-title" id="carousel-panel-title">SYSTEM_DIAGNOSTICS // AGENT_CARD</span>
+              <div class="carousel-header-controls">
+                <button type="button" class="carousel-arrow-btn" id="btn-carousel-prev" title="Previous Slide" aria-label="Previous Slide">‹</button>
+                <div class="panel-indicators" id="carousel-indicators">
+                  <button type="button" class="indicator-dot active" data-slide="0" title="Slide 1: Agent Card" aria-label="Slide 1"></button>
+                  <button type="button" class="indicator-dot" data-slide="1" title="Slide 2: Technical Radar" aria-label="Slide 2"></button>
+                  <button type="button" class="indicator-dot" data-slide="2" title="Slide 3: Runtime Profiling" aria-label="Slide 3"></button>
+                  <button type="button" class="indicator-dot" data-slide="3" title="Slide 4: Shipped Milestones" aria-label="Slide 4"></button>
+                </div>
+                <button type="button" class="carousel-arrow-btn" id="btn-carousel-next" title="Next Slide" aria-label="Next Slide">›</button>
+              </div>
+            </div>
+
+            <div class="carousel-viewport">
+              <!-- SLIDE 1: AGENT CARD / SYSTEM DIAGNOSTICS -->
+              <div class="carousel-slide active" id="carousel-slide-0" data-slide-index="0" data-slide-title="SYSTEM_DIAGNOSTICS // AGENT_CARD">
+                <div class="tactical-display" style="padding: 10px 4px 4px;">
+                  <div class="avatar-holo-wrapper">
+                    <div class="holo-ring outer"></div>
+                    <div class="holo-ring inner"></div>
+                    <div class="avatar-ascii-box">
+                      <div class="avatar-initials">MM</div>
+                      <div class="avatar-title-badge">PRINCIPAL ENG</div>
+                    </div>
+                  </div>
+                  <div class="telemetry-specs-list">
+                    <div class="spec-row">
+                      <span class="spec-key">PRIMARY_STACK</span>
+                      <span class="spec-val highlight">Unreal Engine 5 / Modern C++20</span>
+                    </div>
+                    <div class="spec-row">
+                      <span class="spec-key">SECONDARY_CORE</span>
+                      <span class="spec-val">Unity (C#) / Zenject IoC / Photon</span>
+                    </div>
+                    <div class="spec-row">
+                      <span class="spec-key">SPECIALIZATION</span>
+                      <span class="spec-val">Locomotion, StateTree, Net Replication</span>
+                    </div>
+                    <div class="spec-row">
+                      <span class="spec-key">PROFILING_PIPELINE</span>
+                      <span class="spec-val">Unreal Insights, Tick Optimization</span>
+                    </div>
+                    <div class="spec-row">
+                      <span class="spec-key">CURRENT_ASSIGNMENT</span>
+                      <span class="spec-val text-cyan">Senior Gameplay Programmer Level 4 @ LightFury Games</span>
+                    </div>
+                    <div class="spec-row">
+                      <span class="spec-key">LOCATION</span>
+                      <span class="spec-val">Bengaluru, Karnataka, India</span>
+                    </div>
+                    <div class="spec-row">
+                      <span class="spec-key">HONORS</span>
+                      <span class="spec-val text-amber">BYJU'S Employee of the Year (2021-2022)</span>
+                    </div>
+                  </div>
+
+                  <!-- Live Interactive Radar / Audio Feedback Area -->
+                  <div class="tactical-radar-box" id="tactical-radar">
+                    <div class="radar-scanline"></div>
+                    <div class="radar-target" style="top:35%; left:60%;" title="Netcode Node [Healthy]"></div>
+                    <div class="radar-target" style="top:70%; left:25%;" title="Physics Trajectory [Active]"></div>
+                    <div class="radar-target" style="top:50%; left:80%;" title="StateTree [Executing]"></div>
+                    <span class="radar-readout">SYSTEM STATUS: ALL SUBSYSTEMS NOMINAL</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SLIDE 2: TECHNICAL RADAR / ATTRIBUTE POLAR GRAPH -->
+              <div class="carousel-slide" id="carousel-slide-1" data-slide-index="1" data-slide-title="TECHNICAL_RADAR // ATTRIBUTE POLAR GRAPH">
+                <div class="radar-canvas-container">
+                  <canvas id="radar-chart-canvas" width="340" height="240" class="radar-chart-canvas"></canvas>
+                </div>
+                <div class="radar-metrics-table">
+                  <div class="radar-stat-chip">
+                    <span class="text-secondary">MODERN C++20</span>
+                    <span class="text-cyan">98% [EXPERT]</span>
+                  </div>
+                  <div class="radar-stat-chip">
+                    <span class="text-secondary">UE5 ARCHITECTURE</span>
+                    <span class="text-cyan">96% [LEAD]</span>
+                  </div>
+                  <div class="radar-stat-chip">
+                    <span class="text-secondary">NETCODE REPLICATION</span>
+                    <span class="text-emerald">95% [SYNCED]</span>
+                  </div>
+                  <div class="radar-stat-chip">
+                    <span class="text-secondary">UNREAL INSIGHTS</span>
+                    <span class="text-emerald">95% [0-HITCH]</span>
+                  </div>
+                  <div class="radar-stat-chip">
+                    <span class="text-secondary">PHYSICS / DYNAMICS</span>
+                    <span class="text-amber">94% [SOLVER]</span>
+                  </div>
+                  <div class="radar-stat-chip">
+                    <span class="text-secondary">POD LEADERSHIP</span>
+                    <span class="text-amber">92% [TDD-7884]</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SLIDE 3: RUNTIME PROFILING TELEMETRY -->
+              <div class="carousel-slide" id="carousel-slide-2" data-slide-index="2" data-slide-title="RUNTIME_PROFILING // ECRICKET BENCHMARK METRICS">
+                <div class="profiling-grid-hero">
+                  <div class="profiling-stat-card">
+                    <span class="stat-card-title">TICK SCHEDULE GROUP</span>
+                    <span class="stat-card-val text-cyan">TG_PrePhysics</span>
+                    <span class="stat-card-sub">Budget: 2.5ms | Usage: 0.74ms</span>
+                  </div>
+                  <div class="profiling-stat-card">
+                    <span class="stat-card-title">TARGET CONSOLE LOCK</span>
+                    <span class="stat-card-val text-emerald">120.0 FPS</span>
+                    <span class="stat-card-sub">Frame Time Budget: 8.33ms</span>
+                  </div>
+                  <div class="profiling-stat-card">
+                    <span class="stat-card-title">HEAP CHURN / GC</span>
+                    <span class="stat-card-val text-cyan">0 KB / Tick</span>
+                    <span class="stat-card-sub">Strict Pool Allocators</span>
+                  </div>
+                  <div class="profiling-stat-card">
+                    <span class="stat-card-title">STATETREE OVERHEAD</span>
+                    <span class="stat-card-val text-amber">&lt; 0.04ms</span>
+                    <span class="stat-card-sub">Decoupled Locomotion Pod</span>
+                  </div>
+                </div>
+
+                <div class="profiling-pipeline-flow">
+                  <div class="pipeline-step">
+                    <span>PERFORCE STREAM:</span>
+                    <span class="text-emerald">//ECricket/Main/Source/ECricketGame [SYNCED]</span>
+                  </div>
+                  <div class="pipeline-step">
+                    <span>MEMORY BUDGET:</span>
+                    <span class="text-cyan">18.4 MB Core Runtime Footprint</span>
+                  </div>
+                  <div class="pipeline-step">
+                    <span>DRAW CALL BATCHES:</span>
+                    <span class="text-emerald">Instanced Static Meshes &amp; Nanite</span>
+                  </div>
+                  <div class="pipeline-step">
+                    <span>STANDARDS SPEC:</span>
+                    <span class="text-amber">TDD / ECRICKET-7884 Architectural Governance</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SLIDE 4: SHIPPED COMMERCIAL HIGHLIGHTS -->
+              <div class="carousel-slide" id="carousel-slide-3" data-slide-index="3" data-slide-title="COMMERCIAL_TRACK // SHIPPED HIGHLIGHTS">
+                <div class="milestones-deck">
+                  <div class="milestone-mini-card">
+                    <div class="mini-card-head">
+                      <span class="badge engine-badge">UE5 • MODERN C++</span>
+                      <span class="text-emerald">PRODUCTION ACTIVE</span>
+                    </div>
+                    <div class="mini-card-title">ECricket (LightFury Games)</div>
+                    <div class="mini-card-desc">Flagship AAA production title. Architected core player locomotion refactor, StateTree ability pipelines, and TDD-7884 governance.</div>
+                  </div>
+
+                  <div class="milestone-mini-card">
+                    <div class="mini-card-head">
+                      <span class="badge engine-badge unity">UNITY 3D</span>
+                      <span class="text-amber">CHART-TOPPER #1</span>
+                    </div>
+                    <div class="mini-card-title">Sachin Saga Cricket Champions</div>
+                    <div class="mini-card-desc">Core engineering contributor: Trajectory ballistics, pitch friction, Magnus swing, dynamic ragdoll blend transitions, and fielding AI.</div>
+                  </div>
+
+                  <div class="milestone-mini-card">
+                    <div class="mini-card-head">
+                      <span class="badge engine-badge unity">UNITY / SCALED</span>
+                      <span class="text-cyan">EMPLOYEE OF THE YEAR</span>
+                    </div>
+                    <div class="mini-card-title">Disney • BYJU'S Early Learn</div>
+                    <div class="mini-card-desc">Served as Technical Lead for millions of global users. Reduced initial install size by &gt;35% through dynamic on-demand asset streaming.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-footer" id="carousel-panel-footer">
+              <span class="footer-data" id="carousel-footer-left">MEM_FOOTPRINT: OPTIMIZED</span>
+              <span class="footer-data" id="carousel-footer-right">SLIDE: 01 / 04</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 02: ARCHITECT PROFILE / EXECUTIVE SUMMARY -->
+    <section id="about" class="hud-section about-section">
+      <div class="section-container">
+        <div class="section-heading">
+          <div class="section-index">02 // PROFILE</div>
+          <h2 class="section-title">THE ARCHITECT'S MANIFESTO</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="manifesto-grid">
+          <div class="manifesto-text-col">
+            <h3 class="manifesto-subtitle">Low-Level Systems Engineering Meets Creative Game Feel</h3>
+            <p>
+              My work lives at the exact intersection of low-level systems engineering and visceral, responsive gameplay. Over the last 12+ years, I have architected decoupled, high-performance gameplay frameworks across PC, console (Xbox), and mobile platforms.
+            </p>
+            <p>
+              Whether refactoring core player locomotion for <strong>LightFury's flagship AAA title ECricket</strong>, authoring studio-wide Technical Design Documents (TDDs), or reducing initial binary footprints by <strong>35% for Disney • BYJU'S Early Learn</strong>, my focus remains constant:
+              <em>rock-solid stability, zero frame hitches, and decoupled modular architectures that allow design teams to iterate at lightning speed.</em>
+            </p>
+            
+            <div class="core-competencies-tags">
+              <span class="pill-badge">Modular StateTree</span>
+              <span class="pill-badge">Component-Based Locomotion</span>
+              <span class="pill-badge">Server-Authoritative Replication</span>
+              <span class="pill-badge">Client-Side Prediction</span>
+              <span class="pill-badge">Unreal Insights Profiling</span>
+              <span class="pill-badge">Memory Budget Governance</span>
+              <span class="pill-badge">Dependency Injection (Zenject)</span>
+              <span class="pill-badge">Physics Trajectory &amp; Ragdolls</span>
+            </div>
+
+            <!-- Community Highlight -->
+            <div class="community-banner">
+              <div class="community-badge-icon">🇮🇳</div>
+              <div class="community-info">
+                <h4>Founder, "Unity Developers India"</h4>
+                <p>Created and scaled a nationwide developer guild connecting game programmers, technical artists, and indie founders to foster knowledge sharing, technical mentorship, and industry growth.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Technical Philosophy Pillars -->
+          <div class="manifesto-pillars-col">
+            <div class="pillar-card">
+              <div class="pillar-num">01</div>
+              <div class="pillar-content">
+                <h4>Decoupled Architectural Governance</h4>
+                <p>Enforce strict separation between input routing, locomotion state machines, and replicated visual delegates. Systems communicate via Gameplay Tags and event streams rather than hard object references.</p>
+              </div>
+            </div>
+
+            <div class="pillar-card">
+              <div class="pillar-num">02</div>
+              <div class="pillar-content">
+                <h4>Authoritative Netcode &amp; Lag Mitigation</h4>
+                <p>Network replication must be bulletproof. I engineer server-authoritative architectures with client-side prediction, rollback reconciliations, and low-latency payload serialization for competitive and co-op gameplay.</p>
+              </div>
+            </div>
+
+            <div class="pillar-card">
+              <div class="pillar-num">03</div>
+              <div class="pillar-content">
+                <h4>Zero-Tolerance Performance Profiling</h4>
+                <p>Frame hitches kill game immersion. I utilize Unreal Insights and custom memory profilers to audit tick group dependencies, draw calls, heap fragmentation, and garbage collection pauses down to the microsecond.</p>
+              </div>
+            </div>
+
+            <div class="pillar-card">
+              <div class="pillar-num">04</div>
+              <div class="pillar-content">
+                <h4>Team Multiplier &amp; Engineering Mentorship</h4>
+                <p>Leading pods of 8+ developers, running high-rigor modern C++ code reviews, authoring comprehensive TDDs, and aligning multi-disciplinary goals between code, 3D art, animation, and game design.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 03: INTERACTIVE GAMEPLAY SANDBOX (DYNAMIC GAME DEV PLAYGROUND) -->
+    <section id="sandbox" class="hud-section sandbox-section">
+      <div class="section-container">
+        <div class="section-heading">
+          <div class="section-index">03 // PLAYGROUND</div>
+          <h2 class="section-title">INTERACTIVE GAMEPLAY SIMULATOR &amp; PHYSICS ENGINE</h2>
+          <div class="section-line"></div>
+          <p class="section-desc">Real-time low-level runtime simulator demonstrating Hydrodynamics &amp; Wave Buoyancy (<em>Dhoom 3 Jet Speed</em>), Cricket Ballistics (<em>Sachin Saga</em>), Server Replication with Client Prediction, and Articulated Verlet Ragdolls.</p>
+        </div>
+
+        <div class="sandbox-container">
+          <!-- Control Panel Deck -->
+          <div class="sandbox-controls-deck">
+            <div class="control-box">
+              <label class="control-label" for="sim-mode-select">SIMULATION SUBSYSTEM:</label>
+              <select id="sim-mode-select" class="hud-select">
+                <option value="buoyancy" selected>🌊 Hydrodynamics &amp; Wave Buoyancy (Dhoom 3 Jet Speed)</option>
+                <option value="trajectory">🏏 Cricket Ballistics &amp; Trajectory (Sachin Saga)</option>
+                <option value="netcode">🌐 Server Replication &amp; Client-Side Prediction</option>
+                <option value="ragdoll">🦴 Articulated Verlet Ragdoll &amp; Dynamic Collisions</option>
+              </select>
+            </div>
+
+            <!-- Dynamic Controls: Buoyancy -->
+            <div class="control-box sim-ctrl-group" id="ctrl-group-buoyancy">
+              <label class="control-label">WAVE AMPLITUDE: <span id="wave-amp-val" class="text-cyan">24 px</span></label>
+              <input type="range" id="wave-amp-slider" min="6" max="50" step="2" value="24" class="hud-slider">
+            </div>
+
+            <div class="control-box sim-ctrl-group" id="ctrl-group-buoyancy-freq">
+              <label class="control-label">WAVE FREQUENCY: <span id="wave-freq-val" class="text-cyan">1.8x</span></label>
+              <input type="range" id="wave-freq-slider" min="0.5" max="3.5" step="0.25" value="1.8" class="hud-slider">
+            </div>
+
+            <!-- Dynamic Controls: Cricket Ballistics (Sachin Saga) -->
+            <div class="control-box sim-ctrl-group" id="ctrl-group-cricket-type" style="display: none;">
+              <label class="control-label" for="cricket-delivery-type">DELIVERY ARSENAL:</label>
+              <select id="cricket-delivery-type" class="hud-select">
+                <option value="outswing">⚡ Express Outswinger (145 km/h)</option>
+                <option value="inswing">🌪 Inswinging Yorker (148 km/h)</option>
+                <option value="reverse">🔥 Late Reverse Swing (146 km/h)</option>
+                <option value="bouncer">🚀 Fast Rising Bouncer (152 km/h)</option>
+                <option value="yorker">🎯 Toe-Crushing Yorker (148 km/h)</option>
+                <option value="legcutter">🌀 Gripping Leg-Cutter (124 km/h)</option>
+                <option value="offcutter">⚡ Nipping Off-Cutter (126 km/h)</option>
+              </select>
+            </div>
+
+            <div class="control-box sim-ctrl-group" id="ctrl-group-cricket-length" style="display: none;">
+              <label class="control-label">PITCH LENGTH: <span id="cricket-length-val" class="text-amber">GOOD LENGTH (6.5m)</span></label>
+              <input type="range" id="cricket-length-slider" min="2" max="11" step="0.5" value="6.5" class="hud-slider">
+            </div>
+
+            <div class="control-box sim-ctrl-group" id="ctrl-group-cricket-line" style="display: none;">
+              <label class="control-label">PITCH LINE: <span id="cricket-line-val" class="text-cyan">OUTSIDE OFF (+0.18m)</span></label>
+              <input type="range" id="cricket-line-slider" min="-0.6" max="0.6" step="0.05" value="0.18" class="hud-slider">
+            </div>
+
+            <div class="control-box sim-ctrl-group" id="ctrl-group-cricket-speed" style="display: none;">
+              <label class="control-label">SIM SPEED: <span id="cricket-speed-val" class="text-emerald">1.0x (BROADCAST)</span></label>
+              <input type="range" id="cricket-speed-slider" min="0.25" max="1.0" step="0.25" value="1.0" class="hud-slider">
+            </div>
+
+            <!-- Dynamic Controls: Netcode -->
+            <div class="control-box sim-ctrl-group" id="netcode-delay-box" style="display: none;">
+              <label class="control-label">SIMULATED PING (RTT): <span id="ping-val" class="text-amber">120 ms</span></label>
+              <input type="range" id="ping-slider" min="0" max="350" step="10" value="120" class="hud-slider">
+            </div>
+
+            <div class="control-box sim-ctrl-group" id="netcode-loss-box" style="display: none;">
+              <label class="control-label">PACKET LOSS: <span id="loss-val" class="text-crimson">0%</span></label>
+              <input type="range" id="loss-slider" min="0" max="30" step="5" value="0" class="hud-slider">
+            </div>
+
+            <!-- Dynamic Controls: Tick Rate -->
+            <div class="control-box">
+              <label class="control-label">ENGINE TICK RATE: <span id="tick-rate-val" class="text-emerald">60 Hz</span></label>
+              <input type="range" id="tick-rate-slider" min="15" max="120" step="15" value="60" class="hud-slider">
+            </div>
+
+            <!-- Interactive Action Buttons -->
+            <div class="control-actions">
+              <button type="button" id="btn-fire-sim" class="btn hud-btn primary small">
+                <span class="btn-text" id="btn-fire-text">ACCELERATE JET-SKI [W / ↑]</span>
+              </button>
+              <button type="button" id="btn-secondary-sim" class="btn hud-btn secondary small">
+                <span class="btn-text" id="btn-secondary-text">DROP FLOATING CARGO</span>
+              </button>
+              <button type="button" id="btn-clear-sim" class="btn hud-btn outline small" title="Reset Viewport Entities">
+                <span class="btn-text">RESET VIEWPORT</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Interactive Canvas Screen -->
+          <div class="sandbox-viewport-frame">
+            <div class="viewport-hud-overlay">
+              <div class="hud-left-stat">
+                <span>SIM STATUS: <strong id="sim-state-text" class="text-emerald">SOLVER ACTIVE</strong></span>
+                <span>ENTITIES / ACTORS: <strong id="sim-actor-count">1 Vessel</strong></span>
+                <span id="sim-dynamic-stat-1">HULL BUOYANCY (Fb): <strong id="sim-buoyancy-stat" class="text-cyan">100% NOMINAL</strong></span>
+              </div>
+              <div class="hud-right-stat">
+                <span id="sim-mode-indicator" class="text-cyan">MODE: HYDRODYNAMICS_BUOYANCY_SOLVER</span>
+                <span id="sim-lag-mitigation-status">DISPLACEMENT: ARCHIMEDES_MULTI_POINT_DRAFT</span>
+                <span id="sim-dynamic-stat-2">SPEED: <strong id="sim-speed-stat" class="text-amber">0.0 KNOTS</strong></span>
+              </div>
+            </div>
+
+            <canvas id="sandbox-canvas" width="960" height="480" class="interactive-sandbox-canvas"></canvas>
+
+            <div class="canvas-instructions" id="sandbox-instructions-bar">
+              <span class="keyboard-icon">🎮</span>
+              <span id="sandbox-instructions-text"><strong>Controls:</strong> Press or Hold [W] / [↑] or click ACCELERATE to drive across waves • Click anywhere in water to drop buoyant cargo crates!</span>
+            </div>
+          </div>
+
+          <!-- Real-Time Telemetry Graph Strip -->
+          <div class="sandbox-telemetry-strip">
+            <div class="telemetry-graph-card">
+              <div class="graph-header">
+                <span>FRAME DELTA TIME (ms)</span>
+                <span class="text-cyan" id="graph-delta-readout">16.6ms</span>
+              </div>
+              <canvas id="graph-canvas-frametime" class="mini-telemetry-canvas" width="280" height="50"></canvas>
+            </div>
+
+            <div class="telemetry-graph-card">
+              <div class="graph-header">
+                <span>SERVER RPC SYNC DRIFT</span>
+                <span class="text-amber" id="graph-drift-readout">0.2ms</span>
+              </div>
+              <canvas id="graph-canvas-drift" class="mini-telemetry-canvas" width="280" height="50"></canvas>
+            </div>
+
+            <div class="telemetry-graph-card">
+              <div class="graph-header">
+                <span>HEAP ALLOCATION CHURN</span>
+                <span class="text-emerald" id="graph-alloc-readout">0 KB/tick (GC-Free)</span>
+              </div>
+              <canvas id="graph-canvas-alloc" class="mini-telemetry-canvas" width="280" height="50"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 04: SHIPPED TITLES & ARCHITECTURAL SYSTEMS -->
+    <section id="projects" class="hud-section projects-section">
+      <div class="section-container">
+        <div class="section-heading">
+          <div class="section-index">04 // REPERTOIRE</div>
+          <h2 class="section-title">FLAGSHIP TITLES &amp; CORE RUNTIME SYSTEMS</h2>
+          <div class="section-line"></div>
+          <p class="section-desc">Inspect architectural breakdowns, low-level technical challenges, profiling telemetry, and engineering solutions.</p>
+        </div>
+
+        <!-- Filter Navigation -->
+        <div class="filter-controls">
+          <button class="filter-btn active" data-filter="all">ALL DEPLOYMENTS</button>
+          <button class="filter-btn" data-filter="ue5">UNREAL ENGINE 5 (C++)</button>
+          <button class="filter-btn" data-filter="unity">UNITY ENTERPRISE (C#)</button>
+          <button class="filter-btn" data-filter="apple-arcade">APPLE ARCADE (ALL SCREENS)</button>
+          <button class="filter-btn" data-filter="multiplayer">MULTIPLAYER &amp; NETCODE</button>
+          <button class="filter-btn" data-filter="physics">PHYSICS &amp; SIMULATION</button>
+          <button class="filter-btn" data-filter="optimization">PERFORMANCE &amp; PROFILING</button>
+        </div>
+
+        <!-- Projects Grid -->
+        <div class="projects-grid" id="projects-container">
+
+          <!-- PROJECT 1: ECRICKET (LIGHTFURY GAMES) -->
+          <article class="project-card highlight" data-category="ue5 multiplayer optimization" data-id="ecricket">
+            <div class="card-glow-edge"></div>
+            
+            <!-- Optional Project Media Preview (Only displays if image provided, otherwise seamless) -->
+            <div class="card-media-banner" data-media-for="ecricket">
+              <img src="assets/images/ecricket/ec3.jpg" alt="ECricket Gameplay Visual" class="project-banner-img" loading="lazy">
+              <div class="media-overlay-scanline"></div>
+            </div>
+
+            <div class="card-header">
+              <div class="card-meta">
+                <span class="badge engine-badge">UNREAL ENGINE 5</span>
+                <span class="badge role-badge">PRINCIPAL ARCHITECT</span>
+                <span class="badge date-badge">MOBILE (CURRENT) • PC/CONSOLE (FUTURE)</span>
+              </div>
+              <span class="status-indicator live">PRODUCTION ACTIVE</span>
+            </div>
+
+            <h3 class="card-title">ECricket</h3>
+            <div class="card-company">LightFury Games • Mobile (Current Production) • PC &amp; Console (Future Roadmap)</div>
+
+            <p class="card-summary">
+              Flagship production title built in Unreal Engine 5 with Modern C++ (C++17/20), targeting Mobile (current live production) with PC and Console releases in future roadmaps. Spearheading core gameplay architecture, decoupled locomotion refactoring, and server-authoritative multiplayer replication.
+            </p>
+
+            <div class="card-achievements">
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Locomotion &amp; Interaction Refactor:</strong> Decoupled complex character dependencies, elevating runtime modularity across disciplines.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>TDD/ECRICKET-7884 Governance:</strong> Authored studio-wide technical design documentation defining modern C++ patterns and tick budgeting.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>StateTree &amp; Gameplay Tags:</strong> Managed multi-layered character states, animation triggers, and ability systems with minimal overhead.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Unreal Insights Optimization:</strong> Conducted deep CPU/GPU profiling, eliminating micro-hitches and optimizing tick groups.</span>
+              </div>
+            </div>
+
+            <div class="card-tech-stack">
+              <span class="tech-tag">C++20</span>
+              <span class="tech-tag">UE5.x</span>
+              <span class="tech-tag">StateTree</span>
+              <span class="tech-tag">Gameplay Tags</span>
+              <span class="tech-tag">Unreal Insights</span>
+              <span class="tech-tag">Perforce P4</span>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-card-inspect" data-project="ecricket">
+                <span>INSPECT TECHNICAL SPEC</span>
+                <span class="arrow">→</span>
+              </button>
+              <a class="btn-card-trailer" data-trailer-for="ecricket" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">
+                <span class="trailer-icon">▶</span>
+                <span>WATCH TRAILER</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- PROJECT 2: SACHIN SAGA CRICKET CHAMPIONS -->
+          <article class="project-card" data-category="unity physics multiplayer" data-id="sachin-saga">
+            <div class="card-glow-edge"></div>
+            
+            <!-- Optional Project Media Preview -->
+            <div class="card-media-banner" data-media-for="sachin-saga" style="display: none;">
+              <img src="" alt="Sachin Saga Gameplay Visual" class="project-banner-img" loading="lazy">
+              <div class="media-overlay-scanline"></div>
+            </div>
+
+            <div class="card-header">
+              <div class="card-meta">
+                <span class="badge engine-badge unity">UNITY 3D</span>
+                <span class="badge role-badge">SR. GAME DEVELOPER</span>
+                <span class="badge date-badge">JETSYNTHESYS</span>
+              </div>
+              <span class="status-indicator shipped">CHART-TOPPING HIT</span>
+            </div>
+
+            <h3 class="card-title">Sachin Saga Cricket Champions</h3>
+            <div class="card-company">JetSynthesys Pvt Ltd • Mobile (iOS / Android)</div>
+
+            <p class="card-summary">
+              Official mobile cricket title featuring batting legend Sachin Tendulkar. Core contributor responsible for physics-driven gameplay loops, timing mechanisms, and fielding AI routines.
+            </p>
+
+            <div class="card-achievements">
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Physics-Driven Trajectory Engine:</strong> Engineered real-time trajectory calculation accounting for pitch friction, seam angle, swing, and bat velocity.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Ragdoll &amp; Blend Transitions:</strong> Integrated physics ragdolls with blend animation transitions for lifelike player collisions and dives.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Backend &amp; Multiplayer Core:</strong> Architected robust backend loop integration and real-time head-to-head match validation.</span>
+              </div>
+            </div>
+
+            <div class="card-tech-stack">
+              <span class="tech-tag">Unity</span>
+              <span class="tech-tag">C#</span>
+              <span class="tech-tag">PhysX</span>
+              <span class="tech-tag">Custom Ballistics</span>
+              <span class="tech-tag">Ragdoll Physics</span>
+              <span class="tech-tag">Photon</span>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-card-inspect" data-project="sachin-saga">
+                <span>INSPECT TECHNICAL SPEC</span>
+                <span class="arrow">→</span>
+              </button>
+              <a class="btn-card-trailer" data-trailer-for="sachin-saga" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">
+                <span class="trailer-icon">▶</span>
+                <span>WATCH TRAILER</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- PROJECT 3: DISNEY • BYJU'S EARLY LEARN -->
+          <article class="project-card" data-category="unity optimization" data-id="disney-byjus">
+            <div class="card-glow-edge"></div>
+            
+            <!-- Optional Project Media Preview -->
+            <div class="card-media-banner" data-media-for="disney-byjus">
+              <img src="assets/images/disney-byjus/disney-shape-6.png" alt="Disney BYJU'S Early Learn Visual" class="project-banner-img" loading="lazy">
+              <div class="media-overlay-scanline"></div>
+            </div>
+
+            <div class="card-header">
+              <div class="card-meta">
+                <span class="badge engine-badge unity">UNITY 3D</span>
+                <span class="badge role-badge">LEAD ENGINEER</span>
+                <span class="badge date-badge">BYJU'S • 2021-2023</span>
+              </div>
+              <span class="status-indicator award">AWARD WINNER</span>
+            </div>
+
+            <h3 class="card-title">Disney • BYJU'S Early Learn</h3>
+            <div class="card-company">BYJU'S &amp; Disney • Scaled to Millions Globally</div>
+
+            <p class="card-summary">
+              Gamified educational platform serving millions of concurrent global learners. Led technical roadmaps, performance budgeting, and asset streaming pipelines. Honored with <strong>Employee of the Year (2021-2022)</strong>.
+            </p>
+
+            <div class="card-achievements">
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>35%+ Initial Install Size Reduction:</strong> Architected dynamic content delivery download modules and reusable gameplay runtime systems.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Low-End Device Optimization:</strong> Enforced strict memory budgets and Unity Profiler workflows, achieving smooth 60fps on entry-tier devices.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Engineering Pod Leadership:</strong> Mentored and scaled an engineering pod of game developers, driving high code quality and clean architecture.</span>
+              </div>
+            </div>
+
+            <div class="card-tech-stack">
+              <span class="tech-tag">Unity</span>
+              <span class="tech-tag">C#</span>
+              <span class="tech-tag">Asset Bundles</span>
+              <span class="tech-tag">Memory Profiling</span>
+              <span class="tech-tag">Component Design</span>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-card-inspect" data-project="disney-byjus">
+                <span>INSPECT TECHNICAL SPEC</span>
+                <span class="arrow">→</span>
+              </button>
+              <a class="btn-card-trailer" data-trailer-for="disney-byjus" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">
+                <span class="trailer-icon">▶</span>
+                <span>WATCH TRAILER</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- PROJECT 4: REAL-TIME MULTIPLAYER ARCHITECTURE (LIGHTFURY GAMES) -->
+          <article class="project-card" data-category="multiplayer ue5" data-id="lightfury-multiplayer">
+            <div class="card-glow-edge"></div>
+            
+            <!-- Optional Project Media Preview -->
+            <div class="card-media-banner" data-media-for="lightfury-multiplayer" style="display: none;">
+              <img src="" alt="Real-Time Multiplayer Architecture Visual" class="project-banner-img" loading="lazy">
+              <div class="media-overlay-scanline"></div>
+            </div>
+
+            <div class="card-header">
+              <div class="card-meta">
+                <span class="badge engine-badge ue5">UNREAL ENGINE 5 / NETCODE</span>
+                <span class="badge role-badge">SR GAMEPLAY PROGRAMMER (NETCODE)</span>
+                <span class="badge date-badge">LIGHTFURY GAMES</span>
+              </div>
+              <span class="status-indicator shipped">SERVER-AUTHORITATIVE</span>
+            </div>
+
+            <h3 class="card-title">Real-Time Multiplayer Architecture</h3>
+            <div class="card-company">LightFury Games • Bengaluru, India</div>
+
+            <p class="card-summary">
+              Engineered server-authoritative network replication routines, responsive client-side prediction, lag compensation algorithms, and low-latency state synchronization for competitive live multiplayer gameplay in Unreal Engine 5.
+            </p>
+
+            <div class="card-achievements">
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Server-Authoritative Replication:</strong> Designed deterministic state synchronization and actor replication pipelines minimizing bandwidth while maintaining absolute server authority.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Client-Side Prediction &amp; Reconciliation:</strong> Implemented responsive movement prediction and server reconciliation, eliminating perceivable latency under high jitter and packet loss.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Unreal Insights NetProfiler:</strong> Profiled network traffic, bunch sizes, and RPC call frequencies using Unreal Insights to prevent socket saturation on cellular data.</span>
+              </div>
+            </div>
+
+            <div class="card-tech-stack">
+              <span class="tech-tag">Unreal Engine 5</span>
+              <span class="tech-tag">Modern C++20</span>
+              <span class="tech-tag">Server Authority</span>
+              <span class="tech-tag">Replication Graph</span>
+              <span class="tech-tag">Client Prediction</span>
+              <span class="tech-tag">Lag Compensation</span>
+              <span class="tech-tag">Unreal Insights</span>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-card-inspect" data-project="lightfury-multiplayer">
+                <span>INSPECT TECHNICAL SPEC</span>
+                <span class="arrow">→</span>
+              </button>
+              <a class="btn-card-trailer" data-trailer-for="lightfury-multiplayer" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">
+                <span class="trailer-icon">▶</span>
+                <span>WATCH TRAILER</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- PROJECT 5: DHOOM 3 JET SPEED -->
+          <article class="project-card" data-category="physics unity" data-id="dhoom-jet">
+            <div class="card-glow-edge"></div>
+            
+            <!-- Optional Project Media Preview -->
+            <div class="card-media-banner" data-media-for="dhoom-jet" style="display: none;">
+              <img src="" alt="Dhoom 3 Jet Speed Visual" class="project-banner-img" loading="lazy">
+              <div class="media-overlay-scanline"></div>
+            </div>
+
+            <div class="card-header">
+              <div class="card-meta">
+                <span class="badge engine-badge unity">UNITY 3D</span>
+                <span class="badge role-badge">GAME DEVELOPER</span>
+                <span class="badge date-badge">FRANCHISE IP</span>
+              </div>
+              <span class="status-indicator shipped">BLOCKBUSTER IP</span>
+            </div>
+
+            <h3 class="card-title">Dhoom: 3 Jet Speed</h3>
+            <div class="card-company">Robosoft Technologies / Yash Raj Films</div>
+
+            <p class="card-summary">
+              Official high-speed water racing title for the blockbuster movie franchise. Engineered hydrodynamic jet-ski simulation, buoyant wave collisions, and obstacle velocity response.
+            </p>
+
+            <div class="card-achievements">
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Hydrodynamic Wave Physics:</strong> Custom surface buoyancy mathematics simulating realistic jet-ski skimming and crest jumps.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>High-Speed Drift Mechanics:</strong> Tight arcade controls with kinetic momentum preservation and responsive gyro input.</span>
+              </div>
+            </div>
+
+            <div class="card-tech-stack">
+              <span class="tech-tag">Unity</span>
+              <span class="tech-tag">C#</span>
+              <span class="tech-tag">Hydrodynamics</span>
+              <span class="tech-tag">PhysX</span>
+              <span class="tech-tag">Mobile Optimization</span>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-card-inspect" data-project="dhoom-jet">
+                <span>INSPECT TECHNICAL SPEC</span>
+                <span class="arrow">→</span>
+              </button>
+              <a class="btn-card-trailer" data-trailer-for="dhoom-jet" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">
+                <span class="trailer-icon">▶</span>
+                <span>WATCH TRAILER</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- PROJECT 6: HANX TRIVIA (M56 TECHNOLOGIES - APPLE ARCADE) -->
+          <article class="project-card highlight" data-category="unity apple-arcade multiplayer optimization" data-id="hanx-trivia">
+            <div class="card-glow-edge"></div>
+            
+            <!-- Optional Project Media Preview -->
+            <div class="card-media-banner" data-media-for="hanx-trivia" style="display: none;">
+              <img src="" alt="Hanx Trivia Apple Arcade Visual" class="project-banner-img" loading="lazy">
+              <div class="media-overlay-scanline"></div>
+            </div>
+
+            <div class="card-header">
+              <div class="card-meta">
+                <span class="badge engine-badge arcade">APPLE ARCADE</span>
+                <span class="badge engine-badge apple">IPHONE • IPAD • MAC • APPLE TV</span>
+                <span class="badge role-badge">M56 TECHNOLOGIES</span>
+              </div>
+              <span class="status-indicator live">ALL SCREENS</span>
+            </div>
+
+            <h3 class="card-title">Hanx Trivia</h3>
+            <div class="card-company">M56 Technologies Pvt Ltd • Apple Arcade Cross-Platform Release</div>
+
+            <p class="card-summary">
+              Live interactive trivia title developed in partnership with Academy Award-winning actor Tom Hanks, shipped across the entire <strong>Apple Arcade ecosystem</strong>. Engineered a single unified codebase running natively across <strong>iPhone, iPad, Mac (macOS), and Apple TV (tvOS)</strong> with hot-swappable multi-modal input.
+            </p>
+
+            <div class="card-achievements">
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Unified Apple Ecosystem Architecture:</strong> Single C# codebase deployed across iOS, iPadOS, macOS, and tvOS with target 60 FPS performance.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Multi-Modal Input Abstraction:</strong> Hot-swapping between touchscreen gestures, MFi/Xbox/PlayStation Bluetooth game controllers, Siri Remote, and mouse/keyboard.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>4K 60FPS TV &amp; Retina Scaling:</strong> Dynamic UI projection automatically reconfiguring from handheld mobile aspect ratios up to crisp 4K 60FPS on Apple TV.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>CloudKit &amp; Game Center Cross-Progression:</strong> Universal iCloud save state replication enabling instant multi-device session continuity.</span>
+              </div>
+            </div>
+
+            <div class="card-tech-stack">
+              <span class="tech-tag">Apple Arcade</span>
+              <span class="tech-tag">Apple TV (tvOS)</span>
+              <span class="tech-tag">Mac (macOS)</span>
+              <span class="tech-tag">iPhone / iPad</span>
+              <span class="tech-tag">Game Controllers</span>
+              <span class="tech-tag">CloudKit</span>
+              <span class="tech-tag">Game Center</span>
+              <span class="tech-tag">Unity 3D</span>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-card-inspect" data-project="hanx-trivia">
+                <span>INSPECT TECHNICAL SPEC</span>
+                <span class="arrow">→</span>
+              </button>
+              <a class="btn-card-trailer" data-trailer-for="hanx-trivia" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">
+                <span class="trailer-icon">▶</span>
+                <span>WATCH TRAILER</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- PROJECT 7: BOP LIVE (APRA TECHNOLOGIES) -->
+          <article class="project-card" data-category="multiplayer unity" data-id="bop-live">
+            <div class="card-glow-edge"></div>
+            
+            <!-- Optional Project Media Preview -->
+            <div class="card-media-banner" data-media-for="bop-live" style="display: none;">
+              <img src="" alt="Bop Live Visual" class="project-banner-img" loading="lazy">
+              <div class="media-overlay-scanline"></div>
+            </div>
+
+            <div class="card-header">
+              <div class="card-meta">
+                <span class="badge engine-badge unity">UNITY / REAL-TIME</span>
+                <span class="badge role-badge">SENIOR DEVELOPER</span>
+                <span class="badge date-badge">APRA TECHNOLOGIES</span>
+              </div>
+              <span class="status-indicator shipped">LIVE INTERACTIVE</span>
+            </div>
+
+            <h3 class="card-title">Bop Live</h3>
+            <div class="card-company">Apra Technologies Private LTD • Real-Time Audio &amp; Social Platform</div>
+
+            <p class="card-summary">
+              High-concurrency live social audio and interactive music party platform. Engineered sub-second synchronized game loops, real-time audio cue pipelines, and low-latency interactive UI states under heavy WebSocket traffic.
+            </p>
+
+            <div class="card-achievements">
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>High-Concurrency Audio &amp; Game Loops:</strong> Built responsive real-time multiplayer loops synchronized across concurrent users with sub-second event timing.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Dynamic Live Audio &amp; UI Pipelines:</strong> Designed low-latency audio cue pipelines and responsive UI transitions reacting to live music tracks and rapid player scoring.</span>
+              </div>
+              <div class="achievement-item">
+                <span class="achieve-bullet">▹</span>
+                <span><strong>Resilient Client-Server Pipelines:</strong> Created fault-tolerant event streams and state synchronizations for fast-paced social round turnarounds.</span>
+              </div>
+            </div>
+
+            <div class="card-tech-stack">
+              <span class="tech-tag">Unity 3D</span>
+              <span class="tech-tag">C#</span>
+              <span class="tech-tag">Real-Time Audio</span>
+              <span class="tech-tag">WebSockets</span>
+              <span class="tech-tag">Component Design</span>
+              <span class="tech-tag">Live Ops</span>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-card-inspect" data-project="bop-live">
+                <span>INSPECT TECHNICAL SPEC</span>
+                <span class="arrow">→</span>
+              </button>
+              <a class="btn-card-trailer" data-trailer-for="bop-live" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">
+                <span class="trailer-icon">▶</span>
+                <span>WATCH TRAILER</span>
+              </a>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 05: INTERACTIVE STATETREE / ARCHITECTURE NODE GRAPH -->
+    <section id="statetree" class="hud-section statetree-section">
+      <div class="section-container">
+        <div class="section-heading">
+          <div class="section-index">05 // ARCHITECTURE</div>
+          <h2 class="section-title">UNREAL ENGINE 5 STATETREE &amp; GAMEPLAY TAG GRAPH</h2>
+          <div class="section-line"></div>
+          <p class="section-desc">Interactive node graph demonstrating Mayank's modern modular locomotion and server-authoritative ability execution architecture. Click nodes to inspect runtime transitions and C++ delegates.</p>
+        </div>
+
+        <div class="statetree-editor-window">
+          <!-- Editor Header Toolbar -->
+          <div class="editor-toolbar">
+            <div class="editor-file-info">
+              <span class="file-icon">⚡</span>
+              <span class="file-path">Source/ECricketGame/Public/Gameplay/ST_PlayerLocomotion.uasset</span>
+              <span class="status-tag compiled">COMPILED &amp; REPLICATED</span>
+            </div>
+            <div class="editor-actions">
+              <button id="btn-trigger-state-idle" class="node-state-btn active" data-state="idle">STATE: IDLE</button>
+              <button id="btn-trigger-state-sprint" class="node-state-btn" data-state="sprint">STATE: SPRINT</button>
+              <button id="btn-trigger-state-dodge" class="node-state-btn" data-state="dodge">STATE: DODGE</button>
+              <button id="btn-trigger-state-ability" class="node-state-btn" data-state="ability">STATE: ABILITY_CAST</button>
+            </div>
+          </div>
+
+          <!-- Interactive Node Graph Canvas -->
+          <div class="node-graph-viewport">
+            <svg id="statetree-svg" class="node-graph-svg" viewBox="0 0 1000 520" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <linearGradient id="wire-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#00f2fe" />
+                  <stop offset="100%" stop-color="#4facfe" />
+                </linearGradient>
+                <filter id="glow-filter" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- Connection Bezier Cables -->
+              <g class="graph-cables">
+                <!-- Root to Locomotion -->
+                <path id="cable-root-loco" class="cable active" d="M 220 220 C 300 220, 320 140, 420 140" />
+                <!-- Locomotion to Sub-States -->
+                <path id="cable-loco-idle" class="cable active" d="M 620 120 C 700 120, 720 70, 780 70" />
+                <path id="cable-loco-sprint" class="cable" d="M 620 150 C 700 150, 720 170, 780 170" />
+                <!-- Root to Abilities -->
+                <path id="cable-root-abilities" class="cable" d="M 220 250 C 300 250, 320 340, 420 340" />
+                <path id="cable-abilities-dodge" class="cable" d="M 620 320 C 700 320, 720 280, 780 280" />
+                <path id="cable-abilities-cast" class="cable" d="M 620 360 C 700 360, 720 390, 780 390" />
+                <!-- Server Replication Cross-Link -->
+                <path id="cable-rep-sync" class="cable dashed" d="M 520 420 C 520 480, 850 480, 850 440" />
+              </g>
+
+              <!-- Node: Root StateTree -->
+              <g class="graph-node-group" id="node-root" transform="translate(40, 180)">
+                <rect class="node-rect root" width="180" height="90" rx="6" />
+                <rect class="node-header root" width="180" height="24" rx="6" />
+                <text class="node-title" x="12" y="17">Root StateTree</text>
+                <text class="node-body-line" x="12" y="45">Context: UECricketCharacter</text>
+                <text class="node-body-line text-cyan" x="12" y="65">Tick Group: TG_PrePhysics</text>
+                <circle class="pin out" cx="180" cy="45" r="5" />
+              </g>
+
+              <!-- Node: Locomotion State -->
+              <g class="graph-node-group active-node" id="node-locomotion" transform="translate(420, 90)">
+                <rect class="node-rect" width="200" height="110" rx="6" />
+                <rect class="node-header" width="200" height="24" rx="6" />
+                <text class="node-title" x="12" y="17">State: Locomotion</text>
+                <circle class="pin in" cx="0" cy="50" r="5" />
+                <text class="node-body-line" x="12" y="45">Tag: State.Locomotion</text>
+                <text class="node-body-line text-amber" x="12" y="65">Evaluator: VelocityCheck</text>
+                <text class="node-body-line text-cyan" x="12" y="85">Input: IMC_Default_Walk</text>
+                <circle class="pin out" cx="200" cy="40" r="5" />
+                <circle class="pin out" cx="200" cy="70" r="5" />
+              </g>
+
+              <!-- Sub-Node: Idle State -->
+              <g class="graph-node-group active-node" id="node-idle" transform="translate(780, 30)">
+                <rect class="node-rect" width="180" height="80" rx="6" />
+                <rect class="node-header" width="180" height="22" rx="6" />
+                <text class="node-title" x="10" y="16">SubState: Idle</text>
+                <circle class="pin in" cx="0" cy="40" r="5" />
+                <text class="node-body-line" x="10" y="44">Speed &lt;= 0.1f</text>
+                <text class="node-body-line text-emerald" x="10" y="62">Anim: AS_Idle_Loop</text>
+              </g>
+
+              <!-- Sub-Node: Sprint State -->
+              <g class="graph-node-group" id="node-sprint" transform="translate(780, 130)">
+                <rect class="node-rect" width="180" height="80" rx="6" />
+                <rect class="node-header" width="180" height="22" rx="6" />
+                <text class="node-title" x="10" y="16">SubState: Sprint</text>
+                <circle class="pin in" cx="0" cy="40" r="5" />
+                <text class="node-body-line" x="10" y="44">Tag: Action.Sprint</text>
+                <text class="node-body-line text-cyan" x="10" y="62">MaxSpeed = 750.0f</text>
+              </g>
+
+              <!-- Node: Abilities State -->
+              <g class="graph-node-group" id="node-abilities" transform="translate(420, 290)">
+                <rect class="node-rect" width="200" height="110" rx="6" />
+                <rect class="node-header" width="200" height="24" rx="6" />
+                <text class="node-title" x="12" y="17">State: CombatAbilities</text>
+                <circle class="pin in" cx="0" cy="50" r="5" />
+                <text class="node-body-line" x="12" y="45">Tag: Ability.Active</text>
+                <text class="node-body-line text-amber" x="12" y="65">Server Auth: RPC_Execute</text>
+                <text class="node-body-line text-emerald" x="12" y="85">Predict: ClientPrediction</text>
+                <circle class="pin out" cx="200" cy="40" r="5" />
+                <circle class="pin out" cx="200" cy="80" r="5" />
+              </g>
+
+              <!-- Sub-Node: Dodge State -->
+              <g class="graph-node-group" id="node-dodge" transform="translate(780, 240)">
+                <rect class="node-rect" width="180" height="80" rx="6" />
+                <rect class="node-header" width="180" height="22" rx="6" />
+                <text class="node-title" x="10" y="16">SubState: DodgeRoll</text>
+                <circle class="pin in" cx="0" cy="40" r="5" />
+                <text class="node-body-line" x="10" y="44">I-Frames: 0.35s</text>
+                <text class="node-body-line text-cyan" x="10" y="62">RootMotion: Enabled</text>
+              </g>
+
+              <!-- Sub-Node: Ability Cast -->
+              <g class="graph-node-group" id="node-abilitycast" transform="translate(780, 350)">
+                <rect class="node-rect" width="180" height="80" rx="6" />
+                <rect class="node-header" width="180" height="22" rx="6" />
+                <text class="node-title" x="10" y="16">SubState: CastAbility</text>
+                <circle class="pin in" cx="0" cy="40" r="5" />
+                <text class="node-body-line" x="10" y="44">Delegate: OnAbilityCast</text>
+                <text class="node-body-line text-amber" x="10" y="62">Cost: 25 Stamina</text>
+              </g>
+            </svg>
+          </div>
+
+          <!-- Bottom C++ Implementation Code Inspector -->
+          <div class="code-inspector-dock">
+            <div class="dock-header">
+              <span class="dock-title">C++ ARCHITECTURAL SNIPPET // REPLICATED STATEMACHINE BINDING</span>
+              <span class="dock-meta">MODERN C++20 • ZERO-HEAP-ALLOCATION</span>
+            </div>
+            <pre class="code-block-display" id="snippet-code-box"><code><span class="code-comment">// StateTree Task Execution Delegate for Decoupled Locomotion (TDD/ECRICKET-7884)</span>
+<span class="code-keyword">EStateTreeRunStatus</span> <span class="code-type">FECricketLocomotionTask</span>::EnterState(<span class="code-type">FStateTreeExecutionContext</span>&amp; Context)
+{
+    <span class="code-type">UECricketCharacterMovementComponent</span>* MoveComp = Context.GetExternalData(MoveCompHandle);
+    <span class="code-keyword">if</span> (!MoveComp) <span class="code-keyword">return</span> <span class="code-keyword">EStateTreeRunStatus</span>::Failed;
+
+    <span class="code-comment">// Bind Server-Authoritative Tag Container without dynamic allocation</span>
+    <span class="code-type">FGameplayTagContainer</span> ActiveTags = MoveComp-&gt;GetActiveGameplayTags();
+    <span class="code-keyword">if</span> (ActiveTags.HasTagExact(<span class="code-type">TAG_Locomotion_Sprint</span>))
+    {
+        MoveComp-&gt;SetMaxWalkSpeed(<span class="code-number">750.0f</span>);
+        MoveComp-&gt;Server_SendPredictionPayload(MoveComp-&gt;GetLastTimestamp());
+    }
+    <span class="code-keyword">return</span> <span class="code-keyword">EStateTreeRunStatus</span>::Running;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 06: CAREER XP PROGRESSION LOG -->
+    <section id="experience" class="hud-section experience-section">
+      <div class="section-container">
+        <div class="section-heading">
+          <div class="section-index">06 // CAREER_XP</div>
+          <h2 class="section-title">THE ENGINEERING QUEST LOG (12+ YEARS)</h2>
+          <div class="section-line"></div>
+          <p class="section-desc">Progressive track record of architectural leadership, studio-level TDD standards, and shipped commercial titles.</p>
+        </div>
+
+        <div class="timeline-xp-wrapper">
+
+          <!-- ROLE 1: LIGHTFURY GAMES (PRINCIPAL LEVEL 4) -->
+          <div class="xp-event-card active-role">
+            <div class="xp-badge">
+              <span class="xp-level">LVL 4</span>
+              <span class="xp-date">JUL 2026 - PRESENT</span>
+            </div>
+            <div class="xp-content">
+              <div class="xp-header">
+                <div>
+                  <h3 class="xp-title">Senior Gameplay Programmer Level 4 (Principal Engineer)</h3>
+                  <h4 class="xp-company">LightFury Games • Bengaluru, Karnataka, India</h4>
+                </div>
+                <span class="xp-tag current">CURRENT STATION</span>
+              </div>
+              <p class="xp-intro">
+                Spearheading core gameplay architecture and low-level C++ system foundations for the studio's flagship Unreal Engine 5 production title, <strong>ECricket</strong>. Owning end-to-end technical strategy, architectural governance, and cross-functional alignment between engineering and creative design.
+              </p>
+              <ul class="xp-bullets">
+                <li><strong>Locomotion &amp; Interaction Refactor:</strong> Architected and executed the end-to-end refactor of the core player character locomotion and interaction framework, decoupling complex dependencies to maximize modularity and performance across disciplines.</li>
+                <li><strong>TDD Governance (TDD / ECRICKET-7884):</strong> Authored key technical design documentation establishing architectural paradigms, modularity benchmarks, and modern C++ engineering best practices for the studio.</li>
+                <li><strong>Technical Roadmaps &amp; Milestones:</strong> Defined technical roadmaps and sprint milestones, aligning gameplay engineering execution with production timelines and game design objectives.</li>
+                <li><strong>Profiling Budgets &amp; Benchmarks:</strong> Established engine-level profiling benchmarks and performance budgets across tick execution, memory allocation, and CPU/GPU utilization for the title.</li>
+                <li><strong>Cross-Discipline Reviews &amp; Escalation:</strong> Led cross-discipline technical reviews and served as primary escalation point for complex architectural bottlenecks and runtime edge cases.</li>
+                <li><strong>Pod Mentorship:</strong> Mentored and coached senior and mid-level gameplay engineers, driving code review rigor and elevating modern C++ and UE5 engineering standards.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- ROLE 2: LIGHTFURY GAMES (SENIOR LEVEL 3) -->
+          <div class="xp-event-card">
+            <div class="xp-badge">
+              <span class="xp-level">LVL 3</span>
+              <span class="xp-date">MAY 2024 - JUL 2026</span>
+            </div>
+            <div class="xp-content">
+              <div class="xp-header">
+                <div>
+                  <h3 class="xp-title">Senior Gameplay Programmer 3</h3>
+                  <h4 class="xp-company">LightFury Games • Bengaluru, Karnataka, India</h4>
+                </div>
+                <span class="xp-tag">UE5 RUNTIME</span>
+              </div>
+              <p class="xp-intro">
+                Engineered core gameplay systems and low-level runtime mechanics in modern C++ for flagship Unreal Engine 5 production title, <strong>ECricket</strong>.
+              </p>
+              <ul class="xp-bullets">
+                <li><strong>StateTree &amp; Gameplay Tags:</strong> Implemented modular StateTree and gameplay tag architectures to manage complex character states, animation triggers, and ability behaviors with minimal runtime overhead.</li>
+                <li><strong>Server-Authoritative Netcode:</strong> Designed and integrated server-authoritative network replication routines, delivering smooth client-side prediction, responsive lag mitigation, and reliable delegate bindings.</li>
+                <li><strong>Unreal Insights Optimization:</strong> Conducted deep CPU and GPU performance profiling using Unreal Insights, systematically eliminating frame hitches, optimizing tick groups, and enforcing strict memory allocation standards.</li>
+                <li><strong>Perforce P4 Stream Hygiene:</strong> Governed Perforce stream integration, changelist formatting, and branch hygiene across multi-disciplinary engineering features.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- ROLE 3: M56 TECHNOLOGIES -->
+          <div class="xp-event-card">
+            <div class="xp-badge">
+              <span class="xp-level">LEAD</span>
+              <span class="xp-date">JAN 2023 - MAY 2024</span>
+            </div>
+            <div class="xp-content">
+              <div class="xp-header">
+                <div>
+                  <h3 class="xp-title">Lead Game Developer</h3>
+                  <h4 class="xp-company">M56 Technologies Pvt Ltd • Bengaluru, India</h4>
+                </div>
+                <span class="xp-tag">APPLE ARCADE LEAD</span>
+              </div>
+              <p class="xp-intro">
+                Directed technical architecture and engineering execution for <strong>Hanx Trivia</strong> on <strong>Apple Arcade</strong> (cross-platform deployment across iPhone, iPad, Mac, and Apple TV) and scalable real-time multiplayer titles.
+              </p>
+              <ul class="xp-bullets">
+                <li><strong>Apple Arcade Cross-Screen Deployment:</strong> Architected unified multi-device codebase supporting touch, game controllers, Siri Remote, and keyboard/mouse, maintaining rock-solid 60 FPS up to 4K resolution on Apple TV 4K.</li>
+                <li><strong>IoC Game Loop Decoupling:</strong> Engineered decoupled game loops using IoC/dependency injection frameworks (Zenject) and event-driven architecture, accelerating feature iteration speed across the team.</li>
+                <li><strong>Pod Management (8+ Devs):</strong> Mentored an engineering pod of 8+ developers, balancing sprint workloads, removing technical roadblocks, and ensuring strict code review and quality standards.</li>
+                <li><strong>Low-Latency Client-Server:</strong> Established scalable client-server communication pipelines for low-latency multiplayer gameplay and real-time state synchronization.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- ROLE 4: BYJU'S (LEAD ENGINEER) -->
+          <div class="xp-event-card">
+            <div class="xp-badge">
+              <span class="xp-level">LEAD</span>
+              <span class="xp-date">JAN 2021 - JAN 2023</span>
+            </div>
+            <div class="xp-content">
+              <div class="xp-header">
+                <div>
+                  <h3 class="xp-title">Lead Engineer (Unity)</h3>
+                  <h4 class="xp-company">BYJU'S • Bengaluru, India</h4>
+                </div>
+                <span class="xp-tag award">★ EMPLOYEE OF THE YEAR</span>
+              </div>
+              <p class="xp-intro">
+                Served as Technical Lead for flagship gamified educational software, including <strong>Disney • BYJU'S Early Learn</strong>, steering technical roadmaps and architectural scalability for millions of concurrent global users.
+              </p>
+              <ul class="xp-bullets">
+                <li><strong>Employee of the Year Award (2021–2022):</strong> Honored for engineering excellence, proactive technical leadership, and rapid milestone delivery.</li>
+                <li><strong>35% Footprint Reduction:</strong> Architected reusable gameplay frameworks, asset delivery pipelines, and dynamic content download modules, reducing initial app install sizes by over 35%.</li>
+                <li><strong>Cross-Discipline Alignment:</strong> Led sprint execution, technical architecture reviews, and system design, bridging technical alignment between engineering, art, audio, and product disciplines.</li>
+                <li><strong>Performance Budgeting:</strong> Defined profiling workflows across low-end to high-end mobile devices, ensuring smooth frame rates and optimized memory consumption.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- ROLE 5: BYJU'S (SENIOR GAME DEVELOPER) -->
+          <div class="xp-event-card">
+            <div class="xp-badge">
+              <span class="xp-level">SR</span>
+              <span class="xp-date">NOV 2019 - DEC 2020</span>
+            </div>
+            <div class="xp-content">
+              <div class="xp-header">
+                <div>
+                  <h3 class="xp-title">Senior Game Developer</h3>
+                  <h4 class="xp-company">BYJU'S • Bengaluru, India</h4>
+                </div>
+              </div>
+              <ul class="xp-bullets">
+                <li>Engineered core interactive gameplay modules, gamified learning loops, and animation systems for premier multi-platform mobile learning titles.</li>
+                <li>Integrated responsive UI/UX systems, asset bundles, and state-driven game loops to support dynamic content updates.</li>
+                <li>Diagnosed runtime bottlenecks, memory leaks, and draw-call spikes using Unity Profiler, significantly improving load times on mobile platforms.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- ROLE 6: APRA TECHNOLOGIES PRIVATE LTD -->
+          <div class="xp-event-card">
+            <div class="xp-badge">
+              <span class="xp-level">SR</span>
+              <span class="xp-date">FEB 2019 - NOV 2019</span>
+            </div>
+            <div class="xp-content">
+              <div class="xp-header">
+                <div>
+                  <h3 class="xp-title">Senior Game Developer (Unity)</h3>
+                  <h4 class="xp-company">Apra Technologies Private LTD • Bengaluru, India</h4>
+                </div>
+                <span class="xp-tag">REAL-TIME AUDIO &amp; SOCIAL</span>
+              </div>
+              <p class="xp-intro">
+                Architected core features, sprint task allocations, and real-time interactive loops in Unity for <strong>Bop Live</strong>, a high-concurrency live social audio &amp; interactive game platform.
+              </p>
+              <ul class="xp-bullets">
+                <li><strong>Interactive Live Audio Loops:</strong> Engineered real-time synchronized event listeners and responsive mini-game interaction hooks tied to live audio streaming channels.</li>
+                <li><strong>State-Driven Social Features:</strong> Built low-latency state machines for live audience polling, real-time leaderboards, and gamified social gifting animations.</li>
+                <li><strong>Sprint Execution &amp; Optimization:</strong> Structured technical sprint milestones and profiled runtime memory to ensure crash-free sessions across diverse mobile hardware.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- ROLE 7: JETSYNTHESYS (SACHIN SAGA) -->
+          <div class="xp-event-card">
+            <div class="xp-badge">
+              <span class="xp-level">SR</span>
+              <span class="xp-date">JUL 2017 - FEB 2019</span>
+            </div>
+            <div class="xp-content">
+              <div class="xp-header">
+                <div>
+                  <h3 class="xp-title">Senior Game Developer (Unity)</h3>
+                  <h4 class="xp-company">JetSynthesys Pvt Ltd • Pune, Maharashtra, India</h4>
+                </div>
+                <span class="xp-tag">PHYSICS CORE</span>
+              </div>
+              <ul class="xp-bullets">
+                <li>Core engineering contributor on premier sports titles, including the chart-topping cricket game <strong>Sachin Saga Cricket Champions</strong>.</li>
+                <li>Architected core physics-driven gameplay loops, including ball trajectory calculations, batting timing mechanics, and fielding AI routines.</li>
+                <li>Engineered realistic ragdoll physics and blend animation transitions for dynamic athlete interactions.</li>
+                <li>Responsible for successful real-time backend loop implementation.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- ROLE 8: AQUIMO SPORTS LLC -->
+          <div class="xp-event-card">
+            <div class="xp-badge">
+              <span class="xp-level">SR</span>
+              <span class="xp-date">JAN 2016 - JUL 2017</span>
+            </div>
+            <div class="xp-content">
+              <div class="xp-header">
+                <div>
+                  <h3 class="xp-title">Senior Game Developer</h3>
+                  <h4 class="xp-company">Aquimo Sports LLC</h4>
+                </div>
+              </div>
+              <p class="xp-intro">Real-time interactive mobile gaming and stadium-screen integrated synchronized game loops.</p>
+            </div>
+          </div>
+
+          <!-- ROLE 9: ROBOSOFT TECHNOLOGIES -->
+          <div class="xp-event-card">
+            <div class="xp-badge">
+              <span class="xp-level">DEV</span>
+              <span class="xp-date">FEB 2014 - JAN 2016</span>
+            </div>
+            <div class="xp-content">
+              <div class="xp-header">
+                <div>
+                  <h3 class="xp-title">Game Developer / Senior Game Developer</h3>
+                  <h4 class="xp-company">Robosoft Technologies Pvt Ltd</h4>
+                </div>
+              </div>
+              <p class="xp-intro">Engineered high-profile entertainment games including <em>Dhoom 3 Jet Speed</em> and mobile arcade titles.</p>
+            </div>
+          </div>
+
+          <!-- ROLE 10: GAMEANAX (INDIANIC) -->
+          <div class="xp-event-card">
+            <div class="xp-badge">
+              <span class="xp-level">DEV</span>
+              <span class="xp-date">JAN 2013 - FEB 2014</span>
+            </div>
+            <div class="xp-content">
+              <div class="xp-header">
+                <div>
+                  <h3 class="xp-title">Game Developer</h3>
+                  <h4 class="xp-company">GameAnax (IndiaNIC Pvt Ltd)</h4>
+                </div>
+              </div>
+              <p class="xp-intro">Initiated career building 2D/3D physics mechanics, Box2D gameplay puzzles, and cross-platform mobile implementations.</p>
+            </div>
+          </div>
+
+          <!-- ACADEMIC CREDENTIALS -->
+          <div class="xp-event-card education">
+            <div class="xp-badge">
+              <span class="xp-level">DEGREE</span>
+              <span class="xp-date">2009 - 2012</span>
+            </div>
+            <div class="xp-content">
+              <div class="xp-header">
+                <div>
+                  <h3 class="xp-title">Bachelor of Arts (BA) in Game Development — Grade A</h3>
+                  <h4 class="xp-company">University of Wales, Cardiff — United Kingdom</h4>
+                </div>
+                <span class="xp-tag award">GRADE-A HONORS</span>
+              </div>
+              <p class="xp-intro">
+                Completed rigorous foundational training in game engine mathematics, 3D graphics rendering, computer science fundamentals, and interactive game design.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 07: TECHNICAL LOADOUT / SKILLS HUD -->
+    <section id="skills" class="hud-section skills-section">
+      <div class="section-container">
+        <div class="section-heading">
+          <div class="section-index">07 // LOADOUT</div>
+          <h2 class="section-title">TECHNICAL ARSENAL &amp; ENGINE COMPETENCIES</h2>
+          <div class="section-line"></div>
+          <p class="section-desc">Audited skill proficiencies based on 12+ years of production experience.</p>
+        </div>
+
+        <div class="arsenal-grid">
+
+          <!-- CATEGORY 1: ENGINES & LANGUAGES -->
+          <div class="arsenal-card">
+            <div class="card-glow-bar"></div>
+            <div class="arsenal-header">
+              <span class="arsenal-icon">⚙</span>
+              <h3>Game Engines &amp; Core Languages</h3>
+            </div>
+            <div class="skill-meter-group">
+              <div class="skill-meter">
+                <div class="meter-info">
+                  <span>Unreal Engine 5 (UE5.x / UE4)</span>
+                  <span class="text-cyan">98% [EXPERT]</span>
+                </div>
+                <div class="meter-bar"><div class="meter-fill" style="width: 98%"></div></div>
+              </div>
+
+              <div class="skill-meter">
+                <div class="meter-info">
+                  <span>Modern C++ (C++17 / C++20)</span>
+                  <span class="text-cyan">96% [EXPERT]</span>
+                </div>
+                <div class="meter-bar"><div class="meter-fill" style="width: 96%"></div></div>
+              </div>
+
+              <div class="skill-meter">
+                <div class="meter-info">
+                  <span>Unity 3D / 2D (C#)</span>
+                  <span class="text-cyan">98% [12 YRS]</span>
+                </div>
+                <div class="meter-bar"><div class="meter-fill" style="width: 98%"></div></div>
+              </div>
+
+              <div class="skill-meter">
+                <div class="meter-info">
+                  <span>JavaScript / TypeScript</span>
+                  <span class="text-cyan">88%</span>
+                </div>
+                <div class="meter-bar"><div class="meter-fill" style="width: 88%"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CATEGORY 2: GAMEPLAY ARCHITECTURE -->
+          <div class="arsenal-card">
+            <div class="card-glow-bar"></div>
+            <div class="arsenal-header">
+              <span class="arsenal-icon">🏛</span>
+              <h3>Gameplay Architecture &amp; Patterns</h3>
+            </div>
+            <div class="skill-tags-cloud">
+              <span class="tech-chip">Modular StateTree</span>
+              <span class="tech-chip">Gameplay Tags Pipeline</span>
+              <span class="tech-chip">Component-Based Locomotion</span>
+              <span class="tech-chip">Dependency Injection (Zenject)</span>
+              <span class="tech-chip">StrangeIoC</span>
+              <span class="tech-chip">Finite State Machines (FSM)</span>
+              <span class="tech-chip">Event-Driven Architecture</span>
+              <span class="tech-chip">Decoupled Interaction Systems</span>
+              <span class="tech-chip">Technical Design Docs (TDD)</span>
+            </div>
+          </div>
+
+          <!-- CATEGORY 3: MULTIPLAYER & NETWORKING -->
+          <div class="arsenal-card">
+            <div class="card-glow-bar"></div>
+            <div class="arsenal-header">
+              <span class="arsenal-icon">🌐</span>
+              <h3>Multiplayer &amp; Replication</h3>
+            </div>
+            <div class="skill-tags-cloud">
+              <span class="tech-chip">Server-Authoritative Replication</span>
+              <span class="tech-chip">Client-Side Prediction</span>
+              <span class="tech-chip">Lag Mitigation &amp; Rollback</span>
+              <span class="tech-chip">Photon PUN</span>
+              <span class="tech-chip">PlayFab Backend</span>
+              <span class="tech-chip">GameSparks</span>
+              <span class="tech-chip">Low-Level Sockets (TCP/UDP)</span>
+              <span class="tech-chip">State Sync Serialization</span>
+            </div>
+          </div>
+
+          <!-- CATEGORY 4: PHYSICS & SIMULATION -->
+          <div class="arsenal-card">
+            <div class="card-glow-bar"></div>
+            <div class="arsenal-header">
+              <span class="arsenal-icon">☄</span>
+              <h3>Physics &amp; Dynamics</h3>
+            </div>
+            <div class="skill-tags-cloud">
+              <span class="tech-chip">NVIDIA PhysX</span>
+              <span class="tech-chip">Ragdoll Physics</span>
+              <span class="tech-chip">Trajectory Calculation</span>
+              <span class="tech-chip">Box2D</span>
+              <span class="tech-chip">Collision Resolution</span>
+              <span class="tech-chip">Hydrodynamic Water Physics</span>
+              <span class="tech-chip">Kinematic Vehicle Suspension</span>
+            </div>
+          </div>
+
+          <!-- CATEGORY 5: OPTIMIZATION & PROFILING -->
+          <div class="arsenal-card">
+            <div class="card-glow-bar"></div>
+            <div class="arsenal-header">
+              <span class="arsenal-icon">📈</span>
+              <h3>Optimization &amp; Profiling</h3>
+            </div>
+            <div class="skill-tags-cloud">
+              <span class="tech-chip">Unreal Insights</span>
+              <span class="tech-chip">Tick Group Scheduling</span>
+              <span class="tech-chip">Frame Hitch Elimination</span>
+              <span class="tech-chip">Draw Call Batching</span>
+              <span class="tech-chip">Heap &amp; Memory Profiling</span>
+              <span class="tech-chip">Garbage Collection Minimization</span>
+              <span class="tech-chip">Unity Profiler</span>
+            </div>
+          </div>
+
+          <!-- CATEGORY 6: TOOLCHAIN & PLATFORMS -->
+          <div class="arsenal-card">
+            <div class="card-glow-bar"></div>
+            <div class="arsenal-header">
+              <span class="arsenal-icon">🛠</span>
+              <h3>Toolchains &amp; Platforms</h3>
+            </div>
+            <div class="skill-tags-cloud">
+              <span class="tech-chip">Perforce (P4)</span>
+              <span class="tech-chip">Git / SVN / Bitbucket</span>
+              <span class="tech-chip">JetBrains Rider</span>
+              <span class="tech-chip">Visual Studio 2022</span>
+              <span class="tech-chip">Xbox Console SDK</span>
+              <span class="tech-chip">Windows PC</span>
+              <span class="tech-chip">iOS / Android Mobile</span>
+              <span class="tech-chip">JIRA / Asana Governance</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 08: COMMS LINK / CONTACT & HUD FOOTER -->
+    <section id="contact" class="hud-section contact-section">
+      <div class="section-container">
+        <div class="section-heading">
+          <div class="section-index">08 // COMMS</div>
+          <h2 class="section-title">ESTABLISH SECURE COMMS LINK</h2>
+          <div class="section-line"></div>
+          <p class="section-desc">Open for Principal Gameplay Engineer, Lead Game Developer, and Technical Architect roles in cutting-edge PC/Console/Mobile gaming studios.</p>
+        </div>
+
+        <div class="contact-deck-grid">
+          <div class="contact-info-panel">
+            <div class="comms-status-box">
+              <span class="signal-indicator"><span class="signal-bar b1"></span><span class="signal-bar b2"></span><span class="signal-bar b3"></span></span>
+              <span>FREQUENCY: ENCRYPTED // STATUS: ONLINE</span>
+            </div>
+
+            <div class="contact-links-list">
+              <a href="mailto:mayankmanjul@live.com" class="contact-item-card">
+                <span class="card-icon">✉</span>
+                <div class="card-text">
+                  <span class="label">DIRECT COMMS EMAIL</span>
+                  <span class="value">mayankmanjul@live.com</span>
+                </div>
+                <button class="btn-copy" data-copy="mayankmanjul@live.com" title="Copy Email">COPY</button>
+              </a>
+
+              <a href="tel:+917066845227" class="contact-item-card">
+                <span class="card-icon">📞</span>
+                <div class="card-text">
+                  <span class="label">MOBILE LINE</span>
+                  <span class="value">+91-7066845227</span>
+                </div>
+                <button class="btn-copy" data-copy="+917066845227" title="Copy Phone">COPY</button>
+              </a>
+
+              <a href="https://www.linkedin.com/in/mayankmanjul" target="_blank" rel="noopener noreferrer" class="contact-item-card">
+                <span class="card-icon">🔗</span>
+                <div class="card-text">
+                  <span class="label">LINKEDIN PROFESSIONAL RECORD</span>
+                  <span class="value">linkedin.com/in/mayankmanjul</span>
+                </div>
+                <span class="external-arrow">↗</span>
+              </a>
+
+              <div class="contact-item-card static">
+                <span class="card-icon">📍</span>
+                <div class="card-text">
+                  <span class="label">PRIMARY STATION / BASE</span>
+                  <span class="value">Bengaluru, Karnataka, India (Open to Remote / Relocation)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Comms Transmission Dispatch Form -->
+          <div class="contact-form-panel">
+            <div class="form-header">
+              <span class="form-title">TRANSMIT STUDIO INQUIRY</span>
+              <span class="packet-status" id="form-packet-status">PACKET_READY</span>
+            </div>
+
+            <form id="contact-form" class="hud-form">
+              <div class="form-group">
+                <label for="form-sender">NAME / STUDIO AFFILIATION</label>
+                <input type="text" id="form-sender" placeholder="e.g. CD Projekt Red / Epic Games / Recruiter" required>
+              </div>
+
+              <div class="form-group">
+                <label for="form-email">RESPONSE CHANNEL (EMAIL)</label>
+                <input type="email" id="form-email" placeholder="name@studio.com" required>
+              </div>
+
+              <div class="form-group">
+                <label for="form-subject">INQUIRY DIRECTIVE</label>
+                <select id="form-subject" class="hud-select">
+                  <option value="principal-role">Principal Gameplay Engineer Position</option>
+                  <option value="lead-role">Lead Game Developer / Pod Lead</option>
+                  <option value="architecture">Architectural Consulting &amp; Profiling</option>
+                  <option value="community">Unity Developers India Community Collab</option>
+                  <option value="other">General Studio Inquiry</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="form-message">TRANSMISSION PAYLOAD (MESSAGE)</label>
+                <textarea id="form-message" rows="4" placeholder="Brief mission details, engine stack, and project roadmap..." required></textarea>
+              </div>
+
+              <button type="submit" class="btn hud-btn primary full-width">
+                <span class="btn-text">DISPATCH SECURE TRANSMISSION</span>
+                <span class="btn-icon">⚡</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Technical Spec Modal (Deep Dive into Projects) -->
+  <div id="project-modal" class="hud-modal" style="display: none;" hidden role="dialog" aria-modal="true" aria-labelledby="modal-project-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <span class="modal-icon">◈</span>
+          <h3 id="modal-project-title">Project Technical Blueprint</h3>
+        </div>
+        <button type="button" id="btn-close-modal" class="modal-close-btn" aria-label="Close Blueprint">✕</button>
+      </div>
+      <div class="modal-body" id="modal-project-content">
+        <!-- Content injected dynamically by script.js -->
+      </div>
+      <div class="modal-footer">
+        <span class="modal-security">CONFIDENTIALITY: LEVEL 3 TDD SPECIFICATION</span>
+        <button type="button" class="btn hud-btn outline small" id="btn-modal-dismiss">CLOSE BLUEPRINT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TDD Resume Spec Modal / Print Sheet -->
+  <div id="resume-modal" class="hud-modal" style="display: none;" hidden role="dialog" aria-modal="true" aria-labelledby="resume-modal-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog wide-dialog">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <span class="modal-icon">📄</span>
+          <h3 id="resume-modal-title">TDD RESUME SPECIFICATION // MAYANK MANJUL</h3>
+        </div>
+        <div class="modal-actions-right">
+          <a id="modal-gdrive-download" href="#" target="_blank" rel="noopener noreferrer" class="btn hud-btn highlight-download small" title="Download Official Resume PDF via Google Drive">
+            <span class="btn-icon">📥</span>
+            <span>GOOGLE DRIVE PDF</span>
+          </a>
+          <button type="button" id="btn-print-resume" class="btn hud-btn primary small">
+            <span>PRINT / SAVE AS PDF</span>
+          </button>
+          <button type="button" id="btn-edit-gdrive-link" class="btn hud-btn outline small" title="Configure your Google Drive Link">
+            <span>⚙ EDIT DRIVE URL</span>
+          </button>
+          <button type="button" id="btn-close-resume-modal" class="modal-close-btn" aria-label="Close Resume">✕</button>
+        </div>
+      </div>
+      <div class="modal-body print-area" id="resume-modal-content">
+        <!-- Structured printable resume content injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Persistent HUD Status Line -->
+  <footer class="engine-bottom-bar" role="contentinfo">
+    <div class="bottom-left">
+      <span class="status-glyph">●</span>
+      <span>SYSTEM OPERATIONAL</span>
+      <span class="sep">|</span>
+      <span>MAYANK MANJUL // PRINCIPAL GAMEPLAY ENGINEER</span>
+    </div>
+    <div class="bottom-center hide-mobile">
+      <span>SHORTCUTS: <kbd>~</kbd> Console | <kbd>Space</kbd> Sim Action | <kbd>Esc</kbd> Close Windows</span>
+    </div>
+    <div class="bottom-right">
+      <span>FOUNDER: UNITY DEVELOPERS INDIA</span>
+      <span class="sep">|</span>
+      <span>&copy; <span id="copyright-year">2026</span> ALL RIGHTS RESERVED</span>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="scripts/sound-fx.js"></script>
+  <script src="scripts/background-canvas.js"></script>
+  <script src="scripts/physics-sandbox.js"></script>
+  <script src="scripts/statetree-visualizer.js"></script>
+  <script src="scripts/terminal.js"></script>
+  <script src="scripts/main.js"></script>
+</body>
+</html>

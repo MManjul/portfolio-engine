@@ -1,0 +1,34 @@
+# Operating System
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.tmp
+*.bak
+
+# IDE & Editors
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.swp
+*.swo
+
+# Local Logs & Scratch Artifacts
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+scratch/
+.system_generated/
+.user_uploaded/
+
+# Cloudflare Pages / Wrangler Cache
+.wrangler/
+.mf/
+
+# Note: assets/ and functions/ are strictly tracked for deployment
