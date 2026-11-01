@@ -434,57 +434,15 @@ function initGoogleDriveResume() {
   const heroDownloadBtn = document.getElementById('hero-download-resume-btn');
   const topbarDownloadBtn = document.getElementById('topbar-download-resume');
   const modalDownloadBtn = document.getElementById('modal-gdrive-download');
-  const editLinkBtn = document.getElementById('btn-edit-gdrive-link');
 
-  // Official live Google Drive resume link
-  const OFFICIAL_GDRIVE_URL = 'https://drive.google.com/file/d/1rQcI8EHY2sCMNXN2j-Doxnb8eUOrDM6y/view?usp=sharing';
-  let gdriveUrl = localStorage.getItem('manjul_gdrive_resume_url') || OFFICIAL_GDRIVE_URL;
+  const OFFICIAL_RESUME_URL = 'https://drive.google.com/file/d/1rQcI8EHY2sCMNXN2j-Doxnb8eUOrDM6y/view?usp=sharing';
 
-  function updateDownloadLinks(url) {
-    if (heroDownloadBtn) heroDownloadBtn.href = url;
-    if (topbarDownloadBtn) topbarDownloadBtn.href = url;
-    if (modalDownloadBtn) modalDownloadBtn.href = url;
-  }
-
-  updateDownloadLinks(gdriveUrl);
-
-  // Allow one-click customization of their Google Drive link
-  if (editLinkBtn) {
-    editLinkBtn.addEventListener('click', () => {
-      const current = localStorage.getItem('manjul_gdrive_resume_url') || '';
-      const promptVal = prompt('Paste your Google Drive shareable link for your resume PDF:\n(e.g. https://drive.google.com/file/d/.../view?usp=sharing)', current);
-
-      if (promptVal !== null && promptVal.trim() !== '') {
-        const cleanUrl = promptVal.trim();
-        localStorage.setItem('manjul_gdrive_resume_url', cleanUrl);
-        updateDownloadLinks(cleanUrl);
-        alert('✓ Google Drive Resume Link successfully updated and saved!');
-        if (window.soundFX) window.soundFX.playLaserChime();
-      }
-    });
-  }
-
-  // Intercept click on hero/topbar buttons if still using default placeholder
-  const downloadButtons = [heroDownloadBtn, topbarDownloadBtn, modalDownloadBtn];
-  downloadButtons.forEach(btn => {
-    if (!btn) return;
-    btn.addEventListener('click', (e) => {
-      const stored = localStorage.getItem('manjul_gdrive_resume_url');
-      if (!stored || stored.includes('1Bxxxx')) {
-        e.preventDefault();
-        const entered = prompt('Configure your Google Drive shareable link for your resume PDF:\nPaste your link below to open directly:', 'https://drive.google.com/');
-        if (entered && entered.trim() !== '') {
-          const finalUrl = entered.trim();
-          localStorage.setItem('manjul_gdrive_resume_url', finalUrl);
-          updateDownloadLinks(finalUrl);
-          window.open(finalUrl, '_blank');
-        } else {
-          // If skipped, open the TDD Resume Spec modal with instant Print / Save as PDF!
-          const resumeBtn = document.getElementById('btn-quick-resume');
-          if (resumeBtn) resumeBtn.click();
-        }
-      }
-    });
+  [heroDownloadBtn, topbarDownloadBtn, modalDownloadBtn].forEach(btn => {
+    if (btn) {
+      btn.href = OFFICIAL_RESUME_URL;
+      btn.target = '_blank';
+      btn.rel = 'noopener noreferrer';
+    }
   });
 }
 
