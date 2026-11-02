@@ -1,0 +1,107 @@
+---
+// Self-contained: the script only starts the simulation once the canvas scrolls into view.
+---
+<figure class="demo">
+  <canvas id="net" width="1040" height="420" aria-label="Netcode simulation: server, unpredicted client and predicted client"></canvas>
+  <figcaption>
+    <div class="legend">
+      <span><i style="background:#8b96a3"></i>Server (truth)</span>
+      <span><i style="background:#ff5d6c"></i>Client, no prediction</span>
+      <span><i style="background:#39d0ff"></i>Client, prediction + reconciliation</span>
+    </div>
+    <div class="controls">
+      <label>Round trip <output id="rtt-o">150</output> ms <input id="rtt" type="range" min="0" max="400" step="10" value="150" /></label>
+      <label>Packet loss <output id="loss-o">5</output>% <input id="loss" type="range" min="0" max="40" value="5" /></label>
+      <label class="check"><input id="auto" type="checkbox" checked /> Auto-pilot</label>
+    </div>
+    <p class="hint">Turn off auto-pilot and steer with WASD or the arrow keys. Raise the ping and watch the red client lag while the blue one stays responsive.</p>
+  </figcaption>
+</figure>
+<script>
+  type V = { x: number; y: number };
+  const cv = document.getElementById('net') as HTMLCanvasElement;
+  const ctx = cv.getContext('2d')!;
+  const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+  const W = cv.width, H = cv.height, SPEED = 260, TICK = 1 / 30;
+  const keys = new Set<string>();
+  addEventListener('keydown', (e) => { if (!$('auto').checked) { keys.add(e.key.toLowerCase()); if (e.key.startsWith('Arrow')) e.preventDefault(); } });
+  addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
+  for (const id of ['rtt', 'loss']) $(id).addEventListener('input', () => ((document.getElementById(id + '-o') as HTMLOutputElement).value = $(id).value));
+
+  const server: V = { x: W / 2, y: H / 2 };
+  const raw: V = { ...server };
+  const pred: V = { ...server };
+  let seq = 0, lastAck = -1, t = 0, acc = 0;
+  const pending: { seq: number; dir: V }[] = [];
+  const wire: { at: number; fn: () => void }[] = [];
+  const trail: Record<string, V[]> = { s: [], r: [], p: [] };
+
+  const input = (): V => {
+    if ($('auto').checked) {
+      const tx = W / 2 + Math.cos(t * 0.8) * W * 0.38, ty = H / 2 + Math.sin(t * 1.6) * H * 0.32;
+      const dx = tx - pred.x, dy = ty - pred.y, l = Math.hypot(dx, dy);
+      return l < 4 ? { x: 0, y: 0 } : { x: dx / l, y: dy / l };
+    }
+    const k = (a: string, b: string) => (keys.has(a) || keys.has(b) ? 1 : 0);
+    const v = { x: k('d', 'arrowright') - k('a', 'arrowleft'), y: k('s', 'arrowdown') - k('w', 'arrowup') };
+    const l = Math.hypot(v.x, v.y) || 1; return { x: v.x / l, y: v.y / l };
+  };
+  const step = (p: V, d: V) => { p.x = Math.min(W - 20, Math.max(20, p.x + d.x * SPEED * TICK)); p.y = Math.min(H - 20, Math.max(20, p.y + d.y * SPEED * TICK)); };
+  const send = (fn: () => void) => { if (Math.random() * 100 >= +$('loss').value) wire.push({ at: performance.now() + +$('rtt').value / 2, fn }); };
+
+  function tick() {
+    t += TICK;
+    const dir = input(), s = seq++;
+    step(pred, dir); pending.push({ seq: s, dir });          // client predicts immediately
+    send(() => {                                              // server applies input, then replies with state
+      step(server, dir);
+      const snap = { ...server, ack: s };
+      send(() => {
+        raw.x = snap.x; raw.y = snap.y;                       // naive client just snaps to server state
+        if (snap.ack <= lastAck) return; lastAck = snap.ack;
+        pred.x = snap.x; pred.y = snap.y;                     // reconcile: rewind to server, replay unacked inputs
+        while (pending.length && pending[0].seq <= snap.ack) pending.shift();
+        for (const p of pending) step(pred, p.dir);
+      });
+    });
+  }
+
+  function draw() {
+    ctx.fillStyle = '#0b0d10'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = '#ffffff08'; for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    const dots: [string, V, string][] = [['s', server, '#8b96a3'], ['r', raw, '#ff5d6c'], ['p', pred, '#39d0ff']];
+    for (const [k, p, c] of dots) {
+      const tr = trail[k]; tr.push({ ...p }); if (tr.length > 40) tr.shift();
+      ctx.strokeStyle = c + '55'; ctx.lineWidth = 2; ctx.beginPath(); tr.forEach((q, i) => (i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y))); ctx.stroke();
+      ctx.fillStyle = c; ctx.beginPath(); ctx.arc(p.x, p.y, k === 's' ? 14 : 10, 0, Math.PI * 2); k === 's' ? (ctx.strokeStyle = c, ctx.lineWidth = 2, ctx.stroke()) : ctx.fill();
+    }
+    ctx.fillStyle = '#8b96a3'; ctx.font = '14px ui-monospace, monospace';
+    ctx.fillText(`unacked inputs: ${pending.length}   drift (no prediction): ${Math.hypot(raw.x - pred.x, raw.y - pred.y).toFixed(0)} px`, 16, H - 16);
+  }
+
+  let last = 0, running = false, raf = 0;
+  function frame(now: number) {
+    acc += Math.min(0.25, (now - (last || now)) / 1000); last = now;
+    while (acc >= TICK) { tick(); acc -= TICK; }
+    const n = performance.now();
+    for (let i = wire.length - 1; i >= 0; i--) if (wire[i].at <= n) { const m = wire.splice(i, 1)[0]; m.fn(); }
+    draw(); if (running) raf = requestAnimationFrame(frame);
+  }
+  new IntersectionObserver(([e]) => {
+    running = e.isIntersecting;
+    if (running) { last = 0; raf = requestAnimationFrame(frame); } else cancelAnimationFrame(raf);
+  }).observe(cv);
+  draw();
+</script>
+<style>
+  .demo { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  canvas { width: 100%; height: auto; display: block; border-bottom: 1px solid var(--line); }
+  figcaption { padding: 20px 24px; display: grid; gap: 16px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 20px; font: 13px var(--mono); color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 28px; align-items: center; font: 13px var(--mono); }
+  .controls label { display: flex; gap: 10px; align-items: center; }
+  input[type=range] { accent-color: var(--accent); width: 160px; }
+  .hint { margin: 0; color: var(--muted); font-size: 14px; }
+</style>

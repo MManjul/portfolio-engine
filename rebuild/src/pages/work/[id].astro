@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+export async function getStaticPaths() {
+  const all = await getCollection('projects', (p) => p.data.caseStudy);
+  return all.map((p) => ({ params: { id: p.id }, props: { p } }));
+}
+const { p } = Astro.props; const d = p.data;
+const { Content } = await render(p);
+---
+<Base title={`${d.title} — Mayank Manjul`} description={d.summary}>
+  <article>
+    <header class="wrap head">
+      <a href="/#work" class="back">← All work</a>
+      <p class="label">Case study · {d.studio}</p>
+      <h1>{d.title}</h1>
+      <p class="lede">{d.summary}</p>
+      <dl class="facts">
+        <div><dt>Role</dt><dd>{d.role}</dd></div>
+        <div><dt>Engine</dt><dd>{d.engine}</dd></div>
+        <div><dt>Platforms</dt><dd>{d.platforms}</dd></div>
+      </dl>
+    </header>
+    {d.cover && <Image src={d.cover} alt={`${d.title} gameplay`} widths={[800, 1200, 1600]} sizes="(max-width: 1160px) 100vw, 1120px" class="wrap hero-img" loading="eager" />}
+    {d.results.length > 0 && (
+      <ul class="wrap results">{d.results.map((r) => <li><strong>{r.value}</strong><span>{r.label}</span></li>)}</ul>
+    )}
+    <div class="wrap prose"><Content /></div>
+    {d.gallery.length > 0 && <div class="wrap gallery">{d.gallery.map((g) => <Image src={g} alt={`${d.title} screenshot`} widths={[600, 1000]} sizes="(max-width: 900px) 100vw, 560px" />)}</div>}
+    <div class="wrap foot"><ul class="chips">{d.stack.map((s) => <li>{s}</li>)}</ul><a class="btn" href="/lab/">See the netcode demo in the lab →</a></div>
+  </article>
+</Base>
+<style>
+  .head { padding-top: 56px; padding-bottom: 40px; }
+  .back { font: 13px var(--mono); color: var(--muted); text-decoration: none; display: inline-block; margin-bottom: 28px; }
+  h1 { font-size: clamp(40px, 6vw, 72px); margin: 14px 0 18px; }
+  .lede { font-size: 20px; color: var(--muted); max-width: 60ch; margin: 0; }
+  .facts { display: flex; flex-wrap: wrap; gap: 40px; margin: 32px 0 0; }
+  .facts dt { font: 12px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+  .facts dd { margin: 4px 0 0; }
+  .hero-img { padding: 0; border-radius: 14px; border: 1px solid var(--line); width: calc(100% - 40px); }
+  .results { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 32px auto; }
+  .results li { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+  .results strong { display: block; font: 700 28px var(--mono); color: var(--accent); }
+  .results span { color: var(--muted); font-size: 14px; }
+  .prose { max-width: 720px; padding-top: 24px; }
+  .prose :global(h2) { font-size: 26px; margin: 48px 0 12px; }
+  .prose :global(p), .prose :global(li) { color: #c5cdd5; }
+  .prose :global(strong) { color: var(--text); }
+  .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 48px; }
+  .gallery :global(img) { border-radius: 10px; border: 1px solid var(--line); }
+  .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px; align-items: center; padding: 48px 20px 96px; }
+  @media (max-width: 700px) { .gallery { grid-template-columns: 1fr; } }
+</style>

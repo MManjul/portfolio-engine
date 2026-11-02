@@ -1,0 +1,10 @@
+{
+  // Serves only the Astro build output, so source and config are never public.
+  "name": "mayank-portfolio",
+  "compatibility_date": "2025-10-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}

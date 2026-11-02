@@ -1,0 +1,92 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import portrait from '../assets/portrait.jpg';
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const [flagship, ...rest] = projects;
+const experience = [
+  { when: '2026 — now', role: 'Principal Gameplay Engineer (L4)', where: 'LightFury Games', note: 'Core gameplay architecture for ECricket in UE5.' },
+  { when: '— 2026', role: 'Senior Gameplay Programmer, Netcode', where: 'LightFury Games', note: 'Server-authoritative replication, prediction and lag compensation.' },
+  { when: '2021 — 2023', role: 'Lead Engineer', where: "BYJU'S", note: 'Disney · BYJU’S Early Learn. Employee of the Year 2021–22.' },
+  { when: 'Earlier', role: 'Game Developer → Senior', where: 'M56, JetSynthesys, Robosoft, Apra', note: 'Hanx101 Trivia, Sachin Saga, Dhoom 3 Jet Speed, Bop Live.' },
+];
+---
+<Base>
+  <section class="hero">
+    <div class="wrap grid">
+      <div>
+        <p class="label">Principal gameplay engineer</p>
+        <h1>I build the runtime systems that make games feel right.</h1>
+        <p class="lede">12+ years shipping Unreal Engine 5 and Unity games to millions of players. Character locomotion, server-authoritative netcode and frame-budget optimisation, from mobile to console.</p>
+        <div class="cta">
+          <a class="btn primary" href="#work">See the work</a>
+          <a class="btn" href="/resume.pdf">Résumé (PDF)</a>
+          <a class="btn" href="/lab/">Play in the lab</a>
+        </div>
+        <dl class="stats">
+          <div><dt>12+</dt><dd>years shipping</dd></div>
+          <div><dt>10M+</dt><dd>players reached</dd></div>
+          <div><dt>7</dt><dd>commercial titles</dd></div>
+        </dl>
+      </div>
+      <Image src={portrait} alt="Mayank Manjul" widths={[320, 640]} sizes="320px" class="portrait" loading="eager" />
+    </div>
+  </section>
+
+  <section id="work">
+    <div class="wrap">
+      <p class="label">Selected work</p>
+      <h2>Shipped titles and the systems behind them</h2>
+      <div class="cards">
+        <ProjectCard p={flagship} feature />
+        {rest.map((p) => <ProjectCard p={p} />)}
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="wrap two">
+      <div><p class="label">Experience</p><h2>Career log</h2></div>
+      <ol class="xp">
+        {experience.map((x) => (
+          <li><span class="when">{x.when}</span><div><h3>{x.role}</h3><p class="where">{x.where}</p><p>{x.note}</p></div></li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <p class="label">Contact</p>
+      <h2>Building something that needs to feel great at 120 FPS?</h2>
+      <div class="cta">
+        <a class="btn primary" href="mailto:mayankmanjul@live.com">mayankmanjul@live.com</a>
+        <a class="btn" href="https://www.linkedin.com/in/mayankmanjul" rel="noopener">LinkedIn ↗</a>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .hero { border-top: 0; padding: 88px 0 96px; background: radial-gradient(800px 400px at 80% 0%, var(--accent-dim), transparent), linear-gradient(transparent 95%, #ffffff06 95%) 0 0 / 100% 28px; }
+  .grid { display: grid; grid-template-columns: 1fr 320px; gap: 56px; align-items: center; }
+  h1 { font-size: clamp(36px, 5.4vw, 64px); margin: 16px 0 20px; }
+  h2 { font-size: clamp(26px, 3.4vw, 38px); margin: 12px 0 40px; max-width: 22ch; }
+  .lede { color: var(--muted); font-size: 19px; max-width: 58ch; margin: 0; }
+  .cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .stats { display: flex; gap: 40px; margin: 40px 0 0; }
+  .stats dt { font: 700 30px var(--mono); color: var(--text); }
+  .stats dd { margin: 0; color: var(--muted); font-size: 14px; }
+  .portrait { border-radius: 14px; border: 1px solid var(--line); filter: grayscale(.3) contrast(1.05); aspect-ratio: 4/5; object-fit: cover; width: 100%; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .two { display: grid; grid-template-columns: 1fr 2fr; gap: 48px; }
+  .xp { list-style: none; margin: 0; padding: 0; }
+  .xp li { display: grid; grid-template-columns: 130px 1fr; gap: 20px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+  .xp li:first-child { padding-top: 0; }
+  .when { font: 13px var(--mono); color: var(--accent); padding-top: 4px; }
+  .xp h3 { font-size: 19px; }
+  .xp p { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
+  .where { color: var(--text) !important; }
+  @media (max-width: 900px) { .grid, .two { grid-template-columns: 1fr; } .portrait { max-width: 240px; grid-row: 1; } .xp li { grid-template-columns: 1fr; gap: 4px; } .stats { gap: 24px; } }
+</style>
