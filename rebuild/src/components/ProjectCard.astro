@@ -1,0 +1,36 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+interface Props { p: CollectionEntry<'projects'>; feature?: boolean; }
+const { p, feature = false } = Astro.props;
+const d = p.data;
+const href = d.caseStudy ? `/work/${p.id}/` : d.trailer;
+---
+<article class:list={['card', { feature }]}>
+  {d.cover
+    ? <Image src={d.cover} alt={`${d.title} screenshot`} widths={[480, 800, 1200]} sizes={feature ? '(max-width: 900px) 100vw, 1120px' : '(max-width: 900px) 100vw, 360px'} class="cover" />
+    : <div class="cover blank" aria-hidden="true"><span>{d.title}</span></div>}
+  <div class="body">
+    <p class="meta">{d.engine} · {d.studio}{d.badge && <span class="badge">{d.badge}</span>}</p>
+    <h3>{d.title}</h3>
+    <p>{d.summary}</p>
+    {href && <a class="more" href={href} target={d.caseStudy ? undefined : '_blank'} rel={d.caseStudy ? undefined : 'noopener'}>{d.caseStudy ? 'Read the case study →' : 'Watch trailer ↗'}</a>}
+  </div>
+</article>
+<style>
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: border-color .2s, transform .2s; }
+  .card:hover { border-color: #39d0ff66; transform: translateY(-2px); }
+  .cover { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+  .blank { display: grid; place-items: center; background: repeating-linear-gradient(135deg, #0f1419 0 12px, #11171d 12px 24px); font: 700 20px var(--mono); color: #39d0ff88; text-align: center; padding: 12px; }
+  .body { padding: 20px 22px 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .body p { margin: 0; color: var(--muted); font-size: 15px; }
+  .meta { font: 12px var(--mono) !important; }
+  .badge { margin-left: 8px; color: var(--accent); }
+  h3 { font-size: 21px; }
+  .more { margin-top: auto; padding-top: 6px; font: 500 14px var(--mono); color: var(--accent); text-decoration: none; }
+  .feature { grid-column: 1 / -1; display: grid; grid-template-columns: 1.4fr 1fr; }
+  .feature .cover { height: 100%; aspect-ratio: auto; min-height: 320px; }
+  .feature h3 { font-size: 32px; }
+  .feature .body { padding: 36px; justify-content: center; }
+  @media (max-width: 900px) { .feature { grid-template-columns: 1fr; } .feature .cover { min-height: 0; aspect-ratio: 16/9; } }
+</style>

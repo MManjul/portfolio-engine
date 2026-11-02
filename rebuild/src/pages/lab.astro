@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import NetcodeDemo from '../components/NetcodeDemo.astro';
+---
+<Base title="Lab — Mayank Manjul" description="Interactive gameplay engineering demos: client-side prediction and server reconciliation, running live in the browser.">
+  <section class="wrap" style="border:0;padding-top:64px">
+    <p class="label">Lab</p>
+    <h1>Client-side prediction, live</h1>
+    <p class="lede">The same idea I use for ECricket multiplayer, at toy scale. The server owns the truth. The red client waits for it; the blue one predicts its own input, then rewinds and replays whenever the server's answer arrives.</p>
+    <NetcodeDemo />
+    <p class="next">More demos from the current site (wave buoyancy, cricket ballistics, Verlet ragdoll, StateTree graph) would move here as separate pages, each loading only its own code.</p>
+  </section>
+</Base>
+<style>
+  h1 { font-size: clamp(34px, 5vw, 56px); margin: 14px 0 16px; }
+  .lede { color: var(--muted); font-size: 18px; max-width: 64ch; margin: 0 0 36px; }
+  .next { color: var(--muted); font-size: 15px; margin-top: 28px; }
+</style>
