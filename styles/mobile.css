@@ -354,9 +354,15 @@
     overflow: hidden !important;
   }
 
+  .avatar-holo-wrapper {
+    width: 144px !important;
+    height: 144px !important;
+    margin: 0 auto 16px !important;
+  }
+
   .avatar-photo-frame {
-    width: 82px !important;
-    height: 82px !important;
+    width: 110px !important;
+    height: 110px !important;
   }
 
   .avatar-ring-outer {
@@ -411,35 +417,22 @@
     font-size: 0.75rem !important;
   }
 
-  /* 8. Section 03: Playground (Disabled & Replaced with Calibration Card) */
+  /* 8. Section 03: Netcode Runtime Simulation Lab */
   .sandbox-section .sandbox-container {
-    display: none !important;
+    display: block !important;
   }
 
-  .playground-calibration-card {
-    padding: 20px 16px !important;
-    gap: 14px !important;
-    margin-top: 10px !important;
+  .interactive-sandbox-canvas {
+    height: 320px !important;
   }
 
-  .calibration-title {
-    font-size: 1.25rem !important;
-  }
-
-  .calibration-desc {
-    font-size: 0.88rem !important;
-    line-height: 1.5 !important;
-  }
-
-  .calibration-grid {
+  .sandbox-controls-deck {
     grid-template-columns: 1fr !important;
     padding: 12px 14px !important;
     gap: 10px !important;
   }
 
-  .calibration-actions .btn {
-    width: 100% !important;
-  }
+  
 
   /* 9. Section 04: Projects Grid */
   .filter-controls {
@@ -475,7 +468,13 @@
   }
 
   .card-media-banner {
-    height: 185px !important;
+    height: 200px !important;
+    background: #040812 !important;
+  }
+
+  .project-banner-img {
+    object-fit: contain !important;
+    background: #040812 !important;
   }
 
   .card-actions-row {

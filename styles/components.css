@@ -382,6 +382,7 @@
   position: relative;
   overflow: hidden;
   transition: all var(--transition-normal);
+  cursor: pointer;
 }
 
 .project-card:hover {

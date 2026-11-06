@@ -117,7 +117,7 @@
       </a>
       <a href="#sandbox" class="nav-item" data-nav="sandbox">
         <span class="nav-index">03</span>
-        <span class="nav-label">PLAYGROUND <span class="nav-badge-soon">SOON</span></span>
+        <span class="nav-label">NETCODE_LAB <span class="nav-badge-live">LIVE</span></span>
       </a>
       <a href="#projects" class="nav-item" data-nav="projects">
         <span class="nav-index">04</span>
@@ -239,11 +239,9 @@
                     <div class="avatar-photo-frame">
                       <img src="assets/images/mayank-portrait.jpg" alt="Mayank Manjul - Principal Gameplay Engineer" class="avatar-photo-img" onerror="this.style.display='none'; document.getElementById('avatar-fallback-box').style.display='flex';">
                       <div class="avatar-photo-scanline"></div>
-                      <div class="avatar-title-badge">PRINCIPAL ENG</div>
                     </div>
                     <div class="avatar-ascii-box" id="avatar-fallback-box" style="display: none;">
                       <div class="avatar-initials">MM</div>
-                      <div class="avatar-title-badge">PRINCIPAL ENG</div>
                     </div>
                   </div>
                   <div class="telemetry-specs-list">
@@ -491,45 +489,10 @@
     <section id="sandbox" class="hud-section sandbox-section">
       <div class="section-container">
         <div class="section-heading">
-          <div class="section-index">03 // PLAYGROUND</div>
-          <h2 class="section-title">INTERACTIVE GAMEPLAY SIMULATOR &amp; PHYSICS ENGINE</h2>
+          <div class="section-index">03 // RUNTIME LAB</div>
+          <h2 class="section-title">DETERMINISTIC NETCODE &amp; CLIENT PREDICTION SIMULATOR</h2>
           <div class="section-line"></div>
-          <p class="section-desc">Real-time low-level runtime simulator demonstrating Hydrodynamics &amp; Wave Buoyancy (<em>Dhoom 3 Jet Speed</em>), Cricket Ballistics (<em>Sachin Saga</em>), Server Replication with Client Prediction, and Articulated Verlet Ragdolls.</p>
-        </div>
-
-        <!-- Playground Subsystem Calibration Card (Active while playground is offline) -->
-        <div class="playground-calibration-card">
-          <div class="calibration-badge">
-            <span class="pulse-dot-amber"></span>
-            <span>SUBSYSTEM CALIBRATION IN PROGRESS // TEMPORARILY OFFLINE</span>
-          </div>
-          <h3 class="calibration-title">PHYSICS ENGINE &amp; GAMEPLAY PLAYGROUND</h3>
-          <p class="calibration-desc">
-            The real-time interactive physics engine (Hydrodynamics Wave Buoyancy, 150+ km/h Cricket Ballistics, and Server Replication with Client Prediction) is currently undergoing low-level architecture upgrades, multi-threaded ECS refactoring, and GPU performance profiling for an upcoming release.
-          </p>
-          <div class="calibration-grid">
-            <div class="calib-item">
-              <span class="calib-label">CORE ARCHITECTURE:</span>
-              <span class="calib-val">Unreal Engine 5 / Modern C++ / Box2D Physics Harness</span>
-            </div>
-            <div class="calib-item">
-              <span class="calib-label">CURRENT PIPELINE:</span>
-              <span class="calib-val">Multi-threaded Job System &amp; Shader Calibration</span>
-            </div>
-            <div class="calib-item">
-              <span class="calib-label">SUBSYSTEM STATUS:</span>
-              <span class="calib-val text-amber">COMING SOON // NEXT ENGINE RELEASE</span>
-            </div>
-          </div>
-          <div class="calibration-actions">
-            <a href="#projects" class="btn hud-btn primary">
-              <span class="btn-text">INSPECT SHIPPED TITLES &amp; ARCHITECTURE</span>
-              <span class="btn-chevron">▶</span>
-            </a>
-            <a href="#statetree" class="btn hud-btn secondary">
-              <span class="btn-text">EXPLORE STATETREE NODE GRAPH</span>
-            </a>
-          </div>
+          <p class="section-desc">Interactive low-level multiplayer simulator demonstrating Authoritative Server State, Unpredicted Client Latency, and Client-Side Prediction with Gabriel Gambetta Reconciliation. Steer with WASD or Arrow Keys, adjust RTT &amp; Packet Loss, or toggle Auto-Pilot.</p>
         </div>
 
         <div class="sandbox-container">
@@ -538,62 +501,28 @@
             <div class="control-box">
               <label class="control-label" for="sim-mode-select">SIMULATION SUBSYSTEM:</label>
               <select id="sim-mode-select" class="hud-select">
-                <option value="buoyancy" selected>🌊 Hydrodynamics &amp; Wave Buoyancy (Dhoom 3 Jet Speed)</option>
-                <option value="trajectory">🏏 Cricket Ballistics &amp; Trajectory (Sachin Saga)</option>
-                <option value="netcode">🌐 Server Replication &amp; Client-Side Prediction</option>
+                <option value="netcode" selected>🌐 Server Replication &amp; Client Prediction (2D Netcode)</option>
                 <option value="ragdoll">🦴 Articulated Verlet Ragdoll &amp; Dynamic Collisions</option>
               </select>
             </div>
 
-            <!-- Dynamic Controls: Buoyancy -->
-            <div class="control-box sim-ctrl-group" id="ctrl-group-buoyancy">
-              <label class="control-label">WAVE AMPLITUDE: <span id="wave-amp-val" class="text-cyan">24 px</span></label>
-              <input type="range" id="wave-amp-slider" min="6" max="50" step="2" value="24" class="hud-slider">
+            <!-- Dynamic Controls: Netcode (Active by default) -->
+            <div class="control-box sim-ctrl-group" id="netcode-delay-box">
+              <label class="control-label">SIMULATED PING (RTT): <span id="ping-val" class="text-amber">150 ms</span></label>
+              <input type="range" id="ping-slider" min="0" max="400" step="10" value="150" class="hud-slider">
             </div>
 
-            <div class="control-box sim-ctrl-group" id="ctrl-group-buoyancy-freq">
-              <label class="control-label">WAVE FREQUENCY: <span id="wave-freq-val" class="text-cyan">1.8x</span></label>
-              <input type="range" id="wave-freq-slider" min="0.5" max="3.5" step="0.25" value="1.8" class="hud-slider">
+            <div class="control-box sim-ctrl-group" id="netcode-loss-box">
+              <label class="control-label">PACKET LOSS: <span id="loss-val" class="text-crimson">5%</span></label>
+              <input type="range" id="loss-slider" min="0" max="40" step="1" value="5" class="hud-slider">
             </div>
 
-            <!-- Dynamic Controls: Cricket Ballistics (Sachin Saga) -->
-            <div class="control-box sim-ctrl-group" id="ctrl-group-cricket-type" style="display: none;">
-              <label class="control-label" for="cricket-delivery-type">DELIVERY ARSENAL:</label>
-              <select id="cricket-delivery-type" class="hud-select">
-                <option value="outswing">⚡ Express Outswinger (145 km/h)</option>
-                <option value="inswing">🌪 Inswinging Yorker (148 km/h)</option>
-                <option value="reverse">🔥 Late Reverse Swing (146 km/h)</option>
-                <option value="bouncer">🚀 Fast Rising Bouncer (152 km/h)</option>
-                <option value="yorker">🎯 Toe-Crushing Yorker (148 km/h)</option>
-                <option value="legcutter">🌀 Gripping Leg-Cutter (124 km/h)</option>
-                <option value="offcutter">⚡ Nipping Off-Cutter (126 km/h)</option>
-              </select>
-            </div>
-
-            <div class="control-box sim-ctrl-group" id="ctrl-group-cricket-length" style="display: none;">
-              <label class="control-label">PITCH LENGTH: <span id="cricket-length-val" class="text-amber">GOOD LENGTH (6.5m)</span></label>
-              <input type="range" id="cricket-length-slider" min="2" max="11" step="0.5" value="6.5" class="hud-slider">
-            </div>
-
-            <div class="control-box sim-ctrl-group" id="ctrl-group-cricket-line" style="display: none;">
-              <label class="control-label">PITCH LINE: <span id="cricket-line-val" class="text-cyan">OUTSIDE OFF (+0.18m)</span></label>
-              <input type="range" id="cricket-line-slider" min="-0.6" max="0.6" step="0.05" value="0.18" class="hud-slider">
-            </div>
-
-            <div class="control-box sim-ctrl-group" id="ctrl-group-cricket-speed" style="display: none;">
-              <label class="control-label">SIM SPEED: <span id="cricket-speed-val" class="text-emerald">1.0x (BROADCAST)</span></label>
-              <input type="range" id="cricket-speed-slider" min="0.25" max="1.0" step="0.25" value="1.0" class="hud-slider">
-            </div>
-
-            <!-- Dynamic Controls: Netcode -->
-            <div class="control-box sim-ctrl-group" id="netcode-delay-box" style="display: none;">
-              <label class="control-label">SIMULATED PING (RTT): <span id="ping-val" class="text-amber">120 ms</span></label>
-              <input type="range" id="ping-slider" min="0" max="350" step="10" value="120" class="hud-slider">
-            </div>
-
-            <div class="control-box sim-ctrl-group" id="netcode-loss-box" style="display: none;">
-              <label class="control-label">PACKET LOSS: <span id="loss-val" class="text-crimson">0%</span></label>
-              <input type="range" id="loss-slider" min="0" max="30" step="5" value="0" class="hud-slider">
+            <div class="control-box sim-ctrl-group" id="netcode-auto-box">
+              <label class="control-label" for="netcode-auto-toggle">FLIGHT CONTROLLER:</label>
+              <label class="hud-checkbox-label">
+                <input type="checkbox" id="netcode-auto-toggle" checked>
+                <span class="text-emerald" id="netcode-auto-label">AUTO-PILOT ACTIVE</span>
+              </label>
             </div>
 
             <!-- Dynamic Controls: Tick Rate -->
@@ -605,12 +534,12 @@
             <!-- Interactive Action Buttons -->
             <div class="control-actions">
               <button type="button" id="btn-fire-sim" class="btn hud-btn primary small">
-                <span class="btn-text" id="btn-fire-text">ACCELERATE JET-SKI [W / ↑]</span>
+                <span class="btn-text" id="btn-fire-text">STEER [WASD / ARROWS]</span>
               </button>
               <button type="button" id="btn-secondary-sim" class="btn hud-btn secondary small">
-                <span class="btn-text" id="btn-secondary-text">DROP FLOATING CARGO</span>
+                <span class="btn-text" id="btn-secondary-text">INJECT SERVER DESYNC</span>
               </button>
-              <button type="button" id="btn-clear-sim" class="btn hud-btn outline small" title="Reset Viewport Entities">
+              <button type="button" id="btn-clear-sim" class="btn hud-btn outline small" title="Reset Network State">
                 <span class="btn-text">RESET VIEWPORT</span>
               </button>
             </div>
@@ -621,13 +550,13 @@
             <div class="viewport-hud-overlay">
               <div class="hud-left-stat">
                 <span>SIM STATUS: <strong id="sim-state-text" class="text-emerald">SOLVER ACTIVE</strong></span>
-                <span>ENTITIES / ACTORS: <strong id="sim-actor-count">1 Vessel</strong></span>
-                <span id="sim-dynamic-stat-1">HULL BUOYANCY (Fb): <strong id="sim-buoyancy-stat" class="text-cyan">100% NOMINAL</strong></span>
+                <span>ENTITIES / ACTORS: <strong id="sim-actor-count">3 Network Entities</strong></span>
+                <span id="sim-dynamic-stat-1">UNACKED INPUTS: <strong id="sim-buoyancy-stat" class="text-cyan">0</strong></span>
               </div>
               <div class="hud-right-stat">
-                <span id="sim-mode-indicator" class="text-cyan">MODE: HYDRODYNAMICS_BUOYANCY_SOLVER</span>
-                <span id="sim-lag-mitigation-status">DISPLACEMENT: ARCHIMEDES_MULTI_POINT_DRAFT</span>
-                <span id="sim-dynamic-stat-2">SPEED: <strong id="sim-speed-stat" class="text-amber">0.0 KNOTS</strong></span>
+                <span id="sim-mode-indicator" class="text-cyan">MODE: SERVER_REPLICATION_CLIENT_PREDICTION</span>
+                <span id="sim-lag-mitigation-status">RECONCILIATION: REWIND_REPLAY_DETERMINISTIC</span>
+                <span id="sim-dynamic-stat-2">PREDICTION DRIFT: <strong id="sim-speed-stat" class="text-emerald">0.0 px</strong></span>
               </div>
             </div>
 
@@ -635,7 +564,7 @@
 
             <div class="canvas-instructions" id="sandbox-instructions-bar">
               <span class="keyboard-icon">🎮</span>
-              <span id="sandbox-instructions-text"><strong>Controls:</strong> Press or Hold [W] / [↑] or click ACCELERATE to drive across waves • Click anywhere in water to drop buoyant cargo crates!</span>
+              <span id="sandbox-instructions-text"><strong>Controls:</strong> Steer predicted ship with [W/A/S/D] or [Arrow Keys] • Click or Drag canvas to navigate • Turn off Auto-Pilot to test manual prediction • Raise Ping and Packet Loss to stress reconciliation!</span>
             </div>
           </div>
 
@@ -722,19 +651,19 @@
             <div class="card-achievements">
               <div class="achievement-item">
                 <span class="achieve-bullet">▹</span>
-                <span><strong>Locomotion &amp; Interaction Refactor:</strong> Decoupled complex character dependencies, elevating runtime modularity across disciplines.</span>
+                <span><strong>Locomotion &amp; StateTree Refactor:</strong> Decoupled monolithic character dependencies using UE5 StateTree tasks &amp; replicated Gameplay Tag containers.</span>
               </div>
               <div class="achievement-item">
                 <span class="achieve-bullet">▹</span>
-                <span><strong>TDD/ECRICKET-7884 Governance:</strong> Authored studio-wide technical design documentation defining modern C++ patterns and tick budgeting.</span>
+                <span><strong>GC-Free Tick Optimization:</strong> Eliminated heap allocations in the gameplay tick (0 allocations/frame) via Unreal Insights profiling on low-end target hardware.</span>
               </div>
               <div class="achievement-item">
                 <span class="achieve-bullet">▹</span>
-                <span><strong>StateTree &amp; Gameplay Tags:</strong> Managed multi-layered character states, animation triggers, and ability systems with minimal overhead.</span>
+                <span><strong>120 FPS Target Frame Lock:</strong> Optimized tick groups and delegates to lock 120 FPS on console and maintain frame target on mobile hardware floor.</span>
               </div>
               <div class="achievement-item">
                 <span class="achieve-bullet">▹</span>
-                <span><strong>Unreal Insights Optimization:</strong> Conducted deep CPU/GPU profiling, eliminating micro-hitches and optimizing tick groups.</span>
+                <span><strong>TDD/ECRICKET-7884 Governance:</strong> Authored studio-wide technical architecture standard governing modern C++20 patterns and tick budgets.</span>
               </div>
             </div>
 

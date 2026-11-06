@@ -497,22 +497,22 @@ const projectData = {
     ],
     trailerUrl: 'https://www.youtube.com/watch?v=xkaYueCqsXI',
     content: `
-      <h4>Mission Directives &amp; Architecture:</h4>
-      <p>Spearheading core gameplay architecture and low-level C++ system foundations for LightFury's flagship AAA production title, targeting Mobile (current live production) with PC and Console releases in future technical roadmaps. Directly responsible for authoring Technical Design Documents (TDD / ECRICKET-7884) that set engine-wide modularity benchmarks and tick group budgets for the entire engineering organization.</p>
-      
-      <h4>Key Deliverables &amp; Architectural Refactoring:</h4>
+      <h4>Architectural Challenge:</h4>
+      <p>The batsman, fielders, and bowling actors had grown into an interwoven tangle of direct references across locomotion, animation, input, and network replication. Any change to locomotion broke adjacent disciplines, and gameplay tick overhead was compounding.</p>
+
+      <h4>The System &amp; Solution:</h4>
       <ul>
-        <li><strong>Character Locomotion Refactor:</strong> Completely architected and decoupled player locomotion, stance transitions, and interaction frameworks from monolith character classes into isolated, reusable modular components.</li>
-        <li><strong>StateTree &amp; Gameplay Tags:</strong> Integrated modular StateTree structures to handle complex animation states and combat triggers with minimal tick overhead.</li>
-        <li><strong>Server-Authoritative Replication:</strong> Authored custom prediction routines with client-side lag mitigation and verified rollback delegates.</li>
-        <li><strong>Profiling with Unreal Insights:</strong> Conducted deep CPU/GPU hitch audits, eliminating tick bottlenecks and enforcing strict memory allocation budgets across target hardware.</li>
+        <li><strong>Decoupled Locomotion via StateTree:</strong> Rebuilt the character layer entirely around <strong>StateTree</strong> tasks and <strong>Gameplay Tags</strong>. Each locomotion, batting stance, and ability state is a self-contained task declaring requirements via tags rather than direct component references.</li>
+        <li><strong>Network Replication:</strong> Animation and networking replicate only the lightweight Gameplay Tag container and state header instead of monolithic component structs.</li>
+        <li><strong>Tick Budgeting &amp; Memory:</strong> Enforced strict tick groups; moved non-per-frame logic to timers and events, achieving zero per-frame heap allocations during the active gameplay tick.</li>
+        <li><strong>Studio Governance (TDD/ECRICKET-7884):</strong> Authored the studio-wide C++ standard setting modern C++ ownership patterns, tick budgets, and Unreal Insights profiling protocols.</li>
       </ul>
 
-      <h4>Telemetry &amp; Impact:</h4>
+      <h4>Unreal Insights Profiling &amp; Impact:</h4>
       <div class="quick-metrics-grid" style="margin-top: 16px;">
-        <div class="metric-card"><span class="metric-val">-65%</span><span class="metric-desc">Cross-Actor Tick Dependencies</span></div>
-        <div class="metric-card"><span class="metric-val">120 FPS</span><span class="metric-desc">Target Console Framerate Locked</span></div>
-        <div class="metric-card"><span class="metric-val">TDD-7884</span><span class="metric-desc">Studio-Wide Architectural Standard</span></div>
+        <div class="metric-card"><span class="metric-val">120 FPS</span><span class="metric-desc">Target Frame Lock on Device Floor</span></div>
+        <div class="metric-card"><span class="metric-val">0</span><span class="metric-desc">Per-Frame Heap Allocations in Tick</span></div>
+        <div class="metric-card"><span class="metric-val">1 TDD</span><span class="metric-desc">Studio-Wide Standard (ECRICKET-7884)</span></div>
       </div>
     `
   },
@@ -704,7 +704,7 @@ function initProjectBlueprints() {
           <div class="blueprint-thumbs-strip" style="display: flex; gap: 8px; margin-top: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px;">
             ${data.screenshots.map((s, idx) => `
               <button type="button" class="blueprint-thumb-btn ${idx === 0 ? 'active' : ''}" data-src="${s}" title="View capture ${idx + 1}" style="flex: 0 0 84px; height: 50px; border-radius: 4px; border: 1px solid ${idx === 0 ? 'var(--theme-accent)' : 'rgba(255,255,255,0.2)'}; padding: 0; background: #060b13; overflow: hidden; cursor: pointer; transition: all 0.2s ease;">
-                <img src="${s}" alt="Thumbnail ${idx + 1}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                <img src="${s}" alt="Thumbnail ${idx + 1}" style="width: 100%; height: 100%; object-fit: contain; background: #040810; display: block;">
               </button>
             `).join('')}
           </div>
@@ -712,8 +712,8 @@ function initProjectBlueprints() {
       }
 
       mediaHtml = `
-        <div class="blueprint-media-hero" style="margin-bottom: 8px; position: relative; border-radius: 4px; overflow: hidden; border: 1px solid rgba(0, 242, 254, 0.3); background: #060b13;">
-          <img id="blueprint-hero-image" src="${data.image}" alt="${data.title}" style="width: 100%; max-height: 320px; object-fit: cover; display: block;" onerror="this.parentElement.style.display='none';">
+        <div class="blueprint-media-hero" style="margin-bottom: 12px; position: relative; border-radius: 4px; overflow: hidden; border: 1px solid rgba(0, 242, 254, 0.3); background: #040810; display: flex; align-items: center; justify-content: center; min-height: 220px;">
+          <img id="blueprint-hero-image" src="${data.image}" alt="${data.title}" style="width: 100%; max-height: 480px; object-fit: contain; background: #040810; display: block; margin: 0 auto;" onerror="this.parentElement.style.display='none';">
           <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(10, 16, 26, 0.85); border: 1px solid rgba(0, 242, 254, 0.4); padding: 2px 8px; font-size: 0.7rem; font-family: var(--font-mono); color: var(--theme-accent);">GAMEPLAY CAPTURE</div>
         </div>
         ${thumbsHtml}
@@ -800,8 +800,24 @@ function initProjectBlueprints() {
     }
   }
 
+  // Make the entire project tile/card clickable to open technical specs blueprint
+  const projectCards = document.querySelectorAll('.project-card');
+  projectCards.forEach(card => {
+    card.addEventListener('click', (e) => {
+      // Allow trailer links, carousel arrows, or any external anchors to function normally
+      if (e.target.closest('.btn-card-trailer') || e.target.closest('.carousel-nav-btn') || e.target.closest('a[href]')) {
+        return;
+      }
+      const projectId = card.dataset.id;
+      if (projectId) {
+        openBlueprint(projectId);
+      }
+    });
+  });
+
   inspectBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
       openBlueprint(btn.dataset.project);
     });
   });

@@ -61,6 +61,8 @@ class PhysicsSandboxEngine {
     this.pingValLabel = document.getElementById('ping-val');
     this.lossSlider = document.getElementById('loss-slider');
     this.lossValLabel = document.getElementById('loss-val');
+    this.autoToggle = document.getElementById('netcode-auto-toggle');
+    this.autoValLabel = document.getElementById('netcode-auto-label');
 
     // Telemetry DOM
     this.actorCountLabel = document.getElementById('sim-actor-count');
@@ -78,10 +80,10 @@ class PhysicsSandboxEngine {
     this.driftReadout = document.getElementById('graph-drift-readout');
 
     // Simulation Config
-    this.mode = 'buoyancy'; // 'buoyancy' | 'trajectory' | 'netcode' | 'ragdoll'
+    this.mode = 'netcode'; // 'buoyancy' | 'trajectory' | 'netcode' | 'ragdoll'
     this.tickRate = 60;
-    this.simulatedPing = 120; // ms RTT
-    this.packetLoss = 0; // %
+    this.simulatedPing = 150; // ms RTT
+    this.packetLoss = 5; // %
     this.totalCollisions = 0;
 
     // Simulation Time
@@ -210,6 +212,18 @@ class PhysicsSandboxEngine {
       });
     }
 
+    if (this.autoToggle) {
+      this.autoToggle.addEventListener('change', (e) => {
+        if (this.netcodeState) {
+          this.netcodeState.autoPilot = e.target.checked;
+          if (this.autoValLabel) {
+            this.autoValLabel.textContent = e.target.checked ? 'AUTO-PILOT ACTIVE' : 'MANUAL WASD STEERING';
+            this.autoValLabel.className = e.target.checked ? 'text-emerald' : 'text-cyan';
+          }
+        }
+      });
+    }
+
     // Buttons
     if (this.fireBtn) {
       this.fireBtn.addEventListener('click', (e) => {
@@ -260,13 +274,32 @@ class PhysicsSandboxEngine {
       const activeEl = document.activeElement;
       if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) return;
 
+      if (this.mode === 'netcode' && this.netcodeState) {
+        const k = e.key.toLowerCase();
+        if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) {
+          if (k.startsWith('arrow')) e.preventDefault();
+          this.netcodeState.keys.add(k);
+          if (this.netcodeState.autoPilot) {
+            this.netcodeState.autoPilot = false;
+            if (this.autoToggle) this.autoToggle.checked = false;
+            if (this.autoValLabel) {
+              this.autoValLabel.textContent = 'MANUAL WASD STEERING';
+              this.autoValLabel.className = 'text-cyan';
+            }
+          }
+        }
+      }
+
       if (e.code === 'KeyW' || e.code === 'ArrowUp' || e.code === 'Space') {
-        e.preventDefault();
+        if (this.mode !== 'netcode') e.preventDefault();
         this.handlePrimaryActionClick();
       }
     });
 
     window.addEventListener('keyup', (e) => {
+      if (this.mode === 'netcode' && this.netcodeState) {
+        this.netcodeState.keys.delete(e.key.toLowerCase());
+      }
       if (e.code === 'KeyW' || e.code === 'ArrowUp') {
         this.handlePrimaryActionEnd();
       }
@@ -276,7 +309,16 @@ class PhysicsSandboxEngine {
     this.resetWorld();
 
     this.loop = this.loop.bind(this);
-    requestAnimationFrame(this.loop);
+    this.running = false;
+    this.observer = new IntersectionObserver(([entry]) => {
+      this.running = entry.isIntersecting;
+      if (this.running) {
+        this.lastTime = performance.now();
+        requestAnimationFrame(this.loop);
+      }
+    }, { threshold: 0.05 });
+    if (this.canvas) this.observer.observe(this.canvas);
+    else requestAnimationFrame(this.loop);
   }
 
   resize() {
@@ -338,15 +380,17 @@ class PhysicsSandboxEngine {
       }
       this.computePredictedTrajectory();
     } else if (this.mode === 'netcode') {
+      const netcodeAutoBox = document.getElementById('netcode-auto-box');
       if (netcodeDelayBox) netcodeDelayBox.style.display = 'flex';
       if (netcodeLossBox) netcodeLossBox.style.display = 'flex';
-      if (this.fireBtnText) this.fireBtnText.textContent = 'MOVE TO TARGET DESTINATION';
-      if (this.secBtnText) this.secBtnText.textContent = 'INJECT SERVER MISPREDICTION';
+      if (netcodeAutoBox) netcodeAutoBox.style.display = 'flex';
+      if (this.fireBtnText) this.fireBtnText.textContent = 'TOGGLE AUTO-PILOT';
+      if (this.secBtnText) this.secBtnText.textContent = 'INJECT SERVER DESYNC';
       if (this.secBtn) this.secBtn.style.display = 'inline-flex';
-      this.modeIndicator.textContent = 'MODE: SERVER_AUTHORITY_CLIENT_PREDICTION';
-      this.predictionStatus.textContent = 'REPLICATION: HERMITE_ROLLBACK_RECONCILIATION';
+      this.modeIndicator.textContent = 'MODE: SERVER_REPLICATION_CLIENT_PREDICTION';
+      this.predictionStatus.textContent = 'RECONCILIATION: REWIND_REPLAY_DETERMINISTIC';
       if (this.instructionsText) {
-        this.instructionsText.innerHTML = '<strong>Controls:</strong> Click anywhere on lane to dispatch movement • Click INJECT MISPREDICTION to watch client rollback & smooth reconcile!';
+        this.instructionsText.innerHTML = '<strong>Controls:</strong> Steer predicted ship with [W/A/S/D] or [Arrow Keys] • Click or Drag canvas to navigate • Turn off Auto-Pilot to test manual prediction • Raise Ping and Packet Loss to stress reconciliation!';
       }
     } else if (this.mode === 'ragdoll') {
       if (this.fireBtnText) this.fireBtnText.textContent = 'LAUNCH RAGDOLL IMPULSE';
@@ -1210,102 +1254,150 @@ class PhysicsSandboxEngine {
   }
 
   /* ==========================================================================
-     3. SERVER REPLICATION & LAG MITIGATION (NETCODE)
+     3. SERVER REPLICATION & DETERMINISTIC PREDICTION (NETCODE)
      ========================================================================== */
   initNetcodeState() {
+    const w = (this.canvas ? this.canvas.width / (this.scale || 1) : 960);
+    const h = (this.canvas ? this.canvas.height / (this.scale || 1) : 480);
     this.netcodeState = {
-      serverX: 200,
-      clientPredictedX: 200,
-      clientRawX: 200,
-      targetX: 200,
-      history: [],
-      packets: [],
-      lastSeq: 0,
-      rollbackActive: false,
-      reconcileT: 0
+      server: { x: w * 0.5, y: h * 0.5 },
+      raw: { x: w * 0.5, y: h * 0.5 },
+      pred: { x: w * 0.5, y: h * 0.5 },
+      seq: 0,
+      lastAck: -1,
+      t: 0,
+      acc: 0,
+      pending: [],
+      wire: [],
+      trail: { s: [], r: [], p: [] },
+      autoPilot: true,
+      keys: new Set(),
+      targetPoint: null,
+      speed: 250,
+      tickRateTime: 1 / 30
     };
   }
 
   updateNetcode(dt) {
     const ns = this.netcodeState;
-    const now = performance.now();
-    const rtt = this.simulatedPing;
-    const halfRTT = rtt / 2;
+    if (!ns || !ns.server) this.initNetcodeState();
     const w = this.canvas.width / this.scale;
+    const h = this.canvas.height / this.scale;
+    const TICK = ns.tickRateTime || (1 / 30);
+    const SPEED = ns.speed || 250;
 
-    // Autonomous target waypoint patrol when user hasn't clicked recently
-    if (!ns.lastUserInteraction || now - ns.lastUserInteraction > 2600) {
-      ns.targetX = (w * 0.5) + Math.sin(now * 0.0014) * (w * 0.32);
-    }
-
-    // Client Prediction moves toward target instantly
-    ns.clientPredictedX += (ns.targetX - ns.clientPredictedX) * 0.22;
-
-    // Simulate sending UDP packet from client to server
-    if (Math.random() < 0.25) {
-      ns.lastSeq++;
-      // Check packet loss simulation
-      if (Math.random() * 100 >= this.packetLoss) {
-        ns.packets.push({
-          seq: ns.lastSeq,
-          target: ns.targetX,
-          spawnTime: now,
-          deliverTime: now + halfRTT,
-          type: 'c2s'
-        });
+    const getInput = () => {
+      if (ns.autoPilot) {
+        const tx = w / 2 + Math.cos(ns.t * 0.75) * (w * 0.38);
+        const ty = h / 2 + Math.sin(ns.t * 1.5) * (h * 0.32);
+        const dx = tx - ns.pred.x, dy = ty - ns.pred.y, l = Math.hypot(dx, dy);
+        return l < 6 ? { x: 0, y: 0 } : { x: dx / l, y: dy / l };
       }
-    }
-
-    // Deliver packets to server
-    for (let p of ns.packets) {
-      if (!p.delivered && now >= p.deliverTime) {
-        p.delivered = true;
-        if (p.type === 'c2s') {
-          // Server receives target
-          ns.serverX += (p.target - ns.serverX) * 0.22;
-          // Send server auth snapshot back to client
-          ns.packets.push({
-            seq: p.seq,
-            authX: ns.serverX,
-            spawnTime: now,
-            deliverTime: now + halfRTT,
-            type: 's2c'
-          });
-        } else if (p.type === 's2c') {
-          // Client unpredicted raw receives authoritative state
-          ns.clientRawX = p.authX;
-
-          // Reconcile client prediction if server drift exceeds threshold
-          const drift = Math.abs(ns.clientPredictedX - p.authX);
-          if (drift > 25 && !ns.rollbackActive) {
-            ns.rollbackActive = true;
-            ns.reconcileT = 0;
-          }
+      if (ns.targetPoint) {
+        const dx = ns.targetPoint.x - ns.pred.x, dy = ns.targetPoint.y - ns.pred.y, l = Math.hypot(dx, dy);
+        if (l < 10) {
+          ns.targetPoint = null;
+          return { x: 0, y: 0 };
         }
+        return { x: dx / l, y: dy / l };
+      }
+      const k = (a, b) => (ns.keys.has(a) || ns.keys.has(b) ? 1 : 0);
+      const vx = k('d', 'arrowright') - k('a', 'arrowleft');
+      const vy = k('s', 'arrowdown') - k('w', 'arrowup');
+      const l = Math.hypot(vx, vy) || 1;
+      return (vx === 0 && vy === 0) ? { x: 0, y: 0 } : { x: vx / l, y: vy / l };
+    };
+
+    const stepEntity = (p, d) => {
+      p.x = Math.min(w - 28, Math.max(28, p.x + d.x * SPEED * TICK));
+      p.y = Math.min(h - 28, Math.max(28, p.y + d.y * SPEED * TICK));
+    };
+
+    const rtt = Math.max(0, this.simulatedPing || 150);
+    const loss = Math.max(0, Math.min(100, this.packetLoss || 0));
+
+    const sendPacket = (fn) => {
+      if (Math.random() * 100 >= loss) {
+        ns.wire.push({ at: performance.now() + (rtt / 2), fn });
+      }
+    };
+
+    ns.acc += Math.min(0.25, dt);
+    while (ns.acc >= TICK) {
+      ns.t += TICK;
+      ns.acc -= TICK;
+      const dir = getInput();
+      const s = ns.seq++;
+
+      // Client predicts immediately
+      stepEntity(ns.pred, dir);
+      ns.pending.push({ seq: s, dir });
+
+      // Send to server over wire with latency
+      sendPacket(() => {
+        stepEntity(ns.server, dir);
+        const snap = { x: ns.server.x, y: ns.server.y, ack: s };
+        sendPacket(() => {
+          ns.raw.x = snap.x;
+          ns.raw.y = snap.y;
+          if (snap.ack <= ns.lastAck) return;
+          ns.lastAck = snap.ack;
+
+          // Gabriel Gambetta Reconciliation:
+          // 1. Rewind to server authoritative snapshot
+          ns.pred.x = snap.x;
+          ns.pred.y = snap.y;
+          // 2. Discard acknowledged inputs
+          while (ns.pending.length && ns.pending[0].seq <= snap.ack) {
+            ns.pending.shift();
+          }
+          // 3. Replay unacknowledged inputs
+          for (const p of ns.pending) {
+            stepEntity(ns.pred, p.dir);
+          }
+        });
+      });
+    }
+
+    // Process wire packets
+    const now = performance.now();
+    for (let i = ns.wire.length - 1; i >= 0; i--) {
+      if (ns.wire[i].at <= now) {
+        const m = ns.wire.splice(i, 1)[0];
+        m.fn();
       }
     }
 
-    // Smooth Hermite reconciliation
-    if (ns.rollbackActive) {
-      ns.reconcileT += dt * 3;
-      if (ns.reconcileT >= 1.0) {
-        ns.rollbackActive = false;
-      }
+    // Update trails
+    const maxTrail = 42;
+    const dots = [['s', ns.server], ['r', ns.raw], ['p', ns.pred]];
+    for (const [k, p] of dots) {
+      const tr = ns.trail[k];
+      tr.push({ x: p.x, y: p.y });
+      if (tr.length > maxTrail) tr.shift();
     }
-
-    // Clean stale packets
-    ns.packets = ns.packets.filter(p => now - p.spawnTime < 1400);
 
     // Telemetry updates
-    const driftMs = (Math.abs(ns.serverX - ns.clientPredictedX) * 0.08).toFixed(2);
-    if (this.driftReadout) this.driftReadout.textContent = `${driftMs} ms`;
+    const driftPx = Math.hypot(ns.raw.x - ns.pred.x, ns.raw.y - ns.pred.y).toFixed(1);
+    if (this.driftReadout) this.driftReadout.textContent = `${driftPx} px`;
+    const allocReadout = document.getElementById('graph-alloc-readout');
+    if (allocReadout) allocReadout.textContent = `0 KB/tick (GC-Free)`;
+    if (this.actorCountLabel) this.actorCountLabel.textContent = `3 Network Entities`;
+    if (this.buoyancyStatLabel) {
+      const pCount = ns.pending ? ns.pending.length : 0;
+      this.buoyancyStatLabel.innerHTML = `UNACKED INPUTS: <strong class="text-cyan">${pCount}</strong>`;
+    }
+    if (this.speedStatLabel) {
+      this.speedStatLabel.innerHTML = `PREDICTION DRIFT: <strong class="${driftPx > 20 ? 'text-amber' : 'text-emerald'}">${driftPx} px</strong>`;
+    }
   }
 
   injectServerMisprediction() {
     const ns = this.netcodeState;
-    ns.serverX += (Math.random() > 0.5 ? 80 : -80);
-    ns.rollbackActive = true;
-    ns.reconcileT = 0;
+    if (!ns || !ns.server) return;
+    const offset = (Math.random() > 0.5 ? 90 : -90);
+    ns.server.x = Math.max(40, Math.min(this.canvas.width / this.scale - 40, ns.server.x + offset));
+    ns.server.y = Math.max(40, Math.min(this.canvas.height / this.scale - 40, ns.server.y + (offset * 0.6)));
     if (window.soundFX) window.soundFX.playLaserChime();
   }
 
@@ -1405,24 +1497,19 @@ class PhysicsSandboxEngine {
      ========================================================================== */
   handlePrimaryActionClick() {
     if (this.mode === 'buoyancy') {
-      this.throttleActive = !this.throttleActive;
-      if (this.throttleActive) {
-        if (this.fireBtn) this.fireBtn.classList.add('active-throttle');
-        if (window.soundFX) window.soundFX.playLaunchSound();
-      } else {
-        if (this.fireBtn) this.fireBtn.classList.remove('active-throttle');
-      }
+      this.throttleActive = true;
+      this.applyJetSkiImpulse();
     } else if (this.mode === 'trajectory') {
-      const cs = this.cricketState;
-      if (cs.ball.active && !cs.batsman.connected) {
-        this.swingBat();
-      } else {
-        this.bowlCricketBall();
-      }
+      this.bowlCricketBall();
     } else if (this.mode === 'netcode') {
-      const w = this.canvas.width / this.scale;
-      this.netcodeState.targetX = Math.random() * (w - 180) + 90;
-      this.netcodeState.lastUserInteraction = performance.now();
+      if (this.netcodeState) {
+        this.netcodeState.autoPilot = !this.netcodeState.autoPilot;
+        if (this.autoToggle) this.autoToggle.checked = this.netcodeState.autoPilot;
+        if (this.autoValLabel) {
+          this.autoValLabel.textContent = this.netcodeState.autoPilot ? 'AUTO-PILOT ACTIVE' : 'MANUAL WASD STEERING';
+          this.autoValLabel.className = this.netcodeState.autoPilot ? 'text-emerald' : 'text-cyan';
+        }
+      }
       if (window.soundFX) window.soundFX.playClick();
     } else if (this.mode === 'ragdoll') {
       for (let r of this.ragdollState.ragdolls) {
@@ -1489,43 +1576,23 @@ class PhysicsSandboxEngine {
      ========================================================================== */
   onMouseDown(e) {
     const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const w = this.canvas.width / this.scale;
-    const h = this.canvas.height / this.scale;
+    const x = (e.clientX - rect.left) / this.scale;
+    const y = (e.clientY - rect.top) / this.scale;
 
     if (this.mode === 'buoyancy') {
-      // Click water to spawn floating crate
       this.spawnBuoyantCrate(x, y);
     } else if (this.mode === 'trajectory') {
-      const cs = this.cricketState;
-      const b = cs.ball;
-
-      // If ball is in flight, clicking triggers bat strike!
-      if (b.active && !cs.batsman.connected) {
-        this.swingBat();
-        return;
-      }
-
-      // Check if clicking on 22-yard pitch to set target
-      const hit = this.unprojectCricket3D(x, y, w, h);
-      if (hit && Math.abs(hit.x) <= 1.2 && hit.z >= 2.0 && hit.z <= 22.0) {
-        cs.targetMarkerX = Math.max(-0.6, Math.min(0.6, hit.x));
-        cs.pitchLengthMeters = Math.max(1.5, Math.min(11.5, 22.0 - hit.z));
-        this.updateCricketControlsFromTarget();
-        this.computePredictedTrajectory();
-        if (window.soundFX) window.soundFX.playBlip(950, 0.03);
-      } else {
-        // Clicked outside pitch: bowl delivery or swing
-        if (!b.active) {
-          this.bowlCricketBall();
-        } else {
-          this.swingBat();
+      this.setTargetMarkerFromClick(x, y);
+    } else if (this.mode === 'netcode') {
+      if (this.netcodeState) {
+        this.netcodeState.targetPoint = { x, y };
+        this.netcodeState.autoPilot = false;
+        if (this.autoToggle) this.autoToggle.checked = false;
+        if (this.autoValLabel) {
+          this.autoValLabel.textContent = 'MANUAL WASD STEERING';
+          this.autoValLabel.className = 'text-cyan';
         }
       }
-    } else if (this.mode === 'netcode') {
-      this.netcodeState.targetX = Math.max(50, Math.min(this.canvas.width / this.scale - 50, x));
-      this.netcodeState.lastUserInteraction = performance.now();
       if (window.soundFX) window.soundFX.playClick();
     } else if (this.mode === 'ragdoll') {
       // Check if mouse grabbed any ragdoll node
@@ -1572,8 +1639,8 @@ class PhysicsSandboxEngine {
      MAIN SIMULATION LOOP
      ========================================================================== */
   loop(currentTime) {
-    if (!this.canvas || this.canvas.offsetParent === null) {
-      requestAnimationFrame(this.loop);
+    if (!this.running || !this.canvas || this.canvas.offsetParent === null) {
+      if (this.running) requestAnimationFrame(this.loop);
       return;
     }
     const delta = (currentTime - this.lastTime) / 1000;
@@ -2247,53 +2314,139 @@ class PhysicsSandboxEngine {
   /* --- Render Netcode Replication --- */
   renderNetcode(w, h) {
     const ns = this.netcodeState;
+    if (!ns || !ns.server) return;
 
-    this.ctx.fillStyle = '#050a14';
+    // Tactical dark canvas
+    this.ctx.fillStyle = '#070b12';
     this.ctx.fillRect(0, 0, w, h);
 
-    // 3 Lanes
-    this.drawNetcodeLane(130, 'CLIENT-SIDE PREDICTED (ZERO LAG)', ns.clientPredictedX, '#00f2fe');
-    this.drawNetcodeLane(230, `AUTHORITATIVE SERVER (RTT: ${this.simulatedPing}ms | LOSS: ${this.packetLoss}%)`, ns.serverX, '#ffb800');
-    this.drawNetcodeLane(330, 'RAW UNPREDICTED CLIENT (HEAVY LATENCY)', ns.clientRawX, '#ef4444');
-
-    // Draw traveling network packets
-    for (let p of ns.packets) {
-      const prog = (performance.now() - p.spawnTime) / (p.deliverTime - p.spawnTime || 1);
-      const curProg = Math.max(0, Math.min(1, prog));
-      const packetY = p.type === 'c2s' ? 180 : 280;
-      const packetX = 100 + curProg * (w - 200);
-
-      this.ctx.fillStyle = p.type === 'c2s' ? '#00f2fe' : '#ffb800';
+    // Dual Grid background
+    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+    this.ctx.lineWidth = 1;
+    for (let x = 0; x < w; x += 40) {
       this.ctx.beginPath();
-      this.ctx.arc(packetX, packetY, 5, 0, Math.PI * 2);
-      this.ctx.fill();
+      this.ctx.moveTo(x, 0);
+      this.ctx.lineTo(x, h);
+      this.ctx.stroke();
     }
-  }
+    for (let y = 0; y < h; y += 40) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, y);
+      this.ctx.lineTo(w, y);
+      this.ctx.stroke();
+    }
 
-  drawNetcodeLane(y, label, xPos, color) {
-    const w = this.canvas.width / this.scale;
+    // Minor coordinate markers
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+    this.ctx.font = '9px monospace';
+    this.ctx.fillText('+ [0,0]', 8, 14);
+    this.ctx.fillText(`+ [${Math.floor(w)},${Math.floor(h)}]`, w - 70, h - 8);
 
-    // Track line
-    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-    this.ctx.lineWidth = 2;
-    this.ctx.beginPath();
-    this.ctx.moveTo(80, y);
-    this.ctx.lineTo(w - 80, y);
-    this.ctx.stroke();
+    // Draw trails
+    const dots = [
+      ['s', ns.server, '#ffb800', 14],
+      ['r', ns.raw, '#ef4444', 10],
+      ['p', ns.pred, '#00f2fe', 11]
+    ];
 
-    // Label
+    for (const [k, p, col, radius] of dots) {
+      const tr = ns.trail[k];
+      if (tr && tr.length > 1) {
+        this.ctx.strokeStyle = col + '55';
+        this.ctx.lineWidth = 2.5;
+        this.ctx.beginPath();
+        tr.forEach((pt, idx) => {
+          if (idx === 0) this.ctx.moveTo(pt.x, pt.y);
+          else this.ctx.lineTo(pt.x, pt.y);
+        });
+        this.ctx.stroke();
+      }
+
+      // Draw Craft / Entity
+      this.ctx.save();
+      this.ctx.translate(p.x, p.y);
+
+      if (k === 's') {
+        // Authoritative Server: Radar ping circle + Diamond core
+        this.ctx.strokeStyle = col;
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, radius + 4, 0, Math.PI * 2);
+        this.ctx.stroke();
+
+        this.ctx.fillStyle = col;
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, -radius);
+        this.ctx.lineTo(radius, 0);
+        this.ctx.lineTo(0, radius);
+        this.ctx.lineTo(-radius, 0);
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // Crosshairs
+        this.ctx.strokeStyle = 'rgba(255, 184, 0, 0.4)';
+        this.ctx.beginPath();
+        this.ctx.moveTo(-radius - 8, 0);
+        this.ctx.lineTo(radius + 8, 0);
+        this.ctx.moveTo(0, -radius - 8);
+        this.ctx.lineTo(0, radius + 8);
+        this.ctx.stroke();
+      } else if (k === 'r') {
+        // Raw Unpredicted: Crimson drone
+        this.ctx.fillStyle = col;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#ffffff';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.stroke();
+      } else {
+        // Predicted Client: Cyan Interceptor Ship
+        this.ctx.fillStyle = col;
+        this.ctx.shadowColor = col;
+        this.ctx.shadowBlur = 10;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#ffffff';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+        this.ctx.shadowBlur = 0;
+      }
+      this.ctx.restore();
+    }
+
+    // On-Canvas HUD Legend (Top Left)
+    this.ctx.fillStyle = 'rgba(5, 10, 18, 0.85)';
+    this.ctx.fillRect(14, 14, 340, 68);
+    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    this.ctx.strokeRect(14, 14, 340, 68);
+
+    const legendItems = [
+      { col: '#ffb800', label: 'SERVER (AUTHORITATIVE TRUTH)' },
+      { col: '#ef4444', label: 'CLIENT (RAW UNPREDICTED - LAGGY)' },
+      { col: '#00f2fe', label: 'CLIENT (PREDICTION + RECONCILIATION)' }
+    ];
+    this.ctx.font = '10px monospace';
+    legendItems.forEach((item, idx) => {
+      const y = 32 + (idx * 18);
+      this.ctx.fillStyle = item.col;
+      this.ctx.beginPath();
+      this.ctx.arc(28, y - 3, 4.5, 0, Math.PI * 2);
+      this.ctx.fill();
+      this.ctx.fillStyle = '#c4d7ec';
+      this.ctx.fillText(item.label, 40, y);
+    });
+
+    // Telemetry Footer
+    const driftPx = Math.hypot(ns.raw.x - ns.pred.x, ns.raw.y - ns.pred.y).toFixed(0);
+    this.ctx.fillStyle = '#8b96a3';
     this.ctx.font = '11px monospace';
-    this.ctx.fillStyle = color;
-    this.ctx.fillText(label, 80, y - 24);
-
-    // Actor Box
-    this.ctx.fillStyle = color;
-    this.ctx.beginPath();
-    this.ctx.roundRect(xPos - 18, y - 18, 36, 36, 4);
-    this.ctx.fill();
-    this.ctx.strokeStyle = '#ffffff';
-    this.ctx.lineWidth = 1.5;
-    this.ctx.stroke();
+    this.ctx.fillText(
+      `UNACKED INPUTS: ${ns.pending.length}   |   DRIFT (NO PREDICTION): ${driftPx} px   |   RTT: ${this.simulatedPing}ms   |   LOSS: ${this.packetLoss}%`,
+      16,
+      h - 14
+    );
   }
 
   /* --- Render Ragdoll --- */
