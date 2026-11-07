@@ -1,0 +1,12 @@
+# Robots.txt for Mayank Manjul - Principal Gameplay Engineer Portfolio
+# https://mayankmanjul.com/
+
+User-agent: *
+Allow: /
+
+# Disallow private scratch or dev tooling
+Disallow: /rebuild/
+Disallow: /qr.html
+
+# Sitemap Directive
+Sitemap: https://mayankmanjul.com/sitemap.xml
