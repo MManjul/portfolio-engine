@@ -232,10 +232,12 @@ class PhysicsSandboxEngine {
         e.preventDefault();
         this.handlePrimaryActionClick();
       });
-      this.fireBtn.addEventListener('mousedown', () => this.handlePrimaryActionStart());
-      this.fireBtn.addEventListener('mouseup', () => this.handlePrimaryActionEnd());
-      this.fireBtn.addEventListener('touchstart', (e) => { e.preventDefault(); this.handlePrimaryActionStart(); });
-      this.fireBtn.addEventListener('touchend', (e) => { e.preventDefault(); this.handlePrimaryActionEnd(); });
+      this.fireBtn.addEventListener('mousedown', () => {
+        if (this.mode === 'buoyancy') this.handlePrimaryActionStart();
+      });
+      this.fireBtn.addEventListener('mouseup', () => {
+        if (this.mode === 'buoyancy') this.handlePrimaryActionEnd();
+      });
     }
 
     if (this.secBtn) {
@@ -250,6 +252,7 @@ class PhysicsSandboxEngine {
     }
 
     // Canvas Mouse & Touch Interaction
+    this.isMouseDown = false;
     this.canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
     window.addEventListener('mousemove', (e) => this.onMouseMove(e));
     window.addEventListener('mouseup', () => this.onMouseUp());
@@ -288,13 +291,18 @@ class PhysicsSandboxEngine {
               this.autoValLabel.textContent = 'MANUAL WASD STEERING';
               this.autoValLabel.className = 'text-cyan';
             }
+            if (this.fireBtnText) {
+              this.fireBtnText.textContent = 'TOGGLE AUTO-PILOT [OFF]';
+            }
           }
         }
       }
 
       if (e.code === 'KeyW' || e.code === 'ArrowUp' || e.code === 'Space') {
-        if (this.mode !== 'netcode') e.preventDefault();
-        this.handlePrimaryActionClick();
+        if (this.mode !== 'netcode') {
+          e.preventDefault();
+          this.handlePrimaryActionClick();
+        }
       }
     });
 
@@ -311,16 +319,9 @@ class PhysicsSandboxEngine {
     this.resetWorld();
 
     this.loop = this.loop.bind(this);
-    this.running = false;
-    this.observer = new IntersectionObserver(([entry]) => {
-      this.running = entry.isIntersecting;
-      if (this.running) {
-        this.lastTime = performance.now();
-        requestAnimationFrame(this.loop);
-      }
-    }, { threshold: 0.05 });
-    if (this.canvas) this.observer.observe(this.canvas);
-    else requestAnimationFrame(this.loop);
+    this.running = true;
+    this.lastTime = performance.now();
+    requestAnimationFrame(this.loop);
   }
 
   resize() {
@@ -347,6 +348,7 @@ class PhysicsSandboxEngine {
     const netcodeLossBox = document.getElementById('netcode-loss-box');
 
     // Hide all dynamic groups first
+    const netcodeAutoBox = document.getElementById('netcode-auto-box');
     if (buoyancyGroup) buoyancyGroup.style.display = 'none';
     if (buoyancyFreqGroup) buoyancyFreqGroup.style.display = 'none';
     if (cricketTypeGroup) cricketTypeGroup.style.display = 'none';
@@ -355,6 +357,7 @@ class PhysicsSandboxEngine {
     if (cricketSpeedGroup) cricketSpeedGroup.style.display = 'none';
     if (netcodeDelayBox) netcodeDelayBox.style.display = 'none';
     if (netcodeLossBox) netcodeLossBox.style.display = 'none';
+    if (netcodeAutoBox) netcodeAutoBox.style.display = 'none';
 
     if (this.mode === 'buoyancy') {
       if (buoyancyGroup) buoyancyGroup.style.display = 'flex';
@@ -362,8 +365,8 @@ class PhysicsSandboxEngine {
       if (this.fireBtnText) this.fireBtnText.textContent = 'HOLD THROTTLE [W / ↑]';
       if (this.secBtnText) this.secBtnText.textContent = 'DROP BUOYANT CARGO';
       if (this.secBtn) this.secBtn.style.display = 'inline-flex';
-      this.modeIndicator.textContent = 'MODE: HYDRODYNAMICS_BUOYANCY_SOLVER';
-      this.predictionStatus.textContent = 'SOLVER: ARCHIMEDES_MULTI_POINT_DRAFT';
+      if (this.modeIndicator) this.modeIndicator.textContent = 'MODE: HYDRODYNAMICS_BUOYANCY_SOLVER';
+      if (this.predictionStatus) this.predictionStatus.textContent = 'SOLVER: ARCHIMEDES_MULTI_POINT_DRAFT';
       if (this.instructionsText) {
         this.instructionsText.innerHTML = '<strong>Controls:</strong> Press/Hold [W] or [↑] to fire Jet-Ski throttle across waves • Click anywhere in water to spawn floating cargo barrels!';
       }
@@ -375,22 +378,24 @@ class PhysicsSandboxEngine {
       if (this.fireBtnText) this.fireBtnText.textContent = 'BOWL EXPRESS DELIVERY [SPACE]';
       if (this.secBtnText) this.secBtnText.textContent = 'HAWK-EYE SLOW-MO REPLAY';
       if (this.secBtn) this.secBtn.style.display = 'inline-flex';
-      this.modeIndicator.textContent = 'MODE: SACHIN_SAGA_3D_HAWKEYE_ENGINE';
-      this.predictionStatus.textContent = 'PHYSICS: 3D_MAGNUS_SEAM_AERODYNAMICS';
+      if (this.modeIndicator) this.modeIndicator.textContent = 'MODE: SACHIN_SAGA_3D_HAWKEYE_ENGINE';
+      if (this.predictionStatus) this.predictionStatus.textContent = 'PHYSICS: 3D_MAGNUS_SEAM_AERODYNAMICS';
       if (this.instructionsText) {
         this.instructionsText.innerHTML = '<strong>Controls:</strong> Click anywhere on the 22-yard pitch to place Target Marker • Press [Space] or click BOWL to deliver • Press [Space] or click when ball arrives at crease to SMASH IT • Click SLOW-MO REPLAY to review the full 3D ball path!';
       }
       this.computePredictedTrajectory();
     } else if (this.mode === 'netcode') {
-      const netcodeAutoBox = document.getElementById('netcode-auto-box');
       if (netcodeDelayBox) netcodeDelayBox.style.display = 'flex';
       if (netcodeLossBox) netcodeLossBox.style.display = 'flex';
       if (netcodeAutoBox) netcodeAutoBox.style.display = 'flex';
-      if (this.fireBtnText) this.fireBtnText.textContent = 'TOGGLE AUTO-PILOT';
+      if (this.fireBtnText) {
+        const isAuto = this.netcodeState ? this.netcodeState.autoPilot : true;
+        this.fireBtnText.textContent = isAuto ? 'TOGGLE AUTO-PILOT [ON]' : 'TOGGLE AUTO-PILOT [OFF]';
+      }
       if (this.secBtnText) this.secBtnText.textContent = 'INJECT SERVER DESYNC';
       if (this.secBtn) this.secBtn.style.display = 'inline-flex';
-      this.modeIndicator.textContent = 'MODE: SERVER_REPLICATION_CLIENT_PREDICTION';
-      this.predictionStatus.textContent = 'RECONCILIATION: REWIND_REPLAY_DETERMINISTIC';
+      if (this.modeIndicator) this.modeIndicator.textContent = 'MODE: SERVER_REPLICATION_CLIENT_PREDICTION';
+      if (this.predictionStatus) this.predictionStatus.textContent = 'RECONCILIATION: REWIND_REPLAY_DETERMINISTIC';
       if (this.instructionsText) {
         this.instructionsText.innerHTML = '<strong>Controls:</strong> Steer predicted ship with [W/A/S/D] or [Arrow Keys] • Click or Drag canvas to navigate • Turn off Auto-Pilot to test manual prediction • Raise Ping and Packet Loss to stress reconciliation!';
       }
@@ -398,8 +403,8 @@ class PhysicsSandboxEngine {
       if (this.fireBtnText) this.fireBtnText.textContent = 'LAUNCH RAGDOLL IMPULSE';
       if (this.secBtnText) this.secBtnText.textContent = 'SPAWN EXTRA MANNEQUIN';
       if (this.secBtn) this.secBtn.style.display = 'inline-flex';
-      this.modeIndicator.textContent = 'MODE: VERLET_ARTICULATED_RAGDOLL_IK';
-      this.predictionStatus.textContent = 'SOLVER: RELAXATION_CONSTRAINT_SOLVER';
+      if (this.modeIndicator) this.modeIndicator.textContent = 'MODE: VERLET_ARTICULATED_RAGDOLL_IK';
+      if (this.predictionStatus) this.predictionStatus.textContent = 'SOLVER: RELAXATION_CONSTRAINT_SOLVER';
       if (this.instructionsText) {
         this.instructionsText.innerHTML = '<strong>Controls:</strong> Click and DRAG ANY LIMB directly with mouse to throw or position the ragdoll • Press [Space] for kinetic impulse blast!';
       }
@@ -426,13 +431,7 @@ class PhysicsSandboxEngine {
     } else if (this.mode === 'trajectory') {
       this.resetCricketPitch();
     } else if (this.mode === 'netcode') {
-      this.netcodeState.serverX = w * 0.5;
-      this.netcodeState.clientPredictedX = w * 0.5;
-      this.netcodeState.clientRawX = w * 0.5;
-      this.netcodeState.targetX = w * 0.5;
-      this.netcodeState.history = [];
-      this.netcodeState.packets = [];
-      this.netcodeState.rollbackActive = false;
+      this.initNetcodeState();
     } else if (this.mode === 'ragdoll') {
       this.ragdollState.ragdolls = [];
       this.spawnVerletMannequin(w * 0.5, 120);
@@ -1275,9 +1274,18 @@ class PhysicsSandboxEngine {
       autoPilot: true,
       keys: new Set(),
       targetPoint: null,
-      speed: 250,
-      tickRateTime: 1 / 30
+      speed: 260,
+      tickRateTime: 1 / 30,
+      lastDir: { x: 1, y: 0 }
     };
+    if (this.autoToggle) this.autoToggle.checked = true;
+    if (this.autoValLabel) {
+      this.autoValLabel.textContent = 'AUTO-PILOT ACTIVE';
+      this.autoValLabel.className = 'text-emerald';
+    }
+    if (this.fireBtnText) {
+      this.fireBtnText.textContent = 'TOGGLE AUTO-PILOT [ON]';
+    }
   }
 
   updateNetcode(dt) {
@@ -1286,28 +1294,41 @@ class PhysicsSandboxEngine {
     const w = this.canvas.width / this.scale;
     const h = this.canvas.height / this.scale;
     const TICK = ns.tickRateTime || (1 / 30);
-    const SPEED = ns.speed || 250;
+    const SPEED = ns.speed || 260;
 
     const getInput = () => {
       if (ns.autoPilot) {
-        const tx = w / 2 + Math.cos(ns.t * 0.75) * (w * 0.38);
-        const ty = h / 2 + Math.sin(ns.t * 1.5) * (h * 0.32);
-        const dx = tx - ns.pred.x, dy = ty - ns.pred.y, l = Math.hypot(dx, dy);
-        return l < 6 ? { x: 0, y: 0 } : { x: dx / l, y: dy / l };
+        // Forward lookahead target on smooth figure-8 path to guarantee continuous smooth motion
+        const lookahead = 0.45;
+        const targetT = ns.t + lookahead;
+        const tx = w / 2 + Math.cos(targetT * 0.72) * (w * 0.38);
+        const ty = h / 2 + Math.sin(targetT * 1.44) * (h * 0.32);
+        const dx = tx - ns.pred.x;
+        const dy = ty - ns.pred.y;
+        const l = Math.hypot(dx, dy) || 1;
+        ns.lastDir = { x: dx / l, y: dy / l };
+        return ns.lastDir;
       }
       if (ns.targetPoint) {
-        const dx = ns.targetPoint.x - ns.pred.x, dy = ns.targetPoint.y - ns.pred.y, l = Math.hypot(dx, dy);
+        const dx = ns.targetPoint.x - ns.pred.x;
+        const dy = ns.targetPoint.y - ns.pred.y;
+        const l = Math.hypot(dx, dy);
         if (l < 10) {
           ns.targetPoint = null;
           return { x: 0, y: 0 };
         }
-        return { x: dx / l, y: dy / l };
+        ns.lastDir = { x: dx / l, y: dy / l };
+        return ns.lastDir;
       }
       const k = (a, b) => (ns.keys.has(a) || ns.keys.has(b) ? 1 : 0);
       const vx = k('d', 'arrowright') - k('a', 'arrowleft');
       const vy = k('s', 'arrowdown') - k('w', 'arrowup');
-      const l = Math.hypot(vx, vy) || 1;
-      return (vx === 0 && vy === 0) ? { x: 0, y: 0 } : { x: vx / l, y: vy / l };
+      const l = Math.hypot(vx, vy);
+      if (l > 0) {
+        ns.lastDir = { x: vx / l, y: vy / l };
+        return ns.lastDir;
+      }
+      return { x: 0, y: 0 };
     };
 
     const stepEntity = (p, d) => {
@@ -1334,6 +1355,19 @@ class PhysicsSandboxEngine {
       // Client predicts immediately
       stepEntity(ns.pred, dir);
       ns.pending.push({ seq: s, dir });
+
+      // Spawn thruster exhaust particles when in motion
+      if (Math.hypot(dir.x, dir.y) > 0.1 && Math.random() > 0.3) {
+        this.particles.push({
+          x: ns.pred.x - dir.x * 12 + (Math.random() - 0.5) * 6,
+          y: ns.pred.y - dir.y * 12 + (Math.random() - 0.5) * 6,
+          vx: -dir.x * 50 + (Math.random() - 0.5) * 20,
+          vy: -dir.y * 50 + (Math.random() - 0.5) * 20,
+          life: 0.28,
+          maxLife: 0.28,
+          color: '#00f2fe'
+        });
+      }
 
       // Send to server over wire with latency
       sendPacket(() => {
@@ -1371,7 +1405,7 @@ class PhysicsSandboxEngine {
     }
 
     // Update trails
-    const maxTrail = 42;
+    const maxTrail = 48;
     const dots = [['s', ns.server], ['r', ns.raw], ['p', ns.pred]];
     for (const [k, p] of dots) {
       const tr = ns.trail[k];
@@ -1408,6 +1442,22 @@ class PhysicsSandboxEngine {
     const offset = (Math.random() > 0.5 ? 90 : -90);
     ns.server.x = Math.max(40, Math.min(this.canvas.width / this.scale - 40, ns.server.x + offset));
     ns.server.y = Math.max(40, Math.min(this.canvas.height / this.scale - 40, ns.server.y + (offset * 0.6)));
+
+    // Spawn dramatic desync flash burst
+    for (let i = 0; i < 18; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const spd = 40 + Math.random() * 80;
+      this.particles.push({
+        x: ns.server.x,
+        y: ns.server.y,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd,
+        life: 0.45,
+        maxLife: 0.45,
+        color: '#ffb800'
+      });
+    }
+
     if (window.soundFX) window.soundFX.playLaserChime();
   }
 
@@ -1519,6 +1569,9 @@ class PhysicsSandboxEngine {
           this.autoValLabel.textContent = this.netcodeState.autoPilot ? 'AUTO-PILOT ACTIVE' : 'MANUAL WASD STEERING';
           this.autoValLabel.className = this.netcodeState.autoPilot ? 'text-emerald' : 'text-cyan';
         }
+        if (this.fireBtnText) {
+          this.fireBtnText.textContent = this.netcodeState.autoPilot ? 'TOGGLE AUTO-PILOT [ON]' : 'TOGGLE AUTO-PILOT [OFF]';
+        }
       }
       if (window.soundFX) window.soundFX.playClick();
     } else if (this.mode === 'ragdoll') {
@@ -1585,9 +1638,10 @@ class PhysicsSandboxEngine {
      MOUSE EVENT LISTENERS
      ========================================================================== */
   onMouseDown(e) {
+    this.isMouseDown = true;
     const rect = this.canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / this.scale;
-    const y = (e.clientY - rect.top) / this.scale;
+    const x = (e.clientX - rect.left) / (this.scale || 1);
+    const y = (e.clientY - rect.top) / (this.scale || 1);
 
     if (this.mode === 'buoyancy') {
       this.spawnBuoyantCrate(x, y);
@@ -1602,10 +1656,12 @@ class PhysicsSandboxEngine {
           this.autoValLabel.textContent = 'MANUAL WASD STEERING';
           this.autoValLabel.className = 'text-cyan';
         }
+        if (this.fireBtnText) {
+          this.fireBtnText.textContent = 'TOGGLE AUTO-PILOT [OFF]';
+        }
       }
       if (window.soundFX) window.soundFX.playClick();
     } else if (this.mode === 'ragdoll') {
-      // Check if mouse grabbed any ragdoll node
       for (let r of this.ragdollState.ragdolls) {
         for (let n of r.nodes) {
           if (Math.hypot(n.x - x, n.y - y) < n.radius + 12) {
@@ -1619,13 +1675,28 @@ class PhysicsSandboxEngine {
 
   onMouseMove(e) {
     const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const w = this.canvas.width / this.scale;
-    const h = this.canvas.height / this.scale;
+    const x = (e.clientX - rect.left) / (this.scale || 1);
+    const y = (e.clientY - rect.top) / (this.scale || 1);
+    const w = this.canvas.width / (this.scale || 1);
+    const h = this.canvas.height / (this.scale || 1);
+
+    if (this.mode === 'netcode' && this.isMouseDown && this.netcodeState) {
+      if (x >= 0 && x <= w && y >= 0 && y <= h) {
+        this.netcodeState.targetPoint = { x, y };
+        this.netcodeState.autoPilot = false;
+        if (this.autoToggle) this.autoToggle.checked = false;
+        if (this.autoValLabel) {
+          this.autoValLabel.textContent = 'MANUAL WASD STEERING';
+          this.autoValLabel.className = 'text-cyan';
+        }
+        if (this.fireBtnText) {
+          this.fireBtnText.textContent = 'TOGGLE AUTO-PILOT [OFF]';
+        }
+      }
+    }
 
     if (this.mode === 'trajectory') {
-      const hit = this.unprojectCricket3D(x, y, w, h);
+      const hit = this.unprojectCricket3D(x * this.scale, y * this.scale, w, h);
       if (hit && Math.abs(hit.x) <= 1.2 && hit.z >= 2.0 && hit.z <= 22.0) {
         this.cricketState.hoverTarget = { x: hit.x, z: hit.z, lengthMeters: 22.0 - hit.z };
       } else {
@@ -1633,7 +1704,7 @@ class PhysicsSandboxEngine {
       }
     }
 
-    if (this.ragdollState.draggedNode) {
+    if (this.ragdollState && this.ragdollState.draggedNode) {
       this.ragdollState.draggedNode.x = x;
       this.ragdollState.draggedNode.y = y;
       this.ragdollState.draggedNode.oldX = x;
@@ -1642,24 +1713,26 @@ class PhysicsSandboxEngine {
   }
 
   onMouseUp() {
-    this.ragdollState.draggedNode = null;
+    this.isMouseDown = false;
+    if (this.ragdollState) this.ragdollState.draggedNode = null;
   }
 
   /* ==========================================================================
      MAIN SIMULATION LOOP
      ========================================================================== */
   loop(currentTime) {
-    if (!this.running || !this.canvas || this.canvas.offsetParent === null) {
-      if (this.running) requestAnimationFrame(this.loop);
-      return;
-    }
-    const delta = (currentTime - this.lastTime) / 1000;
+    // Keep animation loop ticking reliably at 60 FPS
+    requestAnimationFrame(this.loop);
+
+    if (!this.canvas) return;
+    if (!this.lastTime) this.lastTime = currentTime;
+    const delta = Math.min((currentTime - this.lastTime) / 1000, 0.1);
     this.lastTime = currentTime;
 
     const timeScale = (this.mode === 'trajectory' ? this.simTimeScale : 1.0);
     const scaledDelta = Math.min(delta * timeScale, 0.1);
 
-    const fixedDt = 1 / this.tickRate;
+    const fixedDt = 1 / Math.max(15, this.tickRate || 60);
     this.tickAccumulator += scaledDelta;
 
     while (this.tickAccumulator >= fixedDt) {
@@ -1683,8 +1756,6 @@ class PhysicsSandboxEngine {
 
     this.render();
     this.updateTelemetry(delta * 1000);
-
-    requestAnimationFrame(this.loop);
   }
 
   /* ==========================================================================
@@ -2350,20 +2421,77 @@ class PhysicsSandboxEngine {
     this.ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
     this.ctx.font = '9px monospace';
     this.ctx.fillText('+ [0,0]', 8, 14);
-    this.ctx.fillText(`+ [${Math.floor(w)},${Math.floor(h)}]`, w - 70, h - 8);
+    this.ctx.fillText(`+ [${Math.floor(w)},${Math.floor(h)}]`, w - 75, h - 8);
 
-    // Draw trails
+    // Render Click/Drag Waypoint Marker in manual mode
+    if (ns.targetPoint) {
+      this.ctx.save();
+      this.ctx.strokeStyle = 'rgba(0, 242, 254, 0.5)';
+      this.ctx.setLineDash([4, 4]);
+      this.ctx.beginPath();
+      this.ctx.moveTo(ns.pred.x, ns.pred.y);
+      this.ctx.lineTo(ns.targetPoint.x, ns.targetPoint.y);
+      this.ctx.stroke();
+
+      this.ctx.strokeStyle = '#00f2fe';
+      this.ctx.setLineDash([]);
+      this.ctx.beginPath();
+      this.ctx.arc(ns.targetPoint.x, ns.targetPoint.y, 8, 0, Math.PI * 2);
+      this.ctx.stroke();
+      this.ctx.restore();
+    }
+
+    // Draw Vector Discrepancy Line between Raw (Unpredicted) and Predicted
+    const driftDist = Math.hypot(ns.pred.x - ns.raw.x, ns.pred.y - ns.raw.y);
+    if (driftDist > 6) {
+      this.ctx.save();
+      this.ctx.setLineDash([3, 3]);
+      this.ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+      this.ctx.lineWidth = 1.5;
+      this.ctx.beginPath();
+      this.ctx.moveTo(ns.raw.x, ns.raw.y);
+      this.ctx.lineTo(ns.pred.x, ns.pred.y);
+      this.ctx.stroke();
+      this.ctx.setLineDash([]);
+
+      const mx = (ns.raw.x + ns.pred.x) / 2;
+      const my = (ns.raw.y + ns.pred.y) / 2;
+      this.ctx.fillStyle = 'rgba(10, 16, 26, 0.88)';
+      this.ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)';
+      this.ctx.lineWidth = 1;
+      this.ctx.fillRect(mx - 32, my - 9, 64, 18);
+      this.ctx.strokeRect(mx - 32, my - 9, 64, 18);
+      this.ctx.fillStyle = '#ef4444';
+      this.ctx.font = '9px monospace';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(`${driftDist.toFixed(1)}px DRIFT`, mx, my);
+      this.ctx.restore();
+    }
+
+    // Render Particle Trail FX
+    for (let p of this.particles) {
+      const alpha = Math.max(0, p.life / p.maxLife);
+      this.ctx.fillStyle = p.color || '#00f2fe';
+      this.ctx.globalAlpha = alpha * 0.8;
+      this.ctx.beginPath();
+      this.ctx.arc(p.x, p.y, 2 + (1 - alpha) * 2, 0, Math.PI * 2);
+      this.ctx.fill();
+    }
+    this.ctx.globalAlpha = 1.0;
+
+    // Draw Trails & Entities
     const dots = [
-      ['s', ns.server, '#ffb800', 14],
-      ['r', ns.raw, '#ef4444', 10],
-      ['p', ns.pred, '#00f2fe', 11]
+      ['s', ns.server, '#ffb800', 13, 'SERVER [AUTHORITATIVE]'],
+      ['r', ns.raw, '#ef4444', 9, 'RAW CLIENT [LAGGY]'],
+      ['p', ns.pred, '#00f2fe', 12, 'LOCAL PREDICTED']
     ];
 
-    for (const [k, p, col, radius] of dots) {
+    for (const [k, p, col, radius, label] of dots) {
       const tr = ns.trail[k];
       if (tr && tr.length > 1) {
-        this.ctx.strokeStyle = col + '55';
-        this.ctx.lineWidth = 2.5;
+        this.ctx.strokeStyle = col + '44';
+        this.ctx.lineWidth = 2;
         this.ctx.beginPath();
         tr.forEach((pt, idx) => {
           if (idx === 0) this.ctx.moveTo(pt.x, pt.y);
@@ -2372,16 +2500,17 @@ class PhysicsSandboxEngine {
         this.ctx.stroke();
       }
 
-      // Draw Craft / Entity
+      // Draw Entity
       this.ctx.save();
       this.ctx.translate(p.x, p.y);
 
       if (k === 's') {
-        // Authoritative Server: Radar ping circle + Diamond core
+        // Authoritative Server: Pulsing radar ring + Diamond Core
+        const pulse = (Math.sin(this.simTime * 4) * 3);
         this.ctx.strokeStyle = col;
-        this.ctx.lineWidth = 2;
+        this.ctx.lineWidth = 1.5;
         this.ctx.beginPath();
-        this.ctx.arc(0, 0, radius + 4, 0, Math.PI * 2);
+        this.ctx.arc(0, 0, radius + 4 + pulse, 0, Math.PI * 2);
         this.ctx.stroke();
 
         this.ctx.fillStyle = col;
@@ -2411,10 +2540,10 @@ class PhysicsSandboxEngine {
         this.ctx.lineWidth = 1.5;
         this.ctx.stroke();
       } else {
-        // Predicted Client: Cyan Interceptor Ship
+        // Predicted Client: Glowing Cyan Interceptor Ship
         this.ctx.fillStyle = col;
         this.ctx.shadowColor = col;
-        this.ctx.shadowBlur = 10;
+        this.ctx.shadowBlur = 12;
         this.ctx.beginPath();
         this.ctx.arc(0, 0, radius, 0, Math.PI * 2);
         this.ctx.fill();
@@ -2423,10 +2552,16 @@ class PhysicsSandboxEngine {
         this.ctx.stroke();
         this.ctx.shadowBlur = 0;
       }
+
+      // Entity Label Tag
+      this.ctx.fillStyle = col;
+      this.ctx.font = '8px monospace';
+      this.ctx.textAlign = 'center';
+      const labelY = (k === 'r') ? radius + 14 : -radius - 8;
+      this.ctx.fillText(label, 0, labelY);
+
       this.ctx.restore();
     }
-
-    // Viewport legend & telemetry are rendered cleanly in the HTML HUD overlay to prevent visual collision
   }
 
   /* --- Render Ragdoll --- */
@@ -2489,7 +2624,9 @@ class PhysicsSandboxEngine {
 
     if (this.deltaReadout) {
       this.deltaReadout.textContent = `${frameTimeMs.toFixed(1)} ms`;
-      this.deltaReadout.className = (frameTimeMs > 20) ? 'text-crimson' : (frameTimeMs > 17 ? 'text-amber' : 'text-cyan');
+      if (this.deltaReadout.classList) {
+        this.deltaReadout.className = (frameTimeMs > 20) ? 'text-crimson' : (frameTimeMs > 17 ? 'text-amber' : 'text-cyan');
+      }
     }
 
     // 2. Heap allocations (GC-Free loop telemetry)
@@ -2502,14 +2639,14 @@ class PhysicsSandboxEngine {
     // Render 3 profiler sparklines with rich gradients & baselines
     this.drawSparkline(this.graphFrametimeCanvas, this.frameHistory, '#00f2fe', {
       targetVal: 16.6,
-      minVal: 6,
+      minVal: 4,
       maxVal: 28
     });
 
-    const maxDrift = Math.max(16, ...this.driftHistory);
+    const maxDrift = Math.max(25, ...this.driftHistory);
     this.drawSparkline(this.graphDriftCanvas, this.driftHistory, '#ffb800', {
       minVal: 0,
-      maxVal: maxDrift
+      maxVal: maxDrift * 1.15
     });
 
     this.drawSparkline(this.graphAllocCanvas, this.allocHistory, '#00f090', {
@@ -2520,6 +2657,14 @@ class PhysicsSandboxEngine {
 
   drawSparkline(canvas, data, strokeColor, opts = {}) {
     if (!canvas || !data || data.length < 2) return;
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const targetW = Math.floor((rect.width || 280) * dpr);
+    const targetH = Math.floor(52 * dpr);
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
+    }
     const ctx = canvas.getContext('2d');
     const w = canvas.width;
     const h = canvas.height;
@@ -2553,10 +2698,10 @@ class PhysicsSandboxEngine {
 
     // Optional Reference Line (e.g. 16.6ms target 60FPS)
     if (opts.targetVal !== undefined) {
-      const targetY = h - ((opts.targetVal - min) / range) * (h - 12) - 6;
+      const targetY = h - ((opts.targetVal - min) / range) * (h - 14 * dpr) - 7 * dpr;
       if (targetY >= 0 && targetY <= h) {
-        ctx.strokeStyle = 'rgba(0, 242, 254, 0.35)';
-        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
+        ctx.setLineDash([4 * dpr, 4 * dpr]);
         ctx.beginPath();
         ctx.moveTo(0, targetY);
         ctx.lineTo(w, targetY);
@@ -2570,8 +2715,8 @@ class PhysicsSandboxEngine {
     const pts = [];
     for (let i = 0; i < data.length; i++) {
       const val = data[i];
-      const normY = h - ((val - min) / range) * (h - 14) - 7;
-      pts.push({ x: i * step, y: Math.max(4, Math.min(h - 4, normY)) });
+      const normY = h - ((val - min) / range) * (h - 16 * dpr) - 8 * dpr;
+      pts.push({ x: i * step, y: Math.max(4 * dpr, Math.min(h - 4 * dpr, normY)) });
     }
 
     // Gradient Area Fill under the waveform
@@ -2597,9 +2742,9 @@ class PhysicsSandboxEngine {
       ctx.lineTo(pts[i].x, pts[i].y);
     }
     ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2 * dpr;
     ctx.shadowColor = strokeColor;
-    ctx.shadowBlur = 6;
+    ctx.shadowBlur = 6 * dpr;
     ctx.stroke();
     ctx.shadowBlur = 0;
 
@@ -2607,14 +2752,18 @@ class PhysicsSandboxEngine {
     const last = pts[pts.length - 1];
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(last.x - 2, last.y, 3, 0, Math.PI * 2);
+    ctx.arc(last.x - 2 * dpr, last.y, 3 * dpr, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.5 * dpr;
     ctx.stroke();
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    window.physicsSandbox = new PhysicsSandboxEngine('sandbox-canvas');
+  });
+} else {
   window.physicsSandbox = new PhysicsSandboxEngine('sandbox-canvas');
-});
+}
