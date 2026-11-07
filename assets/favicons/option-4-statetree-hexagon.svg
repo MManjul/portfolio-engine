@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <linearGradient id="hex-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1220" />
+      <stop offset="100%" stop-color="#03060c" />
+    </linearGradient>
+    <linearGradient id="neon-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="100%" stop-color="#00a8ff" />
+    </linearGradient>
+    <filter id="hex-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect x="6" y="6" width="116" height="116" rx="28" fill="url(#hex-bg)" stroke="#1a283c" stroke-width="3" />
+
+  <!-- Outer Cyber Hexagon -->
+  <polygon points="64,18 102,40 102,84 64,106 26,84 26,40" fill="none" stroke="url(#neon-cyan)" stroke-width="3.5" stroke-linejoin="round" />
+
+  <!-- Inner Architectural Circuit Lines -->
+  <path d="M 40 76 L 40 52 L 64 66 L 88 52 L 88 76" fill="none" stroke="#00f2fe" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#hex-glow)" />
+
+  <!-- Central Execution Node -->
+  <circle cx="64" cy="66" r="6" fill="#00f2fe" filter="url(#hex-glow)" />
+  <circle cx="64" cy="66" r="2.5" fill="#ffffff" />
+
+  <!-- Peripheral Logic Gate Nodes -->
+  <circle cx="64" cy="18" r="4" fill="#00ff99" />
+  <circle cx="102" cy="84" r="3.5" fill="#00f2fe" />
+  <circle cx="26" cy="84" r="3.5" fill="#00f2fe" />
+</svg>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mayank Manjul — 3D Coordinate Cube Gizmo Favicons</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --card-bg: #0e1624;
+      --border: #1a293e;
+      --cyan: #00f2fe;
+      --amber: #ffb800;
+      --emerald: #00f090;
+      --crimson: #ef4444;
+      --text: #e2e8f0;
+      --text-dim: #8b9bb4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "JetBrains Mono", monospace;
+      padding: 40px 20px;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(0, 242, 254, 0.1);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      color: var(--cyan);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    p.subtitle {
+      color: var(--text-dim);
+      font-size: 15px;
+    }
+
+    /* Grid of 4 options */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-bottom: 50px;
+    }
+    .option-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 20px;
+      text-align: center;
+      transition: all 0.2s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .option-card:hover {
+      border-color: var(--cyan);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 242, 254, 0.15);
+    }
+    .option-card.highlight {
+      border-color: rgba(0, 242, 254, 0.6);
+      background: linear-gradient(180deg, #101c30 0%, #0a1220 100%);
+    }
+    .opt-number {
+      font-size: 11px;
+      color: var(--cyan);
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
+    }
+    .icon-preview-large {
+      width: 104px;
+      height: 104px;
+      margin: 10px auto 20px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(4, 8, 16, 0.6);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+      padding: 8px;
+    }
+    .icon-preview-large img {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+    }
+    .opt-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .opt-desc {
+      font-size: 12px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 18px;
+      flex-grow: 1;
+    }
+
+    /* Size comparison chips */
+    .size-chips {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      width: 100%;
+    }
+    .size-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: #64748b;
+    }
+    .size-chip img {
+      display: block;
+    }
+
+    /* Browser Tab Simulator Section */
+    .simulator-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 24px;
+      margin-top: 30px;
+    }
+    .sim-header {
+      margin-bottom: 20px;
+    }
+    .sim-header h2 {
+      font-size: 18px;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .sim-header p {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    /* Tab Bars */
+    .tab-bar {
+      border-radius: 8px 8px 0 0;
+      padding: 8px 12px 0;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+    .tab-bar.dark {
+      background: #181a1f;
+      border-bottom: 1px solid #23272e;
+    }
+    .tab-bar.light {
+      background: #dee1e6;
+      border-bottom: 1px solid #c9cdd4;
+    }
+    .tab-mock {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-radius: 8px 8px 0 0;
+      font-size: 12px;
+      font-weight: 500;
+      min-width: 220px;
+      max-width: 260px;
+      cursor: default;
+    }
+    .tab-bar.dark .tab-mock {
+      background: #23272e;
+      color: #d1d5db;
+    }
+    .tab-bar.light .tab-mock {
+      background: #ffffff;
+      color: #202124;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .tab-mock img {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+    .tab-mock .tab-close {
+      margin-left: auto;
+      font-size: 14px;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">3D ENGINE &amp; PHYSICS GIZMO FAVICONS</div>
+      <h1>3D COORDINATE CUBE GIZMO VARIATIONS</h1>
+      <p class="subtitle">Personalized for Mayank Manjul. Exploring variations of the 3D Engine Coordinate Cube for rendering & physics.</p>
+    </header>
+
+    <div class="grid">
+      <!-- Option 2A -->
+      <div class="option-card highlight">
+        <div class="opt-number">OPTION 2A (RECOMMENDED)</div>
+        <div class="icon-preview-large">
+          <img src="assets/favicons/cube-gizmo-mm-core.svg" alt="Option 2A: MM Coordinate Core">
+        </div>
+        <div class="opt-title">ISOMETRIC MM COORDINATE CORE</div>
+        <div class="opt-desc">Combines the 3D coordinate cube with an architectural "M" monogram. Vertical rails and central chevrons form the "M" with X/Y/Z coordinate handles.</div>
+        <div class="size-chips">
+          <div class="size-chip"><img src="assets/favicons/cube-gizmo-mm-core.svg" width="32" height="32"><span>32px</span></div>
+          <div class="size-chip"><img src="assets/favicons/cube-gizmo-mm-core.svg" width="20" height="20"><span>20px</span></div>
+          <div class="size-chip"><img src="assets/favicons/cube-gizmo-mm-core.svg" width="16" height="16"><span>16px</span></div>
+        </div>
+      </div>
+
+      <!-- Option 2B -->
+      <div class="option-card">
+        <div class="opt-number">OPTION 2B</div>
+        <div class="icon-preview-large">
+          <img src="assets/favicons/cube-gizmo-unreal-transform.svg" alt="Option 2B: UE5 Transform Gizmo">
+        </div>
+        <div class="opt-title">UE5 3D TRANSFORM GIZMO</div>
+        <div class="opt-desc">Authentic Unreal Engine viewport coordinate gizmo with RGB arrows (X-Red, Y-Green, Z-Cyan) and central translation cubic hub on blueprint grid.</div>
+        <div class="size-chips">
+          <div class="size-chip"><img src="assets/favicons/cube-gizmo-unreal-transform.svg" width="32" height="32"><span>32px</span></div>
+          <div class="size-chip"><img src="assets/favicons/cube-gizmo-unreal-transform.svg" width="20" height="20"><span>20px</span></div>
+          <div class="size-chip"><img src="assets/favicons/cube-gizmo-unreal-transform.svg" width="16" height="16"><span>16px</span></div>
+        </div>
+      </div>
+
+      <!-- Option 2C -->
+      <div class="option-card">
+        <div class="opt-number">OPTION 2C</div>
+        <div class="icon-preview-large">
+          <img src="assets/favicons/cube-gizmo-physics-tesseract.svg" alt="Option 2C: Physics Simulation Cube">
+        </div>
+        <div class="opt-title">PHYSICS KINETIC CUBE</div>
+        <div class="opt-desc">Dashed AABB collision bounding box surrounding an inner solid rigid-body mass with an angular momentum velocity vector arc. Pure game physics.</div>
+        <div class="size-chips">
+          <div class="size-chip"><img src="assets/favicons/cube-gizmo-physics-tesseract.svg" width="32" height="32"><span>32px</span></div>
+          <div class="size-chip"><img src="assets/favicons/cube-gizmo-physics-tesseract.svg" width="20" height="20"><span>20px</span></div>
+          <div class="size-chip"><img src="assets/favicons/cube-gizmo-physics-tesseract.svg" width="16" height="16"><span>16px</span></div>
+        </div>
+      </div>
+
+      <!-- Option 2D -->
+      <div class="option-card">
+        <div class="opt-number">OPTION 2D</div>
+        <div class="icon-preview-large">
+          <img src="assets/favicons/option-2-isometric-vertex.svg" alt="Option 2D: Original Isometric Vertex">
+        </div>
+        <div class="opt-title">ORIGINAL ISOMETRIC VERTEX</div>
+        <div class="opt-desc">The original minimal 3D isometric cube with solid shaded coordinate faces and converging central gold origin vertex.</div>
+        <div class="size-chips">
+          <div class="size-chip"><img src="assets/favicons/option-2-isometric-vertex.svg" width="32" height="32"><span>32px</span></div>
+          <div class="size-chip"><img src="assets/favicons/option-2-isometric-vertex.svg" width="20" height="20"><span>20px</span></div>
+          <div class="size-chip"><img src="assets/favicons/option-2-isometric-vertex.svg" width="16" height="16"><span>16px</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Browser Tab Simulation -->
+    <div class="simulator-section">
+      <div class="sim-header">
+        <h2>REALISTIC BROWSER TAB SIMULATION (16px)</h2>
+        <p>Preview each 3D coordinate cube at real-world browser tab scale.</p>
+      </div>
+
+      <!-- Dark Mode Tabs -->
+      <div style="font-size: 11px; color: #64748b; font-weight: 700; margin-bottom: 8px; letter-spacing: 1px;">CHROME / EDGE DARK THEME:</div>
+      <div class="tab-bar dark">
+        <div class="tab-mock">
+          <img src="assets/favicons/cube-gizmo-mm-core.svg">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Mayank Manjul | 2A (MM Core)</span>
+          <span class="tab-close">×</span>
+        </div>
+        <div class="tab-mock">
+          <img src="assets/favicons/cube-gizmo-unreal-transform.svg">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Mayank Manjul | 2B (UE5 Gizmo)</span>
+          <span class="tab-close">×</span>
+        </div>
+        <div class="tab-mock">
+          <img src="assets/favicons/cube-gizmo-physics-tesseract.svg">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Mayank Manjul | 2C (Physics AABB)</span>
+          <span class="tab-close">×</span>
+        </div>
+        <div class="tab-mock">
+          <img src="assets/favicons/option-2-isometric-vertex.svg">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Mayank Manjul | 2D (Original)</span>
+          <span class="tab-close">×</span>
+        </div>
+      </div>
+
+      <!-- Light Mode Tabs -->
+      <div style="font-size: 11px; color: #64748b; font-weight: 700; margin-bottom: 8px; letter-spacing: 1px;">CHROME / EDGE LIGHT THEME:</div>
+      <div class="tab-bar light">
+        <div class="tab-mock">
+          <img src="assets/favicons/cube-gizmo-mm-core.svg">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Mayank Manjul | 2A (MM Core)</span>
+          <span class="tab-close">×</span>
+        </div>
+        <div class="tab-mock">
+          <img src="assets/favicons/cube-gizmo-unreal-transform.svg">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Mayank Manjul | 2B (UE5 Gizmo)</span>
+          <span class="tab-close">×</span>
+        </div>
+        <div class="tab-mock">
+          <img src="assets/favicons/cube-gizmo-physics-tesseract.svg">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Mayank Manjul | 2C (Physics AABB)</span>
+          <span class="tab-close">×</span>
+        </div>
+        <div class="tab-mock">
+          <img src="assets/favicons/option-2-isometric-vertex.svg">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Mayank Manjul | 2D (Original)</span>
+          <span class="tab-close">×</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

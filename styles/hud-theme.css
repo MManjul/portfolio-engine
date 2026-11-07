@@ -99,6 +99,24 @@ body.theme-crimson-red {
   letter-spacing: 0.1em;
 }
 
+.engine-logo-img {
+  width: 22px !important;
+  height: 22px !important;
+  max-width: 22px !important;
+  max-height: 22px !important;
+  display: inline-block !important;
+  vertical-align: middle;
+  flex-shrink: 0;
+  border-radius: 4px;
+  filter: drop-shadow(0 0 6px rgba(0, 242, 254, 0.45));
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.engine-brand:hover .engine-logo-img {
+  transform: scale(1.08) rotate(3deg);
+  filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.8));
+}
+
 .engine-logo-glyph {
   color: var(--theme-accent);
   font-size: 1.1rem;
@@ -660,14 +678,14 @@ body.theme-crimson-red {
   width: 24px;
   height: 11px;
   border-radius: 5px;
-  background: var(--accent-emerald);
-  box-shadow: 0 0 10px var(--accent-emerald);
+  background: var(--theme-accent) !important;
+  box-shadow: 0 0 10px var(--theme-accent) !important;
 }
 
 /* Pause indicator symbol on active dot when mouse is hovering the carousel */
 .hud-panel-frame.is-paused .indicator-dot.active {
-  background: var(--accent-emerald);
-  box-shadow: 0 0 12px rgba(0, 240, 144, 0.9);
+  background: var(--theme-accent) !important;
+  box-shadow: 0 0 12px rgba(var(--theme-accent-rgb), 0.9) !important;
   cursor: default;
 }
 
@@ -1152,4 +1170,11 @@ body.theme-crimson-red {
   margin-left: 6px;
   font-weight: 700;
   vertical-align: middle;
+}
+
+.text-accent,
+.radar-stat-chip .radar-stat-val {
+  color: var(--theme-accent) !important;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(var(--theme-accent-rgb), 0.35);
 }

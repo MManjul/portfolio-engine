@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <linearGradient id="craft-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080e1a" />
+      <stop offset="100%" stop-color="#020509" />
+    </linearGradient>
+    <linearGradient id="hull-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="100%" stop-color="#0066cc" />
+    </linearGradient>
+    <linearGradient id="thruster-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="60%" stop-color="#00e5ff" />
+      <stop offset="100%" stop-color="transparent" />
+    </linearGradient>
+    <filter id="craft-glow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="3.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect x="6" y="6" width="116" height="116" rx="28" fill="url(#craft-bg)" stroke="#162234" stroke-width="3" />
+
+  <!-- Radar Range Concentric Grid Rings -->
+  <circle cx="64" cy="64" r="42" fill="none" stroke="#00f2fe" stroke-width="1" stroke-opacity="0.15" stroke-dasharray="4 4" />
+  <circle cx="64" cy="64" r="26" fill="none" stroke="#00f2fe" stroke-width="1" stroke-opacity="0.25" stroke-dasharray="2 3" />
+
+  <!-- Twin Thruster Ion Exhaust Plumes -->
+  <path d="M 44 88 L 47 106 L 50 88 Z" fill="url(#thruster-grad)" opacity="0.9" filter="url(#craft-glow)" />
+  <path d="M 78 88 L 81 106 L 84 88 Z" fill="url(#thruster-grad)" opacity="0.9" filter="url(#craft-glow)" />
+
+  <!-- Supersonic Stealth Interceptor Hull -->
+  <!-- Main Fuselage -->
+  <polygon points="64,22 88,88 64,74 40,88" fill="url(#hull-grad)" stroke="#ffffff" stroke-width="1.8" stroke-linejoin="round" />
+  
+  <!-- Cockpit Canopy Glass -->
+  <polygon points="64,36 72,62 64,58 56,62" fill="#0c1a2e" stroke="#00f2fe" stroke-width="1.2" />
+
+  <!-- Authoritative Server Beacon Dot -->
+  <circle cx="64" cy="48" r="3" fill="#ffb800" filter="url(#craft-glow)" />
+</svg>

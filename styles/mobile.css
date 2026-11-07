@@ -119,6 +119,11 @@
     text-overflow: ellipsis !important;
     flex-shrink: 0 !important;
   }
+  .engine-logo-img {
+    width: 19px !important;
+    height: 19px !important;
+  }
+
 
   .engine-brand .highlight,
   .engine-brand .build-badge {

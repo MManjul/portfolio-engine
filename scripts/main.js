@@ -95,6 +95,8 @@ function initThemeSwitcher() {
       buttons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       localStorage.setItem('manjul_theme', themeClass);
+      drawRadarChart();
+      setTimeout(drawRadarChart, 50);
       if (window.soundFX) window.soundFX.playLaserChime();
     });
   });
@@ -106,6 +108,7 @@ function initThemeSwitcher() {
     buttons.forEach(b => {
       b.classList.toggle('active', b.dataset.theme === savedTheme);
     });
+    setTimeout(drawRadarChart, 50);
   }
 }
 
@@ -223,6 +226,8 @@ function initTacticalCarousel() {
     // If slide 1 (Radar chart), trigger canvas draw
     if (currentSlide === 1) {
       drawRadarChart();
+      requestAnimationFrame(drawRadarChart);
+      setTimeout(drawRadarChart, 60);
     }
   }
 
@@ -327,6 +332,7 @@ function initTacticalCarousel() {
 }
 
 /* Draws dynamic 6-axis attribute polar graph on canvas */
+window.addEventListener('resize', () => { if (document.getElementById('radar-chart-canvas')) drawRadarChart(); });
 function drawRadarChart() {
   const canvas = document.getElementById('radar-chart-canvas');
   if (!canvas) return;
@@ -340,6 +346,11 @@ function drawRadarChart() {
   ctx.scale(dpr, dpr);
 
   ctx.clearRect(0, 0, w, h);
+
+  // Read active theme CSS variables dynamically
+  const comp = getComputedStyle(document.body);
+  const accent = comp.getPropertyValue('--theme-accent').trim() || '#00f2fe';
+  const rgb = comp.getPropertyValue('--theme-accent-rgb').trim() || '0, 242, 254';
 
   const centerX = w / 2;
   const centerY = h / 2 + 6;
@@ -369,8 +380,8 @@ function drawRadarChart() {
       else ctx.lineTo(x, y);
     }
     ctx.closePath();
-    ctx.strokeStyle = l === levels ? 'rgba(0, 242, 254, 0.35)' : 'rgba(255, 255, 255, 0.08)';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = l === levels ? `rgba(${rgb}, 0.45)` : 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = l === levels ? 1.5 : 1;
     ctx.stroke();
   }
 
@@ -383,7 +394,7 @@ function drawRadarChart() {
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.lineTo(x, y);
-    ctx.strokeStyle = 'rgba(0, 242, 254, 0.2)';
+    ctx.strokeStyle = `rgba(${rgb}, 0.25)`;
     ctx.stroke();
 
     // Spoke labels
@@ -391,13 +402,13 @@ function drawRadarChart() {
     const labelY = centerY + Math.sin(angle) * (radius + 14);
 
     ctx.font = 'bold 9px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#00f2fe';
+    ctx.fillStyle = accent;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(`${Math.round(values[i] * 100)}%`, labelX, labelY);
   }
 
-  // 3. Shaded Data Polygon
+  // 3. Shaded Data Polygon with Theme Glow
   ctx.beginPath();
   for (let i = 0; i < sides; i++) {
     const angle = (Math.PI * 2 / sides) * i - Math.PI / 2;
@@ -410,11 +421,14 @@ function drawRadarChart() {
   }
   ctx.closePath();
 
-  ctx.fillStyle = 'rgba(0, 242, 254, 0.28)';
+  ctx.fillStyle = `rgba(${rgb}, 0.25)`;
   ctx.fill();
-  ctx.strokeStyle = '#00f2fe';
+  ctx.strokeStyle = accent;
   ctx.lineWidth = 2.5;
+  ctx.shadowColor = accent;
+  ctx.shadowBlur = 8;
   ctx.stroke();
+  ctx.shadowBlur = 0;
 
   // 4. Glowing vertex vertices
   for (let i = 0; i < sides; i++) {
@@ -427,7 +441,7 @@ function drawRadarChart() {
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#00f2fe';
+    ctx.strokeStyle = accent;
     ctx.lineWidth = 2;
     ctx.stroke();
   }

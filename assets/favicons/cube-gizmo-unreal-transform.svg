@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gizmo-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c121e" />
+      <stop offset="100%" stop-color="#03060a" />
+    </linearGradient>
+    <filter id="axis-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Dark Rounded Base -->
+  <rect x="6" y="6" width="116" height="116" rx="28" fill="url(#gizmo-bg)" stroke="#1a283e" stroke-width="3" />
+
+  <!-- Wireframe Bounding Cube (Subtle Blueprint lines) -->
+  <polygon points="64,22 104,45 64,68 24,45" fill="none" stroke="#00f2fe" stroke-width="1.2" stroke-opacity="0.25" stroke-dasharray="3 3" />
+  <polygon points="24,45 64,68 64,110 24,87" fill="none" stroke="#00f2fe" stroke-width="1.2" stroke-opacity="0.15" />
+  <polygon points="64,68 104,45 104,87 64,110" fill="none" stroke="#00f2fe" stroke-width="1.2" stroke-opacity="0.15" />
+
+  <!-- 3D Transform Planes (Arc Arcs / Translation Quadrants) -->
+  <!-- XY Plane Arc (Yellow / Amber) -->
+  <path d="M 64 68 L 86 55 A 25 25 0 0 1 64 44 Z" fill="rgba(255, 184, 0, 0.25)" stroke="#ffb800" stroke-width="1" />
+  <!-- XZ Plane Arc (Cyan) -->
+  <path d="M 64 68 L 42 55 A 25 25 0 0 0 64 44 Z" fill="rgba(0, 242, 254, 0.25)" stroke="#00f2fe" stroke-width="1" />
+
+  <!-- 3D Coordinate Axis Handles -->
+  <!-- Z-Axis (Vertical Up - Cyan/Blue) -->
+  <line x1="64" y1="68" x2="64" y2="22" stroke="#00f2fe" stroke-width="4.5" stroke-linecap="round" filter="url(#axis-glow)" />
+  <polygon points="64,14 58,25 70,25" fill="#00f2fe" />
+
+  <!-- X-Axis (Forward/Right - Crimson/Red in Unreal) -->
+  <line x1="64" y1="68" x2="104" y2="45" stroke="#ef4444" stroke-width="4.5" stroke-linecap="round" filter="url(#axis-glow)" />
+  <polygon points="110,42 101,42 105,51" fill="#ef4444" />
+
+  <!-- Y-Axis (Right/Left - Emerald/Green in Unreal) -->
+  <line x1="64" y1="68" x2="24" y2="45" stroke="#00f090" stroke-width="4.5" stroke-linecap="round" filter="url(#axis-glow)" />
+  <polygon points="18,42 22,51 27,42" fill="#00f090" />
+
+  <!-- Central Origin Cube Gizmo (Free Transform Handle) -->
+  <polygon points="64,60 71,64 64,68 57,64" fill="#ffffff" />
+  <polygon points="57,64 64,68 64,76 57,72" fill="#d1d5db" />
+  <polygon points="64,68 71,64 71,72 64,76" fill="#9ca3af" />
+  <polygon points="64,60 71,64 64,68 57,64" fill="none" stroke="#ffb800" stroke-width="1.5" />
+</svg>
