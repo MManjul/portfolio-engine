@@ -9,7 +9,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initMobileDeck();
   initMobileBanners();
+  initMobileNetcodeUI();
 });
+
+function initMobileNetcodeUI() {
+  const fireBtnText = document.getElementById('btn-fire-text');
+  if (fireBtnText) fireBtnText.textContent = 'TAP CANVAS TO STEER';
+
+  const instructionsText = document.getElementById('sandbox-instructions-text');
+  if (instructionsText) {
+    instructionsText.innerHTML = '<strong>Touch Controls:</strong> Tap anywhere on the canvas to steer the ship • Adjust Ping (RTT) &amp; Packet Loss below to stress reconciliation!';
+  }
+
+  const keyboardIcon = document.querySelector('.keyboard-icon');
+  if (keyboardIcon) keyboardIcon.textContent = '👆';
+
+  const autoLabel = document.getElementById('netcode-auto-label');
+  if (autoLabel) autoLabel.textContent = 'AUTO-PILOT ACTIVE';
+}
 
 function initMobileDeck() {
   const sections = document.querySelectorAll('.hud-section');
@@ -18,7 +35,7 @@ function initMobileDeck() {
   const sectionMeta = {
     'hero': { index: '01', title: 'COMMAND_CENTER' },
     'about': { index: '02', title: 'ARCHITECT_PROFILE' },
-    'sandbox': { index: '03', title: 'PLAYGROUND', badge: 'COMING SOON' },
+    'sandbox': { index: '03', title: 'NETCODE_LAB', badge: 'LIVE' },
     'projects': { index: '04', title: 'TITLES_&_SYSTEMS' },
     'statetree': { index: '05', title: 'STATETREE_NODE_GRAPH' },
     'experience': { index: '06', title: 'CAREER_XP_LOG' },
@@ -36,14 +53,12 @@ function initMobileDeck() {
     btn.className = 'mobile-deck-header';
     btn.dataset.section = secId;
 
-    const isHero = secId === 'hero';
-    if (isHero) {
-      btn.classList.add('active');
-    } else {
-      sec.classList.add('mobile-collapsed');
-    }
+    // All sections are expanded by default on mobile
+    btn.classList.add('active');
+    sec.classList.remove('mobile-collapsed');
 
-    const badgeHtml = meta.badge ? `<span class="deck-badge-offline">${meta.badge}</span>` : '';
+    const badgeClass = meta.badge === 'LIVE' ? 'deck-badge-live' : 'deck-badge-offline';
+    const badgeHtml = meta.badge ? `<span class="${badgeClass}">${meta.badge}</span>` : '';
 
     btn.innerHTML = `
       <div class="deck-header-left">
@@ -51,43 +66,29 @@ function initMobileDeck() {
         <span class="deck-header-title">${meta.title}</span>
         ${badgeHtml}
       </div>
-      <span class="deck-header-chevron">${isHero ? '▴' : '▾'}</span>
+      <span class="deck-header-chevron">▴</span>
     `;
 
     sec.insertBefore(btn, sec.firstChild);
 
     btn.addEventListener('click', () => {
-      const isAlreadyOpen = !sec.classList.contains('mobile-collapsed') && btn.classList.contains('active');
+      const isCollapsed = sec.classList.contains('mobile-collapsed');
+      const chev = btn.querySelector('.deck-header-chevron');
 
-      if (isAlreadyOpen) {
-        // One item is always open: keep active section open and re-align smoothly if tapped
+      if (isCollapsed) {
+        // Expand this section
+        sec.classList.remove('mobile-collapsed');
+        btn.classList.add('active');
+        if (chev) chev.textContent = '▴';
         requestAnimationFrame(() => {
           btn.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
-        return;
+      } else {
+        // Collapse this section
+        sec.classList.add('mobile-collapsed');
+        btn.classList.remove('active');
+        if (chev) chev.textContent = '▾';
       }
-
-      // Close all other sections
-      sections.forEach(s => {
-        s.classList.add('mobile-collapsed');
-        const b = s.querySelector('.mobile-deck-header');
-        if (b) {
-          b.classList.remove('active');
-          const chev = b.querySelector('.deck-header-chevron');
-          if (chev) chev.textContent = '▾';
-        }
-      });
-
-      // Open this section
-      sec.classList.remove('mobile-collapsed');
-      btn.classList.add('active');
-      const chev = btn.querySelector('.deck-header-chevron');
-      if (chev) chev.textContent = '▴';
-
-      // Position this section header smoothly at top under fixed engine header (48px)
-      requestAnimationFrame(() => {
-        btn.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
 
       if (window.soundFX && window.soundFX.playClick) {
         window.soundFX.playClick();
@@ -106,7 +107,15 @@ function initMobileDeck() {
         const btn = targetSec.querySelector('.mobile-deck-header');
         if (btn) {
           e.preventDefault();
-          btn.click();
+          if (targetSec.classList.contains('mobile-collapsed')) {
+            targetSec.classList.remove('mobile-collapsed');
+            btn.classList.add('active');
+            const chev = btn.querySelector('.deck-header-chevron');
+            if (chev) chev.textContent = '▴';
+          }
+          requestAnimationFrame(() => {
+            btn.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
         }
       }
     });
@@ -124,7 +133,7 @@ function initMobileBanners() {
         <span class="notice-icon">↔</span>
         <div class="notice-text">
           <strong>INTERACTIVE NODE GRAPH</strong>
-          Swipe horizontally across the viewport below to inspect the full 960px UE5 StateTree schema.
+          Swipe horizontally across the viewport below to inspect the full UE5 StateTree schema.
         </div>
       `;
       const editorWin = container.querySelector('.statetree-editor-window');

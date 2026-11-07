@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initThemeSwitcher();
   initAudioControls();
   initNavScrollspy();
+  initBackToTop();
   initTacticalCarousel();
   initGoogleDriveResume();
   initProjectFilters();
@@ -16,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initResumeModal();
   initContactSystem();
   initSoundHooks();
+  initCustomSelects();
 });
 
 /* ==========================================================================
@@ -175,6 +177,33 @@ function initNavScrollspy() {
   navItems.forEach(item => {
     item.addEventListener('click', () => {
       if (window.soundFX) window.soundFX.playClick();
+    });
+  });
+}
+
+/* ==========================================================================
+   4C. RETURN TO TOP HUD NAVIGATION
+   ========================================================================== */
+function initBackToTop() {
+  const btn = document.getElementById('btn-back-to-top');
+  if (!btn) return;
+
+  const toggleVisibility = () => {
+    if (window.scrollY > 300) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  };
+
+  window.addEventListener('scroll', toggleVisibility, { passive: true });
+  toggleVisibility();
+
+  btn.addEventListener('click', () => {
+    if (window.soundFX) window.soundFX.playClick();
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
     });
   });
 }
@@ -1269,3 +1298,137 @@ function initSoundHooks() {
     });
   });
 }
+
+/* ==========================================================================
+   10. CUSTOM HUD CYBERPUNK DROPDOWNS (ZERO NATIVE OS DIALOGS)
+   ========================================================================== */
+function initCustomSelects() {
+  const selects = document.querySelectorAll('select.hud-select');
+  selects.forEach(select => {
+    if (select.dataset.customized === 'true') return;
+    select.dataset.customized = 'true';
+
+    // Hide native select visually while keeping it in DOM for forms/listeners
+    select.classList.add('hud-native-select-hidden');
+
+    // Create custom wrapper
+    const wrapper = document.createElement('div');
+    wrapper.className = 'hud-custom-select';
+    wrapper.setAttribute('data-target-select', select.id || '');
+
+    // Create trigger button
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'hud-custom-select-trigger';
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+
+    const selectedOption = select.options[select.selectedIndex] || select.options[0];
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'hud-custom-select-label';
+    labelSpan.innerHTML = selectedOption ? selectedOption.innerHTML : 'Select option';
+
+    const chevronSpan = document.createElement('span');
+    chevronSpan.className = 'hud-custom-select-chevron';
+    chevronSpan.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+
+    trigger.appendChild(labelSpan);
+    trigger.appendChild(chevronSpan);
+    wrapper.appendChild(trigger);
+
+    // Create options menu
+    const menu = document.createElement('div');
+    menu.className = 'hud-custom-select-menu';
+    menu.setAttribute('role', 'listbox');
+
+    Array.from(select.options).forEach((opt, idx) => {
+      const optEl = document.createElement('div');
+      optEl.className = 'hud-custom-select-option' + (idx === select.selectedIndex ? ' active' : '');
+      optEl.setAttribute('role', 'option');
+      optEl.setAttribute('data-value', opt.value);
+      optEl.setAttribute('aria-selected', idx === select.selectedIndex ? 'true' : 'false');
+
+      const bullet = document.createElement('span');
+      bullet.className = 'opt-bullet';
+
+      const text = document.createElement('span');
+      text.className = 'opt-text';
+      text.innerHTML = opt.innerHTML;
+
+      optEl.appendChild(bullet);
+      optEl.appendChild(text);
+
+      optEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (select.value !== opt.value) {
+          select.value = opt.value;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        updateCustomSelectUI(wrapper, select);
+        closeAllCustomSelects();
+        if (window.soundFX) window.soundFX.playClick();
+      });
+
+      menu.appendChild(optEl);
+    });
+
+    wrapper.appendChild(menu);
+
+    // Insert wrapper right after select in DOM
+    select.parentNode.insertBefore(wrapper, select.nextSibling);
+
+    // Toggle menu
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = wrapper.classList.contains('is-open');
+      closeAllCustomSelects();
+      if (!isOpen) {
+        wrapper.classList.add('is-open');
+        trigger.setAttribute('aria-expanded', 'true');
+        if (window.soundFX) window.soundFX.playBlip(750, 0.02);
+      }
+    });
+
+    // Sync if select value changes programmatically
+    select.addEventListener('change', () => {
+      updateCustomSelectUI(wrapper, select);
+    });
+  });
+
+  // Global close on outside click or escape
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.hud-custom-select')) {
+      closeAllCustomSelects();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeAllCustomSelects();
+    }
+  });
+}
+
+function updateCustomSelectUI(wrapper, select) {
+  const triggerLabel = wrapper.querySelector('.hud-custom-select-label');
+  const selectedOpt = select.options[select.selectedIndex];
+  if (triggerLabel && selectedOpt) {
+    triggerLabel.innerHTML = selectedOpt.innerHTML;
+  }
+  const optionEls = wrapper.querySelectorAll('.hud-custom-select-option');
+  optionEls.forEach(optEl => {
+    const isSelected = optEl.dataset.value === select.value;
+    optEl.classList.toggle('active', isSelected);
+    optEl.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+  });
+}
+
+function closeAllCustomSelects() {
+  document.querySelectorAll('.hud-custom-select.is-open').forEach(w => {
+    w.classList.remove('is-open');
+    const trig = w.querySelector('.hud-custom-select-trigger');
+    if (trig) trig.setAttribute('aria-expanded', 'false');
+  });
+}
+
+window.initCustomSelects = initCustomSelects;

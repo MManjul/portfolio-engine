@@ -219,8 +219,9 @@ kbd {
 .text-emerald { color: var(--accent-emerald) !important; }
 .text-crimson { color: var(--accent-crimson) !important; }
 
-.hide-mobile { display: inline-flex; }
-.hide-tablet { display: inline-flex; }
+.hide-mobile { display: inline; }
+.show-mobile { display: none !important; }
+.hide-tablet { display: inline; }
 
 @media (max-width: 900px) {
   .hide-tablet { display: none !important; }
@@ -228,8 +229,7 @@ kbd {
 
 @media (max-width: 600px) {
   .hide-mobile { display: none !important; }
-  .hud-section { padding: 50px 16px; }
   body {
-    padding-top: calc(var(--header-height) + 50px);
+    padding-top: var(--header-height);
   }
 }

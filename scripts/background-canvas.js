@@ -1274,6 +1274,29 @@ class BackgroundCanvasOrchestrator {
   }
 
   init() {
+    // Check if device is mobile: completely disable background canvas animation to prevent visual distraction
+    if (window.innerWidth <= 768) {
+      if (this.canvas) {
+        this.canvas.style.display = 'none';
+      }
+      // Listen for orientation change or desktop resizing
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 768 && !this.currentEngine) {
+          if (this.canvas) this.canvas.style.display = 'block';
+          this.startSimulation();
+        } else if (window.innerWidth <= 768 && this.currentEngine) {
+          this.currentEngine.stop();
+          this.currentEngine = null;
+          if (this.canvas) this.canvas.style.display = 'none';
+        }
+      });
+      return;
+    }
+
+    this.startSimulation();
+  }
+
+  startSimulation() {
     // Select randomly on page launch
     const randomIndex = Math.floor(Math.random() * this.modes.length);
     const chosen = this.modes[randomIndex];

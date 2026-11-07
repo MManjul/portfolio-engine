@@ -21,7 +21,7 @@
   <meta name="twitter:image" content="https://mayankmanjul.com/assets/images/mayank-portrait.jpg">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=3.6.3">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=3.7.3">
 
   <!-- Google Fonts for Futuristic Cyber/Engine Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,10 +29,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="styles/main.css?v=3.6.3">
-  <link rel="stylesheet" href="styles/hud-theme.css?v=3.6.3">
-  <link rel="stylesheet" href="styles/components.css?v=3.6.3">
-  <link rel="stylesheet" href="styles/mobile.css?v=3.6.3" media="(max-width: 768px)">
+  <link rel="stylesheet" href="styles/main.css?v=3.7.3">
+  <link rel="stylesheet" href="styles/hud-theme.css?v=3.7.3">
+  <link rel="stylesheet" href="styles/components.css?v=3.7.3">
+  <link rel="stylesheet" href="styles/mobile.css?v=3.7.3" media="(max-width: 768px)">
 </head>
 <body class="theme-unreal-cyan">
   <!-- Scanline & Ambient Grid Overlay -->
@@ -46,7 +46,7 @@
   <header class="engine-top-bar" role="banner">
     <div class="telemetry-group left">
       <div class="engine-brand">
-        <img src="favicon.svg?v=3.6.3" alt="MM Coordinate Core" class="engine-logo-img" width="22" height="22" style="width: 22px !important; height: 22px !important; max-width: 22px !important; max-height: 22px !important; display: inline-block; vertical-align: middle; flex-shrink: 0;">
+        <img src="favicon.svg?v=3.7.3" alt="MM Coordinate Core" class="engine-logo-img" width="22" height="22" style="width: 22px !important; height: 22px !important; max-width: 22px !important; max-height: 22px !important; display: inline-block; vertical-align: middle; flex-shrink: 0;">
         <span class="engine-title">MAYANK MANJUL</span>
         <span class="build-badge">v5.4.4-SHIPPING</span>
       </div>
@@ -495,7 +495,7 @@
           <div class="section-index">03 // RUNTIME LAB</div>
           <h2 class="section-title">DETERMINISTIC NETCODE &amp; CLIENT PREDICTION SIMULATOR</h2>
           <div class="section-line"></div>
-          <p class="section-desc">Interactive low-level multiplayer simulator demonstrating Authoritative Server State, Unpredicted Client Latency, and Client-Side Prediction with Gabriel Gambetta Reconciliation. Steer with WASD or Arrow Keys, adjust RTT &amp; Packet Loss, or toggle Auto-Pilot.</p>
+          <p class="section-desc">Interactive low-level multiplayer simulator demonstrating Authoritative Server State, Unpredicted Client Latency, and Client-Side Prediction with Gabriel Gambetta Reconciliation. <span class="hide-mobile">Steer with WASD or Arrow Keys, adjust RTT &amp; Packet Loss, or toggle Auto-Pilot.</span><span class="show-mobile">Tap anywhere on the canvas to navigate, adjust RTT &amp; Packet Loss, or toggle Auto-Pilot.</span></p>
         </div>
 
         <div class="sandbox-container">
@@ -1127,92 +1127,94 @@
               <!-- Connection Bezier Cables -->
               <g class="graph-cables">
                 <!-- Root to Locomotion -->
-                <path id="cable-root-loco" class="cable active" d="M 220 220 C 300 220, 320 140, 420 140" />
+                <path id="cable-root-loco" class="cable active" d="M 240 230 C 285 230, 285 125, 330 125" />
                 <!-- Locomotion to Sub-States -->
-                <path id="cable-loco-idle" class="cable active" d="M 620 120 C 700 120, 720 70, 780 70" />
-                <path id="cable-loco-sprint" class="cable" d="M 620 150 C 700 150, 720 170, 780 170" />
+                <path id="cable-loco-idle" class="cable active" d="M 610 123 C 655 123, 655 67, 700 67" />
+                <path id="cable-loco-sprint" class="cable" d="M 610 157 C 655 157, 655 172, 700 172" />
                 <!-- Root to Abilities -->
-                <path id="cable-root-abilities" class="cable" d="M 220 250 C 300 250, 320 340, 420 340" />
-                <path id="cable-abilities-dodge" class="cable" d="M 620 320 C 700 320, 720 280, 780 280" />
-                <path id="cable-abilities-cast" class="cable" d="M 620 360 C 700 360, 720 390, 780 390" />
+                <path id="cable-root-abilities" class="cable" d="M 240 230 C 285 230, 285 330, 330 330" />
+                <path id="cable-abilities-dodge" class="cable" d="M 610 328 C 655 328, 655 287, 700 287" />
+                <path id="cable-abilities-cast" class="cable" d="M 610 362 C 655 362, 655 397, 700 397" />
                 <!-- Server Replication Cross-Link -->
-                <path id="cable-rep-sync" class="cable dashed" d="M 520 420 C 520 480, 850 480, 850 440" />
+                <path id="cable-rep-sync" class="cable dashed" d="M 470 395 C 470 475, 830 475, 830 439" />
               </g>
 
               <!-- Node: Root StateTree -->
-              <g class="graph-node-group" id="node-root" transform="translate(40, 180)">
-                <rect class="node-rect root" width="180" height="90" rx="6" />
-                <rect class="node-header header-root" width="180" height="24" rx="6" />
+              <g class="graph-node-group" id="node-root" transform="translate(30, 185)">
+                <rect class="node-rect root" width="210" height="90" rx="6" />
+                <rect class="node-header header-root" width="210" height="24" rx="6" />
                 <text class="node-title" x="12" y="17">Root StateTree</text>
-                <text class="node-body-line" x="12" y="45">Context: UECricketBatsman</text>
-                <text class="node-body-line text-cyan" x="12" y="65">Tick Group: TG_PrePhysics</text>
-                <circle class="pin out" cx="180" cy="45" r="5" />
+                <text class="node-body-line" x="12" y="46">Context: UECricketBatsman</text>
+                <text class="node-body-line text-cyan" x="12" y="68">Tick Group: TG_PrePhysics</text>
+                <circle class="pin out" cx="210" cy="45" r="5" />
               </g>
 
               <!-- Node: Locomotion State (Crease & Stance) -->
-              <g class="graph-node-group active-node" id="node-locomotion" transform="translate(420, 90)">
-                <rect class="node-rect" width="200" height="110" rx="6" />
-                <rect class="node-header header-loco" width="200" height="24" rx="6" />
+              <g class="graph-node-group active-node" id="node-locomotion" transform="translate(330, 75)">
+                <rect class="node-rect" width="280" height="115" rx="6" />
+                <rect class="node-header header-loco" width="280" height="24" rx="6" />
                 <text class="node-title" x="12" y="17">State: CreaseLocomotion</text>
                 <circle class="pin in" cx="0" cy="50" r="5" />
-                <text class="node-body-line" x="12" y="45">Tag: State.Locomotion.Crease</text>
-                <text class="node-body-line text-amber" x="12" y="65">Evaluator: BowlerReleaseCheck</text>
-                <text class="node-body-line text-cyan" x="12" y="85">Input: IMC_ECricket_Crease</text>
-                <circle class="pin out" cx="200" cy="40" r="5" />
-                <circle class="pin out" cx="200" cy="70" r="5" />
+                <text class="node-body-line" x="12" y="48">Tag: State.Locomotion.Crease</text>
+                <text class="node-body-line text-amber" x="12" y="70">Evaluator: BowlerReleaseCheck</text>
+                <text class="node-body-line text-cyan" x="12" y="92">Input: IMC_ECricket_Crease</text>
+                <circle class="pin out" cx="280" cy="48" r="5" />
+                <circle class="pin out" cx="280" cy="82" r="5" />
               </g>
 
               <!-- Sub-Node: Batting Stance State -->
-              <g class="graph-node-group active-node" id="node-idle" transform="translate(780, 30)">
-                <rect class="node-rect" width="180" height="80" rx="6" />
-                <rect class="node-header header-stance" width="180" height="22" rx="6" />
-                <text class="node-title" x="10" y="16">SubState: CreaseStance</text>
-                <circle class="pin in" cx="0" cy="40" r="5" />
-                <text class="node-body-line" x="10" y="44">Speed &lt;= 0.1 m/s (Tapping)</text>
-                <text class="node-body-line text-emerald" x="10" y="62">Anim: AS_Batsman_CreaseTap</text>
+              <g class="graph-node-group active-node" id="node-idle" transform="translate(700, 25)">
+                <rect class="node-rect" width="260" height="84" rx="6" />
+                <rect class="node-header header-stance" width="260" height="24" rx="6" />
+                <text class="node-title" x="12" y="17">SubState: CreaseStance</text>
+                <circle class="pin in" cx="0" cy="42" r="5" />
+                <text class="node-body-line" x="12" y="47">Speed &lt;= 0.1 m/s (Tapping)</text>
+                <text class="node-body-line text-emerald" x="12" y="67">Anim: AS_Batsman_CreaseTap</text>
               </g>
 
               <!-- Sub-Node: Sprint Between Wickets State -->
-              <g class="graph-node-group" id="node-sprint" transform="translate(780, 130)">
-                <rect class="node-rect" width="180" height="80" rx="6" />
-                <rect class="node-header header-sprint" width="180" height="22" rx="6" />
-                <text class="node-title" x="10" y="16">SubState: SprintRun</text>
-                <circle class="pin in" cx="0" cy="40" r="5" />
-                <text class="node-body-line" x="10" y="44">Tag: Locomotion.SprintWickets</text>
-                <text class="node-body-line text-cyan" x="10" y="62">MaxSprint = 8.4 m/s (Slide)</text>
+              <g class="graph-node-group" id="node-sprint" transform="translate(700, 130)">
+                <rect class="node-rect" width="260" height="84" rx="6" />
+                <rect class="node-header header-sprint" width="260" height="24" rx="6" />
+                <text class="node-title" x="12" y="17">SubState: SprintRun</text>
+                <circle class="pin in" cx="0" cy="42" r="5" />
+                <text class="node-body-line" x="12" y="47">Tag: Locomotion.SprintWickets</text>
+                <text class="node-body-line text-cyan" x="12" y="67">MaxSprint = 8.4 m/s (Slide)</text>
               </g>
 
               <!-- Node: Stroke Execution State -->
-              <g class="graph-node-group" id="node-abilities" transform="translate(420, 290)">
-                <rect class="node-rect" width="200" height="110" rx="6" />
-                <rect class="node-header header-action" width="200" height="24" rx="6" />
+              <g class="graph-node-group" id="node-abilities" transform="translate(330, 280)">
+                <rect class="node-rect" width="280" height="115" rx="6" />
+                <rect class="node-header header-action" width="280" height="24" rx="6" />
                 <text class="node-title" x="12" y="17">State: BattingStrokeExecution</text>
                 <circle class="pin in" cx="0" cy="50" r="5" />
-                <text class="node-body-line" x="12" y="45">Tag: Action.Batting.Stroke</text>
-                <text class="node-body-line text-amber" x="12" y="65">Server Auth: RPC_AuthoritativeImpact</text>
-                <text class="node-body-line text-emerald" x="12" y="85">Predict: ClientTrajectoryPredict</text>
-                <circle class="pin out" cx="200" cy="40" r="5" />
-                <circle class="pin out" cx="200" cy="80" r="5" />
+                <text class="node-body-line" x="12" y="48">Tag: Action.Batting.Stroke</text>
+                <text class="node-body-line text-amber" x="12" y="70">Server Auth: RPC_AuthoritativeImpact</text>
+                <text class="node-body-line text-emerald" x="12" y="92">Predict: ClientTrajectoryPredict</text>
+                <circle class="pin out" cx="280" cy="48" r="5" />
+                <circle class="pin out" cx="280" cy="82" r="5" />
+                <circle class="pin sync" cx="140" cy="115" r="4" />
               </g>
 
               <!-- Sub-Node: Stroke Play (Power Drive) -->
-              <g class="graph-node-group" id="node-dodge" transform="translate(780, 240)">
-                <rect class="node-rect" width="180" height="80" rx="6" />
-                <rect class="node-header header-stroke" width="180" height="22" rx="6" />
-                <text class="node-title" x="10" y="16">SubState: CoverDrive</text>
-                <circle class="pin in" cx="0" cy="40" r="5" />
-                <text class="node-body-line" x="10" y="44">Tag: Stroke.CoverDrive</text>
-                <text class="node-body-line text-cyan" x="10" y="62">BatVelocity = 138 km/h</text>
+              <g class="graph-node-group" id="node-dodge" transform="translate(700, 245)">
+                <rect class="node-rect" width="260" height="84" rx="6" />
+                <rect class="node-header header-stroke" width="260" height="24" rx="6" />
+                <text class="node-title" x="12" y="17">SubState: CoverDrive</text>
+                <circle class="pin in" cx="0" cy="42" r="5" />
+                <text class="node-body-line" x="12" y="47">Tag: Stroke.CoverDrive</text>
+                <text class="node-body-line text-cyan" x="12" y="67">BatVelocity = 138 km/h</text>
               </g>
 
               <!-- Sub-Node: Defensive Block -->
-              <g class="graph-node-group" id="node-abilitycast" transform="translate(780, 350)">
-                <rect class="node-rect" width="180" height="80" rx="6" />
-                <rect class="node-header header-defense" width="180" height="22" rx="6" />
-                <text class="node-title" x="10" y="16">SubState: DefensiveBlock</text>
-                <circle class="pin in" cx="0" cy="40" r="5" />
-                <text class="node-body-line" x="10" y="44">Tag: Defensive.SoftHands</text>
-                <text class="node-body-line text-amber" x="10" y="62">Restitution = 0.18f (Damped)</text>
+              <g class="graph-node-group" id="node-abilitycast" transform="translate(700, 355)">
+                <rect class="node-rect" width="260" height="84" rx="6" />
+                <rect class="node-header header-defense" width="260" height="24" rx="6" />
+                <text class="node-title" x="12" y="17">SubState: DefensiveBlock</text>
+                <circle class="pin in" cx="0" cy="42" r="5" />
+                <text class="node-body-line" x="12" y="47">Tag: Defensive.SoftHands</text>
+                <text class="node-body-line text-amber" x="12" y="67">Restitution = 0.18f (Damped)</text>
+                <circle class="pin sync" cx="130" cy="84" r="4" />
               </g>
             </svg>
           </div>
@@ -1804,6 +1806,16 @@
     </div>
   </div>
 
+  <!-- Return to Top Floating HUD Navigation -->
+  <button type="button" id="btn-back-to-top" class="hud-back-to-top" aria-label="Return to top of page" title="Return to Top [↑]">
+    <span class="hud-corner top-left"></span>
+    <span class="hud-corner bottom-right"></span>
+    <svg class="hud-top-chevron" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+    <span class="hud-top-label">TOP</span>
+  </button>
+
   <!-- Bottom Persistent HUD Status Line -->
   <footer class="engine-bottom-bar" role="contentinfo">
     <div class="bottom-left">
@@ -1823,11 +1835,11 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="scripts/sound-fx.js?v=3.6.3"></script>
-  <script src="scripts/background-canvas.js?v=3.6.3"></script>
-  <script src="scripts/physics-sandbox.js?v=3.6.3"></script>
-  <script src="scripts/statetree-visualizer.js?v=3.6.3"></script>
-  <script src="scripts/main.js?v=3.6.3"></script>
-  <script src="scripts/mobile.js?v=3.6.3"></script>
+  <script src="scripts/sound-fx.js?v=3.7.3"></script>
+  <script src="scripts/background-canvas.js?v=3.7.3"></script>
+  <script src="scripts/physics-sandbox.js?v=3.7.3"></script>
+  <script src="scripts/statetree-visualizer.js?v=3.7.3"></script>
+  <script src="scripts/main.js?v=3.7.3"></script>
+  <script src="scripts/mobile.js?v=3.7.3"></script>
 </body>
 </html>

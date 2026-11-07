@@ -218,10 +218,7 @@ class PhysicsSandboxEngine {
       this.autoToggle.addEventListener('change', (e) => {
         if (this.netcodeState) {
           this.netcodeState.autoPilot = e.target.checked;
-          if (this.autoValLabel) {
-            this.autoValLabel.textContent = e.target.checked ? 'AUTO-PILOT ACTIVE' : 'MANUAL WASD STEERING';
-            this.autoValLabel.className = e.target.checked ? 'text-emerald' : 'text-cyan';
-          }
+          this.updateNetcodeLabels();
         }
       });
     }
@@ -257,22 +254,59 @@ class PhysicsSandboxEngine {
     window.addEventListener('mousemove', (e) => this.onMouseMove(e));
     window.addEventListener('mouseup', () => this.onMouseUp());
 
-    // Mobile Touch Bindings
+    // Mobile Touch & Tap Controls (Zero Conflict with Page Scrolling)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isTouchScrolling = false;
+
     this.canvas.addEventListener('touchstart', (e) => {
       if (e.touches && e.touches.length > 0) {
         const touch = e.touches[0];
-        this.onMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        isTouchScrolling = false;
+        this.isMouseDown = true;
       }
     }, { passive: true });
 
     window.addEventListener('touchmove', (e) => {
       if (e.touches && e.touches.length > 0) {
         const touch = e.touches[0];
-        this.onMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
+        const dy = Math.abs(touch.clientY - touchStartY);
+        const dx = Math.abs(touch.clientX - touchStartX);
+
+        // When vertical drag > 8px, user is scrolling the webpage: release canvas hold
+        if (window.innerWidth <= 768 && dy > 8 && dy > dx) {
+          isTouchScrolling = true;
+          this.isMouseDown = false;
+          return;
+        }
+
+        if (!isTouchScrolling && this.isMouseDown) {
+          const coords = this.getCanvasCoords(touch);
+          this.handlePointerTarget(coords.x, coords.y);
+        }
       }
     }, { passive: true });
 
-    window.addEventListener('touchend', () => this.onMouseUp(), { passive: true });
+    this.canvas.addEventListener('touchend', (e) => {
+      this.isMouseDown = false;
+      if (!isTouchScrolling && e.changedTouches && e.changedTouches.length > 0) {
+        const touch = e.changedTouches[0];
+        const dist = Math.hypot(touch.clientX - touchStartX, touch.clientY - touchStartY);
+        if (dist <= 15) {
+          // Clean tap registered!
+          const coords = this.getCanvasCoords(touch);
+          this.handlePointerTarget(coords.x, coords.y);
+        }
+      }
+      isTouchScrolling = false;
+    }, { passive: true });
+
+    window.addEventListener('resize', () => {
+      this.resize();
+      if (this.mode === 'netcode') this.updateNetcodeLabels();
+    });
 
     // Keyboard bindings
     window.addEventListener('keydown', (e) => {
@@ -287,13 +321,7 @@ class PhysicsSandboxEngine {
           if (this.netcodeState.autoPilot) {
             this.netcodeState.autoPilot = false;
             if (this.autoToggle) this.autoToggle.checked = false;
-            if (this.autoValLabel) {
-              this.autoValLabel.textContent = 'MANUAL WASD STEERING';
-              this.autoValLabel.className = 'text-cyan';
-            }
-            if (this.fireBtnText) {
-              this.fireBtnText.textContent = 'TOGGLE AUTO-PILOT [OFF]';
-            }
+            this.updateNetcodeLabels();
           }
         }
       }
@@ -388,17 +416,11 @@ class PhysicsSandboxEngine {
       if (netcodeDelayBox) netcodeDelayBox.style.display = 'flex';
       if (netcodeLossBox) netcodeLossBox.style.display = 'flex';
       if (netcodeAutoBox) netcodeAutoBox.style.display = 'flex';
-      if (this.fireBtnText) {
-        const isAuto = this.netcodeState ? this.netcodeState.autoPilot : true;
-        this.fireBtnText.textContent = isAuto ? 'TOGGLE AUTO-PILOT [ON]' : 'TOGGLE AUTO-PILOT [OFF]';
-      }
       if (this.secBtnText) this.secBtnText.textContent = 'INJECT SERVER DESYNC';
       if (this.secBtn) this.secBtn.style.display = 'inline-flex';
       if (this.modeIndicator) this.modeIndicator.textContent = 'MODE: SERVER_REPLICATION_CLIENT_PREDICTION';
       if (this.predictionStatus) this.predictionStatus.textContent = 'RECONCILIATION: REWIND_REPLAY_DETERMINISTIC';
-      if (this.instructionsText) {
-        this.instructionsText.innerHTML = '<strong>Controls:</strong> Steer predicted ship with [W/A/S/D] or [Arrow Keys] • Click or Drag canvas to navigate • Turn off Auto-Pilot to test manual prediction • Raise Ping and Packet Loss to stress reconciliation!';
-      }
+      this.updateNetcodeLabels();
     } else if (this.mode === 'ragdoll') {
       if (this.fireBtnText) this.fireBtnText.textContent = 'LAUNCH RAGDOLL IMPULSE';
       if (this.secBtnText) this.secBtnText.textContent = 'SPAWN EXTRA MANNEQUIN';
@@ -1279,13 +1301,7 @@ class PhysicsSandboxEngine {
       lastDir: { x: 1, y: 0 }
     };
     if (this.autoToggle) this.autoToggle.checked = true;
-    if (this.autoValLabel) {
-      this.autoValLabel.textContent = 'AUTO-PILOT ACTIVE';
-      this.autoValLabel.className = 'text-emerald';
-    }
-    if (this.fireBtnText) {
-      this.fireBtnText.textContent = 'TOGGLE AUTO-PILOT [ON]';
-    }
+    this.updateNetcodeLabels();
   }
 
   updateNetcode(dt) {
@@ -1565,13 +1581,7 @@ class PhysicsSandboxEngine {
       if (this.netcodeState) {
         this.netcodeState.autoPilot = !this.netcodeState.autoPilot;
         if (this.autoToggle) this.autoToggle.checked = this.netcodeState.autoPilot;
-        if (this.autoValLabel) {
-          this.autoValLabel.textContent = this.netcodeState.autoPilot ? 'AUTO-PILOT ACTIVE' : 'MANUAL WASD STEERING';
-          this.autoValLabel.className = this.netcodeState.autoPilot ? 'text-emerald' : 'text-cyan';
-        }
-        if (this.fireBtnText) {
-          this.fireBtnText.textContent = this.netcodeState.autoPilot ? 'TOGGLE AUTO-PILOT [ON]' : 'TOGGLE AUTO-PILOT [OFF]';
-        }
+        this.updateNetcodeLabels();
       }
       if (window.soundFX) window.soundFX.playClick();
     } else if (this.mode === 'ragdoll') {
@@ -1634,15 +1644,31 @@ class PhysicsSandboxEngine {
     }
   }
 
-  /* ==========================================================================
-     MOUSE EVENT LISTENERS
-     ========================================================================== */
-  onMouseDown(e) {
-    this.isMouseDown = true;
+  getCanvasCoords(e) {
     const rect = this.canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / (this.scale || 1);
-    const y = (e.clientY - rect.top) / (this.scale || 1);
+    const logicalW = this.canvas.width / (this.scale || 1);
+    const logicalH = this.canvas.height / (this.scale || 1);
 
+    let clientX = e.clientX;
+    let clientY = e.clientY;
+    if (clientX === undefined && e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else if (clientX === undefined && e.changedTouches && e.changedTouches.length > 0) {
+      clientX = e.changedTouches[0].clientX;
+      clientY = e.changedTouches[0].clientY;
+    }
+
+    const normX = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const normY = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+
+    return {
+      x: normX * logicalW,
+      y: normY * logicalH
+    };
+  }
+
+  handlePointerTarget(x, y) {
     if (this.mode === 'buoyancy') {
       this.spawnBuoyantCrate(x, y);
     } else if (this.mode === 'trajectory') {
@@ -1652,19 +1678,13 @@ class PhysicsSandboxEngine {
         this.netcodeState.targetPoint = { x, y };
         this.netcodeState.autoPilot = false;
         if (this.autoToggle) this.autoToggle.checked = false;
-        if (this.autoValLabel) {
-          this.autoValLabel.textContent = 'MANUAL WASD STEERING';
-          this.autoValLabel.className = 'text-cyan';
-        }
-        if (this.fireBtnText) {
-          this.fireBtnText.textContent = 'TOGGLE AUTO-PILOT [OFF]';
-        }
+        this.updateNetcodeLabels();
       }
       if (window.soundFX) window.soundFX.playClick();
     } else if (this.mode === 'ragdoll') {
       for (let r of this.ragdollState.ragdolls) {
         for (let n of r.nodes) {
-          if (Math.hypot(n.x - x, n.y - y) < n.radius + 12) {
+          if (Math.hypot(n.x - x, n.y - y) < n.radius + 18) {
             this.ragdollState.draggedNode = n;
             return;
           }
@@ -1673,26 +1693,63 @@ class PhysicsSandboxEngine {
     }
   }
 
-  onMouseMove(e) {
-    const rect = this.canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / (this.scale || 1);
-    const y = (e.clientY - rect.top) / (this.scale || 1);
-    const w = this.canvas.width / (this.scale || 1);
-    const h = this.canvas.height / (this.scale || 1);
+  updateNetcodeLabels() {
+    const isMobile = window.innerWidth <= 768;
+    const isAuto = this.netcodeState ? this.netcodeState.autoPilot : true;
 
-    if (this.mode === 'netcode' && this.isMouseDown && this.netcodeState) {
-      if (x >= 0 && x <= w && y >= 0 && y <= h) {
-        this.netcodeState.targetPoint = { x, y };
-        this.netcodeState.autoPilot = false;
-        if (this.autoToggle) this.autoToggle.checked = false;
-        if (this.autoValLabel) {
-          this.autoValLabel.textContent = 'MANUAL WASD STEERING';
-          this.autoValLabel.className = 'text-cyan';
-        }
-        if (this.fireBtnText) {
-          this.fireBtnText.textContent = 'TOGGLE AUTO-PILOT [OFF]';
-        }
+    if (this.autoValLabel) {
+      if (isAuto) {
+        this.autoValLabel.textContent = 'AUTO-PILOT ACTIVE';
+        this.autoValLabel.className = 'text-emerald';
+      } else {
+        this.autoValLabel.textContent = isMobile ? 'MANUAL TOUCH STEERING' : 'MANUAL WASD STEERING';
+        this.autoValLabel.className = 'text-cyan';
       }
+    }
+
+    if (this.fireBtnText) {
+      if (isMobile) {
+        this.fireBtnText.textContent = isAuto ? 'TAP CANVAS TO STEER' : 'RESUME AUTO-PILOT';
+      } else {
+        this.fireBtnText.textContent = isAuto ? 'STEER [WASD / ARROWS]' : 'RESUME AUTO-PILOT';
+      }
+    }
+
+    if (this.instructionsText) {
+      if (isMobile) {
+        this.instructionsText.innerHTML = '<strong>Touch Controls:</strong> Tap anywhere on the canvas to steer the ship • Adjust Ping (RTT) &amp; Packet Loss below to stress reconciliation!';
+      } else {
+        this.instructionsText.innerHTML = '<strong>Controls:</strong> Steer predicted ship with [W/A/S/D] or [Arrow Keys] • Click or Drag canvas to navigate • Turn off Auto-Pilot to test manual prediction • Raise Ping and Packet Loss to stress reconciliation!';
+      }
+    }
+
+    const keyboardIcon = document.querySelector('.keyboard-icon');
+    if (keyboardIcon) {
+      keyboardIcon.textContent = isMobile ? '👆' : '🎮';
+    }
+  }
+
+  /* ==========================================================================
+     MOUSE EVENT LISTENERS
+     ========================================================================== */
+  onMouseDown(e) {
+    this.isMouseDown = true;
+    const { x, y } = this.getCanvasCoords(e);
+    this.handlePointerTarget(x, y);
+  }
+
+  onMouseMove(e) {
+    if (!this.isMouseDown) return;
+    const { x, y } = this.getCanvasCoords(e);
+
+    if (this.mode === 'netcode' && this.netcodeState) {
+      this.netcodeState.targetPoint = { x, y };
+      this.netcodeState.autoPilot = false;
+      if (this.autoToggle) this.autoToggle.checked = false;
+      this.updateNetcodeLabels();
+    } else if (this.mode === 'ragdoll' && this.ragdollState.draggedNode) {
+      this.ragdollState.draggedNode.x = x;
+      this.ragdollState.draggedNode.y = y;
     }
 
     if (this.mode === 'trajectory') {

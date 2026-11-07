@@ -30,5 +30,7 @@ scratch/
 # Cloudflare Pages / Wrangler Cache
 .wrangler/
 .mf/
+rebuild/
+qr.html
 
 # Note: assets/ and functions/ are strictly tracked for deployment
