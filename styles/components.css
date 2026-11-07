@@ -133,13 +133,13 @@
 }
 
 .sandbox-controls-deck {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 18px;
   padding: 16px 20px;
   background: rgba(10, 16, 26, 0.95);
   border-bottom: 1px solid var(--border-color);
-  align-items: center;
+  align-items: flex-end;
 }
 
 .hud-btn.active-throttle {
@@ -225,8 +225,15 @@
 
 .control-actions {
   display: flex;
-  gap: 10px;
-  align-items: flex-end;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.control-actions .btn {
+  white-space: nowrap;
 }
 
 .sandbox-viewport-frame {
@@ -253,11 +260,31 @@
 .hud-left-stat, .hud-right-stat {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  background: rgba(8, 14, 24, 0.75);
-  padding: 6px 10px;
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 4px;
+  background: rgba(6, 11, 20, 0.88);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.overlay-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #c4d7ec;
+  line-height: 1.35;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
 }
 
 .interactive-sandbox-canvas {
@@ -318,10 +345,11 @@
 
 .mini-telemetry-canvas {
   width: 100%;
-  height: 45px;
+  height: 52px;
   display: block;
-  background: rgba(5, 8, 14, 0.6);
-  border-radius: 2px;
+  background: #060a12;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* ==========================================================================
@@ -568,19 +596,23 @@
   position: relative;
   width: calc(100% + 48px);
   margin: -24px -24px 18px -24px;
-  height: 185px;
+  height: 220px;
   overflow: hidden;
-  background: #060b13;
+  background: #040812;
   border-bottom: 1px solid var(--border-color);
   user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .project-banner-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
   transition: transform 0.4s ease;
+  background: #040812;
 }
 
 .project-card:hover .project-banner-img {

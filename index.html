@@ -26,10 +26,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="styles/main.css?v=1.1.0">
-  <link rel="stylesheet" href="styles/hud-theme.css?v=2.5.1">
-  <link rel="stylesheet" href="styles/components.css?v=1.1.0">
-  <link rel="stylesheet" href="styles/mobile.css?v=3.1.0" media="(max-width: 768px)">
+  <link rel="stylesheet" href="styles/main.css?v=3.6.0">
+  <link rel="stylesheet" href="styles/hud-theme.css?v=3.6.0">
+  <link rel="stylesheet" href="styles/components.css?v=3.6.0">
+  <link rel="stylesheet" href="styles/mobile.css?v=3.6.0" media="(max-width: 768px)">
 </head>
 <body class="theme-unreal-cyan">
   <!-- Scanline & Ambient Grid Overlay -->
@@ -549,14 +549,14 @@
           <div class="sandbox-viewport-frame">
             <div class="viewport-hud-overlay">
               <div class="hud-left-stat">
-                <span>SIM STATUS: <strong id="sim-state-text" class="text-emerald">SOLVER ACTIVE</strong></span>
-                <span>ENTITIES / ACTORS: <strong id="sim-actor-count">3 Network Entities</strong></span>
-                <span id="sim-dynamic-stat-1">UNACKED INPUTS: <strong id="sim-buoyancy-stat" class="text-cyan">0</strong></span>
+                <div class="overlay-legend-row"><span class="legend-dot" style="background:#ffb800; box-shadow: 0 0 6px #ffb800;"></span> <span>SERVER (AUTHORITATIVE TRUTH)</span></div>
+                <div class="overlay-legend-row"><span class="legend-dot" style="background:#ef4444; box-shadow: 0 0 6px #ef4444;"></span> <span>CLIENT (RAW UNPREDICTED)</span></div>
+                <div class="overlay-legend-row"><span class="legend-dot" style="background:#00f2fe; box-shadow: 0 0 6px #00f2fe;"></span> <span>CLIENT (PREDICTED + RECONCILED)</span></div>
               </div>
               <div class="hud-right-stat">
-                <span id="sim-mode-indicator" class="text-cyan">MODE: SERVER_REPLICATION_CLIENT_PREDICTION</span>
-                <span id="sim-lag-mitigation-status">RECONCILIATION: REWIND_REPLAY_DETERMINISTIC</span>
-                <span id="sim-dynamic-stat-2">PREDICTION DRIFT: <strong id="sim-speed-stat" class="text-emerald">0.0 px</strong></span>
+                <span>SIM STATUS: <strong id="sim-state-text" class="text-emerald">SOLVER ACTIVE (60 HZ)</strong></span>
+                <span>UNACKED IN-FLIGHT: <strong id="sim-buoyancy-stat" class="text-cyan">0 packets</strong></span>
+                <span>CLIENT DRIFT: <strong id="sim-speed-stat" class="text-emerald">0.0 px</strong></span>
               </div>
             </div>
 
@@ -1820,11 +1820,11 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="scripts/sound-fx.js?v=2.5.1"></script>
-  <script src="scripts/background-canvas.js?v=3.1.0"></script>
-  <script src="scripts/physics-sandbox.js?v=1.1.0"></script>
-  <script src="scripts/statetree-visualizer.js?v=2.5.1"></script>
-  <script src="scripts/main.js?v=2.5.1"></script>
-  <script src="scripts/mobile.js?v=2.5.1"></script>
+  <script src="scripts/sound-fx.js?v=3.6.0"></script>
+  <script src="scripts/background-canvas.js?v=3.6.0"></script>
+  <script src="scripts/physics-sandbox.js?v=3.6.0"></script>
+  <script src="scripts/statetree-visualizer.js?v=3.6.0"></script>
+  <script src="scripts/main.js?v=3.6.0"></script>
+  <script src="scripts/mobile.js?v=3.6.0"></script>
 </body>
 </html>
