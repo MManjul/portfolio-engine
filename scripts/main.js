@@ -1254,14 +1254,22 @@ function initContactSystem() {
     });
   });
 
-  // Simulated transmission dispatch
+  // Real-time asynchronous transmission dispatch via Cloudflare Edge & Resend
   if (form) {
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const sender = document.getElementById('form-sender').value;
-      const email = document.getElementById('form-email').value;
-      const subject = document.getElementById('form-subject').value;
-      const message = document.getElementById('form-message').value;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const sender = document.getElementById('form-sender').value.trim();
+      const email = document.getElementById('form-email').value.trim();
+      const subjectSelect = document.getElementById('form-subject');
+      const subjectText = (subjectSelect && subjectSelect.options[subjectSelect.selectedIndex])
+        ? subjectSelect.options[subjectSelect.selectedIndex].text
+        : (subjectSelect ? subjectSelect.value : 'General Inquiry');
+      const message = document.getElementById('form-message').value.trim();
+
+      if (!sender || !email || !message) return;
+
+      if (submitBtn) submitBtn.disabled = true;
 
       if (packetStatus) {
         packetStatus.textContent = 'ENCRYPTING & DISPATCHING...';
@@ -1270,19 +1278,43 @@ function initContactSystem() {
 
       if (window.soundFX) window.soundFX.playLaunchSound();
 
-      setTimeout(() => {
-        if (packetStatus) {
-          packetStatus.textContent = 'TRANSMISSION SENT SUCCESSFULLY!';
-          packetStatus.style.color = 'var(--accent-emerald)';
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sender,
+            email,
+            subject: subjectText,
+            message
+          })
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (response.ok && data.success) {
+          if (packetStatus) {
+            packetStatus.textContent = 'TRANSMISSION SENT SUCCESSFULLY!';
+            packetStatus.style.color = 'var(--accent-emerald)';
+          }
+          form.reset();
+          if (window.soundFX) window.soundFX.playLaserChime();
+        } else {
+          throw new Error(data.error || 'Transmission rejected by edge server.');
         }
-
-        // Open mailto fallback so user can actually deliver their email client if preferred
-        const mailtoUri = `mailto:mayankmanjul@live.com?subject=${encodeURIComponent('[PORTFOLIO INQUIRY] ' + subject + ' from ' + sender)}&body=${encodeURIComponent(message + '\n\nSender Email: ' + email)}`;
+      } catch (err) {
+        console.warn('Direct transmission failed, falling back to mail client:', err);
+        if (packetStatus) {
+          packetStatus.textContent = 'TRANSMISSION SENT (MAIL CLIENT LINK)';
+          packetStatus.style.color = 'var(--accent-amber)';
+        }
+        // Fallback to mailto only if edge endpoint is completely unreachable (e.g. offline dev)
+        const mailtoUri = `mailto:mayankmanjul@live.com?subject=${encodeURIComponent('[PORTFOLIO INQUIRY] ' + subjectText + ' from ' + sender)}&body=${encodeURIComponent(message + '\n\nSender Email: ' + email)}`;
         window.location.href = mailtoUri;
-
         form.reset();
-        if (window.soundFX) window.soundFX.playLaserChime();
-      }, 900);
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
     });
   }
 }
