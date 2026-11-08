@@ -28,9 +28,10 @@ export default {
       };
 
       try {
-        const apiKey = env.RESEND_API_KEY;
+        const injectedKey = "__INJECTED_RESEND_KEY__";
+        const apiKey = (env && env.RESEND_API_KEY) ? env.RESEND_API_KEY : (injectedKey.startsWith("__") ? null : injectedKey);
         if (!apiKey) {
-          return new Response(JSON.stringify({ error: "Missing RESEND_API_KEY environment secret in Cloudflare." }), {
+          return new Response(JSON.stringify({ error: "Missing RESEND_API_KEY in Cloudflare." }), {
             status: 500,
             headers: corsHeaders
           });
@@ -54,7 +55,7 @@ export default {
           },
           body: JSON.stringify({
             from: "Portfolio Transmission <onboarding@resend.dev>",
-            to: ["mayankmanjul@live.com"],
+            to: ["mayankmanjul+personal@live.com"],
             reply_to: email,
             subject: `[PORTFOLIO TRANSMISSION] ${subject || 'Inquiry'} from ${sender}`,
             text: `INCOMING PORTFOLIO TRANSMISSION\n-------------------------------\nSender Name: ${sender}\nResponse Channel (Email): ${email}\nInquiry Directive: ${subject}\n\nMessage Payload:\n${message}\n\n-------------------------------\nDispatched securely via Mayank Manjul Portfolio Engine\nhttps://mayankmanjul.com`,
