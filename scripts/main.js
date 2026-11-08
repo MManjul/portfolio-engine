@@ -1303,15 +1303,11 @@ function initContactSystem() {
           throw new Error(data.error || 'Transmission rejected by edge server.');
         }
       } catch (err) {
-        console.warn('Direct transmission failed, falling back to mail client:', err);
+        console.error('Transmission error:', err);
         if (packetStatus) {
-          packetStatus.textContent = 'TRANSMISSION SENT (MAIL CLIENT LINK)';
-          packetStatus.style.color = 'var(--accent-amber)';
+          packetStatus.textContent = 'TRANSMISSION FAILED // PLEASE RETRY';
+          packetStatus.style.color = 'var(--accent-crimson)';
         }
-        // Fallback to mailto only if edge endpoint is completely unreachable (e.g. offline dev)
-        const mailtoUri = `mailto:mayankmanjul@live.com?subject=${encodeURIComponent('[PORTFOLIO INQUIRY] ' + subjectText + ' from ' + sender)}&body=${encodeURIComponent(message + '\n\nSender Email: ' + email)}`;
-        window.location.href = mailtoUri;
-        form.reset();
       } finally {
         if (submitBtn) submitBtn.disabled = false;
       }
