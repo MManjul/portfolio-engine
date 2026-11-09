@@ -82,11 +82,13 @@ function initThemeSwitcher() {
   themeBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     themeMenu.hidden = !themeMenu.hidden;
+    themeBtn.setAttribute('aria-expanded', String(!themeMenu.hidden));
     if (window.soundFX) window.soundFX.playClick();
   });
 
   document.addEventListener('click', () => {
     themeMenu.hidden = true;
+    themeBtn.setAttribute('aria-expanded', 'false');
   });
 
   const buttons = themeMenu.querySelectorAll('button');

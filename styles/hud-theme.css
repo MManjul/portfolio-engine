@@ -1178,3 +1178,50 @@ body.theme-crimson-red {
   font-weight: 700;
   text-shadow: 0 0 8px rgba(var(--theme-accent-rgb), 0.35);
 }
+
+
+/* Secondary Sandbox Interactive Button */
+.btn.hud-btn.highlight-sandbox {
+  border: 1px solid rgba(255, 184, 0, 0.45);
+  background: rgba(255, 184, 0, 0.08);
+  color: #ffca3a;
+}
+
+.btn.hud-btn.highlight-sandbox:hover {
+  background: rgba(255, 184, 0, 0.18);
+  border-color: #ffb800;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(255, 184, 0, 0.4);
+}
+
+/* ==========================================================================
+   PREFERS-REDUCED-MOTION SUPPORT (WCAG 2.2 AA)
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hud-scanlines,
+  .hud-vignette,
+  .background-canvas,
+  #bg-canvas,
+  .pulse-dot,
+  .btn-glow,
+  .glitch-anim,
+  .hud-radar-sweep {
+    animation: none !important;
+    opacity: 0.2 !important;
+  }
+
+  .btn:hover,
+  .hud-control-btn:hover,
+  .project-card:hover {
+    transform: none !important;
+  }
+}

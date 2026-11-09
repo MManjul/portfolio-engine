@@ -92,7 +92,7 @@
   </script>
 
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=3.7.5">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=3.8.0">
 
   <!-- Google Fonts for Futuristic Cyber/Engine Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -100,12 +100,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="styles/main.css?v=3.7.5">
-  <link rel="stylesheet" href="styles/hud-theme.css?v=3.7.5">
-  <link rel="stylesheet" href="styles/components.css?v=3.7.5">
-  <link rel="stylesheet" href="styles/mobile.css?v=3.7.5" media="(max-width: 768px)">
+  <link rel="stylesheet" href="styles/main.css?v=3.8.0">
+  <link rel="stylesheet" href="styles/hud-theme.css?v=3.8.0">
+  <link rel="stylesheet" href="styles/components.css?v=3.8.0">
+  <link rel="stylesheet" href="styles/mobile.css?v=3.8.0" media="(max-width: 768px)">
 </head>
 <body class="theme-unreal-cyan">
+  <!-- Accessible Skip to Content Link -->
+  <a href="#hero" class="skip-link">SKIP TO MAIN CONTENT</a>
   <!-- Scanline & Ambient Grid Overlay -->
   <div class="hud-scanlines" aria-hidden="true"></div>
   <div class="hud-vignette" aria-hidden="true"></div>
@@ -117,7 +119,7 @@
   <header class="engine-top-bar" role="banner">
     <div class="telemetry-group left">
       <div class="engine-brand">
-        <img src="favicon.svg?v=3.7.5" alt="MM Coordinate Core" class="engine-logo-img" width="22" height="22" style="width: 22px !important; height: 22px !important; max-width: 22px !important; max-height: 22px !important; display: inline-block; vertical-align: middle; flex-shrink: 0;">
+        <img src="favicon.svg?v=3.8.0" alt="MM Coordinate Core" class="engine-logo-img" width="22" height="22" style="width: 22px !important; height: 22px !important; max-width: 22px !important; max-height: 22px !important; display: inline-block; vertical-align: middle; flex-shrink: 0;">
         <span class="engine-title">MAYANK MANJUL</span>
         <span class="build-badge">v5.4.4-SHIPPING</span>
       </div>
@@ -150,20 +152,20 @@
     <div class="telemetry-group right">
       <!-- Direct Resume Download Button -->
       <a id="topbar-download-resume" href="https://drive.google.com/file/d/1rQcI8EHY2sCMNXN2j-Doxnb8eUOrDM6y/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="hud-control-btn resume-quick-link" title="Open Official Resume PDF on Google Drive">
-        <span class="btn-icon">📥</span>
+        <span class="btn-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></span>
         <span class="btn-text hide-mobile">RESUME PDF</span>
       </a>
 
       <!-- Audio Synthesizer Control -->
       <button id="btn-audio-toggle" class="hud-control-btn" title="Toggle Synthesizer Audio FX" aria-label="Toggle Audio">
-        <span class="btn-icon">🔊</span>
+        <span class="btn-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg></span>
         <span class="btn-text hide-mobile">AUDIO: <span id="audio-status" class="text-cyan">ON</span></span>
       </button>
 
       <!-- Theme Switcher -->
       <div class="theme-dropdown-wrapper">
-        <button id="btn-theme-selector" class="hud-control-btn" title="Switch HUD Color Theme" aria-label="Color Palette">
-          <span class="btn-icon">🎨</span>
+        <button id="btn-theme-selector" class="hud-control-btn" title="Switch HUD Color Theme" aria-label="Color Palette" aria-haspopup="true" aria-expanded="false">
+          <span class="btn-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path></svg></span>
           <span class="btn-text hide-mobile">PALETTE</span>
         </button>
         <div class="theme-menu" id="theme-menu" hidden>
@@ -267,20 +269,21 @@
 
           <!-- Hero Actions -->
           <div class="hero-actions">
-            <a href="#sandbox" class="btn hud-btn primary">
+            <a href="#projects" class="btn hud-btn primary highlight-shipped" title="Explore Shipped Commercial Titles">
               <span class="btn-glow"></span>
-              <span class="btn-text">GAMEPLAY PLAYGROUND</span>
+              <span class="btn-text">INSPECT SHIPPED TITLES</span>
               <span class="btn-chevron">▶</span>
             </a>
             <a id="hero-download-resume-btn" href="https://drive.google.com/file/d/1rQcI8EHY2sCMNXN2j-Doxnb8eUOrDM6y/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="btn hud-btn highlight-download" title="Open Official Resume PDF via Google Drive">
-              <span class="btn-icon">📥</span>
+              <span class="btn-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></span>
               <span class="btn-text">DOWNLOAD RESUME (PDF)</span>
             </a>
-            <a href="#projects" class="btn hud-btn secondary">
-              <span class="btn-text">INSPECT SHIPPED TITLES</span>
+            <a href="#sandbox" class="btn hud-btn secondary highlight-sandbox" title="Run Interactive Physics &amp; Netcode Simulation">
+              <span class="btn-text">GAMEPLAY PLAYGROUND</span>
+              <span class="btn-chevron">▶</span>
             </a>
-            <button type="button" id="btn-quick-resume" class="btn hud-btn outline">
-              <span class="btn-icon">📄</span>
+            <button type="button" id="btn-quick-resume" class="btn hud-btn outline" title="Inspect TDD Resume Specification Blueprint">
+              <span class="btn-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span>
               <span class="btn-text">TDD RESUME SPEC</span>
             </button>
           </div>
@@ -637,7 +640,7 @@
             <canvas id="sandbox-canvas" width="960" height="480" class="interactive-sandbox-canvas"></canvas>
 
             <div class="canvas-instructions" id="sandbox-instructions-bar">
-              <span class="keyboard-icon">🎮</span>
+              <span class="keyboard-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="6"></rect></svg></span>
               <span id="sandbox-instructions-text"><strong>Controls:</strong> Steer predicted ship with [W/A/S/D] or [Arrow Keys] • Click or Drag canvas to navigate • Turn off Auto-Pilot to test manual prediction • Raise Ping and Packet Loss to stress reconciliation!</span>
             </div>
           </div>
@@ -1633,7 +1636,7 @@
           <div class="arsenal-card">
             <div class="card-glow-bar"></div>
             <div class="arsenal-header">
-              <span class="arsenal-icon">🏛</span>
+              <span class="arsenal-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="4" y1="10" x2="20" y2="10"></line><polygon points="12 2 20 7 4 7 12 2"></polygon><line x1="6" y1="10" x2="6" y2="21"></line><line x1="10" y1="10" x2="10" y2="21"></line><line x1="14" y1="10" x2="14" y2="21"></line><line x1="18" y1="10" x2="18" y2="21"></line></svg></span>
               <h3>Gameplay Architecture &amp; Patterns</h3>
             </div>
             <div class="skill-tags-cloud">
@@ -1653,7 +1656,7 @@
           <div class="arsenal-card">
             <div class="card-glow-bar"></div>
             <div class="arsenal-header">
-              <span class="arsenal-icon">🌐</span>
+              <span class="arsenal-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></span>
               <h3>Multiplayer &amp; Replication</h3>
             </div>
             <div class="skill-tags-cloud">
@@ -1690,7 +1693,7 @@
           <div class="arsenal-card">
             <div class="card-glow-bar"></div>
             <div class="arsenal-header">
-              <span class="arsenal-icon">📈</span>
+              <span class="arsenal-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></span>
               <h3>Optimization &amp; Profiling</h3>
             </div>
             <div class="skill-tags-cloud">
@@ -1708,7 +1711,7 @@
           <div class="arsenal-card">
             <div class="card-glow-bar"></div>
             <div class="arsenal-header">
-              <span class="arsenal-icon">🛠</span>
+              <span class="arsenal-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg></span>
               <h3>Toolchains &amp; Platforms</h3>
             </div>
             <div class="skill-tags-cloud">
@@ -1745,35 +1748,35 @@
             </div>
 
             <div class="contact-links-list">
-              <a href="mailto:mayankmanjul@live.com" class="contact-item-card">
-                <span class="card-icon">✉</span>
-                <div class="card-text">
+              <div class="contact-item-card">
+                <span class="card-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></span>
+                <a href="mailto:mayankmanjul@live.com" class="card-text card-link" title="Send email to mayankmanjul@live.com">
                   <span class="label">DIRECT COMMS EMAIL</span>
                   <span class="value">mayankmanjul@live.com</span>
-                </div>
-                <button class="btn-copy" data-copy="mayankmanjul@live.com" title="Copy Email">COPY</button>
-              </a>
+                </a>
+                <button type="button" class="btn-copy" data-copy="mayankmanjul@live.com" title="Copy Email" aria-label="Copy Email Address">COPY</button>
+              </div>
 
-              <a href="tel:+917066845227" class="contact-item-card">
-                <span class="card-icon">📞</span>
-                <div class="card-text">
+              <div class="contact-item-card">
+                <span class="card-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span>
+                <a href="tel:+917066845227" class="card-text card-link" title="Call +91-7066845227">
                   <span class="label">MOBILE LINE</span>
                   <span class="value">+91-7066845227</span>
-                </div>
-                <button class="btn-copy" data-copy="+917066845227" title="Copy Phone">COPY</button>
-              </a>
+                </a>
+                <button type="button" class="btn-copy" data-copy="+917066845227" title="Copy Phone" aria-label="Copy Phone Number">COPY</button>
+              </div>
 
-              <a href="https://www.linkedin.com/in/mayankmanjul" target="_blank" rel="noopener noreferrer" class="contact-item-card">
-                <span class="card-icon">🔗</span>
-                <div class="card-text">
+              <div class="contact-item-card">
+                <span class="card-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></span>
+                <a href="https://www.linkedin.com/in/mayankmanjul" target="_blank" rel="noopener noreferrer" class="card-text card-link" title="Open LinkedIn Profile">
                   <span class="label">LINKEDIN PROFESSIONAL RECORD</span>
                   <span class="value">linkedin.com/in/mayankmanjul</span>
-                </div>
+                </a>
                 <span class="external-arrow">↗</span>
-              </a>
+              </div>
 
               <div class="contact-item-card static">
-                <span class="card-icon">📍</span>
+                <span class="card-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>
                 <div class="card-text">
                   <span class="label">PRIMARY STATION / BASE</span>
                   <span class="value">Bengaluru, Karnataka, India (Open to Remote / Relocation)</span>
@@ -1792,17 +1795,17 @@
             <form id="contact-form" class="hud-form">
               <div class="form-group">
                 <label for="form-sender">NAME / STUDIO AFFILIATION</label>
-                <input type="text" id="form-sender" placeholder="e.g. CD Projekt Red / Epic Games / Recruiter" required>
+                <input type="text" id="form-sender" name="sender" placeholder="e.g. CD Projekt Red / Epic Games / Recruiter" autocomplete="name" required>
               </div>
 
               <div class="form-group">
                 <label for="form-email">RESPONSE CHANNEL (EMAIL)</label>
-                <input type="email" id="form-email" placeholder="name@studio.com" required>
+                <input type="email" id="form-email" name="email" placeholder="name@studio.com" autocomplete="email" required>
               </div>
 
               <div class="form-group">
                 <label for="form-subject">INQUIRY DIRECTIVE</label>
-                <select id="form-subject" class="hud-select">
+                <select id="form-subject" name="subject" class="hud-select">
                   <option value="principal-role">Principal Gameplay Engineer Position</option>
                   <option value="lead-role">Lead Game Developer / Pod Lead</option>
                   <option value="architecture">Architectural Consulting &amp; Profiling</option>
@@ -1813,12 +1816,12 @@
 
               <div class="form-group">
                 <label for="form-message">TRANSMISSION PAYLOAD (MESSAGE)</label>
-                <textarea id="form-message" rows="4" placeholder="Brief mission details, engine stack, and project roadmap..." required></textarea>
+                <textarea id="form-message" name="message" rows="4" placeholder="Brief mission details, engine stack, and project roadmap..." required></textarea>
               </div>
 
               <button type="submit" class="btn hud-btn primary full-width">
                 <span class="btn-text">DISPATCH SECURE TRANSMISSION</span>
-                <span class="btn-icon">⚡</span>
+                <span class="btn-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
               </button>
             </form>
           </div>
@@ -1855,12 +1858,12 @@
     <div class="modal-dialog wide-dialog">
       <div class="modal-header">
         <div class="modal-title-box">
-          <span class="modal-icon">📄</span>
+          <span class="modal-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span>
           <h3 id="resume-modal-title">TDD RESUME SPECIFICATION // MAYANK MANJUL</h3>
         </div>
         <div class="modal-actions-right">
           <a id="modal-gdrive-download" href="https://drive.google.com/file/d/1rQcI8EHY2sCMNXN2j-Doxnb8eUOrDM6y/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="btn hud-btn highlight-download small" title="Open Official Resume PDF via Google Drive">
-            <span class="btn-icon">📥</span>
+            <span class="btn-icon"><svg class="hud-svg-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></span>
             <span>GOOGLE DRIVE PDF</span>
           </a>
           <button type="button" id="btn-print-resume" class="btn hud-btn primary small">
@@ -1904,11 +1907,11 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="scripts/sound-fx.js?v=3.7.5"></script>
-  <script src="scripts/background-canvas.js?v=3.7.5"></script>
-  <script src="scripts/physics-sandbox.js?v=3.7.5"></script>
-  <script src="scripts/statetree-visualizer.js?v=3.7.5"></script>
-  <script src="scripts/main.js?v=3.7.5"></script>
-  <script src="scripts/mobile.js?v=3.7.5"></script>
+  <script src="scripts/sound-fx.js?v=3.8.0"></script>
+  <script src="scripts/background-canvas.js?v=3.8.0"></script>
+  <script src="scripts/physics-sandbox.js?v=3.8.0"></script>
+  <script src="scripts/statetree-visualizer.js?v=3.8.0"></script>
+  <script src="scripts/main.js?v=3.8.0"></script>
+  <script src="scripts/mobile.js?v=3.8.0"></script>
 </body>
 </html>

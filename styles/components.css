@@ -2111,3 +2111,15 @@
   border-bottom: 2px solid var(--theme-accent);
   border-right: 2px solid var(--theme-accent);
 }
+
+
+/* Contact Card Link Fix */
+.contact-item-card .card-link {
+  text-decoration: none;
+  color: inherit;
+  flex-grow: 1;
+}
+
+.contact-item-card .card-link:hover .value {
+  color: var(--theme-accent);
+}
