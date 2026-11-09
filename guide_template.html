@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mayank Manjul Portfolio Engine - Architecture & Code Control Manual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4;
+      margin: 14mm 14mm 14mm 14mm;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background-color: #070a0f;
+      color: #e2e8f0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.5;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Color Tokens */
+    :root {
+      --cyan: #00f2fe;
+      --cyan-dim: rgba(0, 242, 254, 0.15);
+      --amber: #ffb800;
+      --amber-dim: rgba(255, 184, 0, 0.15);
+      --emerald: #00f090;
+      --emerald-dim: rgba(0, 240, 144, 0.15);
+      --purple: #a855f7;
+      --purple-dim: rgba(168, 85, 247, 0.15);
+      --crimson: #ff3366;
+      --card-bg: #0d131f;
+      --card-border: #1a263d;
+      --code-bg: #060910;
+    }
+
+    /* Header Banner */
+    .header-banner {
+      border: 1px solid var(--cyan);
+      background: linear-gradient(135deg, rgba(0, 242, 254, 0.12) 0%, rgba(13, 19, 31, 0.95) 100%);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      border-bottom: 1px solid rgba(0, 242, 254, 0.3);
+      padding-bottom: 8px;
+    }
+
+    .title-group h1 {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 18pt;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .title-group .subtitle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9pt;
+      color: var(--cyan);
+      letter-spacing: 0.08em;
+    }
+
+    .badge-telemetry {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      color: var(--emerald);
+      background: rgba(0, 240, 144, 0.12);
+      border: 1px solid var(--emerald);
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-align: right;
+    }
+
+    /* Section Styles */
+    .section {
+      margin-bottom: 16px;
+      page-break-inside: avoid;
+    }
+
+    .section-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 12.5pt;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--card-border);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .section-title .num {
+      color: var(--cyan);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10pt;
+    }
+
+    /* Card Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      position: relative;
+      page-break-inside: avoid;
+    }
+
+    .card.cyan-edge { border-left: 3px solid var(--cyan); }
+    .card.amber-edge { border-left: 3px solid var(--amber); }
+    .card.emerald-edge { border-left: 3px solid var(--emerald); }
+    .card.purple-edge { border-left: 3px solid var(--purple); }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .card-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 7.5pt;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+
+    .tag-cyan { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(0, 242, 254, 0.4); }
+    .tag-amber { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(255, 184, 0, 0.4); }
+    .tag-emerald { background: var(--emerald-dim); color: var(--emerald); border: 1px solid rgba(0, 240, 144, 0.4); }
+    .tag-purple { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.4); }
+
+    .card p, .card li {
+      font-size: 9pt;
+      color: #94a3b8;
+      line-height: 1.45;
+    }
+
+    .card ul {
+      padding-left: 16px;
+      margin-top: 4px;
+    }
+
+    .card li strong {
+      color: #cbd5e1;
+    }
+
+    /* Flow Architecture Box */
+    .flow-box {
+      background: #04070d;
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.5pt;
+      color: #e2e8f0;
+      margin-bottom: 12px;
+      line-height: 1.4;
+      page-break-inside: avoid;
+    }
+
+    .flow-box .arrow {
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    .flow-box .step-title {
+      color: var(--amber);
+      font-weight: 700;
+    }
+
+    .flow-box .step-desc {
+      color: #94a3b8;
+    }
+
+    /* Table Styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 8.5pt;
+      page-break-inside: avoid;
+    }
+
+    th {
+      font-family: 'Chakra Petch', sans-serif;
+      background: #0d1524;
+      color: var(--cyan);
+      text-align: left;
+      padding: 6px 10px;
+      border: 1px solid var(--card-border);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 6px 10px;
+      border: 1px solid var(--card-border);
+      background: #080d17;
+      color: #cbd5e1;
+      font-family: 'Inter', sans-serif;
+    }
+
+    td code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      color: var(--cyan);
+      background: rgba(0, 242, 254, 0.08);
+      padding: 1px 4px;
+      border-radius: 2px;
+    }
+
+    /* Code Blocks */
+    pre, code.block {
+      background: var(--code-bg);
+      border: 1px solid #1e293b;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.5pt;
+      color: #38bdf8;
+      display: block;
+      margin: 6px 0;
+      white-space: pre-wrap;
+      line-height: 1.4;
+    }
+
+    /* Callout Alert */
+    .callout {
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 8.5pt;
+      margin: 8px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      page-break-inside: avoid;
+    }
+
+    .callout.tip {
+      background: rgba(0, 240, 144, 0.08);
+      border: 1px solid rgba(0, 240, 144, 0.3);
+      color: #a7f3d0;
+    }
+
+    .callout.note {
+      background: rgba(0, 242, 254, 0.08);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      color: #bae6fd;
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--card-border);
+      padding-top: 8px;
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 7.5pt;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= PAGE 1 ================= -->
+  <div class="header-banner">
+    <div class="header-top">
+      <div class="title-group">
+        <h1>PORTFOLIO ENGINE // ARCHITECTURE & CODE MANUAL</h1>
+        <div class="subtitle">COMPLETE SYSTEMS BLUEPRINT • DEVELOPER CONTROL GUIDE</div>
+      </div>
+      <div class="badge-telemetry">
+        STATUS: v5.4.4-SHIPPING<br>
+        STACK: HTML5 / CSS3 / JS / CF WORKER
+      </div>
+    </div>
+    <p style="font-size: 9pt; color: #94a3b8; margin: 0;">
+      A comprehensive, color-coded reference manual for Mayank Manjul's portfolio codebase (<code style="color: var(--cyan); background: none;">mayankmanjul.com</code>). Covers project layout, editing guidelines, local previewing, and Cloudflare automated deployment.
+    </p>
+  </div>
+
+  <!-- SECTION 1: IDE SELECTION -->
+  <div class="section">
+    <div class="section-title"><span class="num">01 //</span> RECOMMENDED IDE ENVIRONMENT</div>
+    <div class="grid-2">
+      <div class="card cyan-edge">
+        <div class="card-header">
+          <span class="card-title">JetBrains Rider</span>
+          <span class="card-tag tag-cyan">RECOMMENDED FOR C++/UNITY</span>
+        </div>
+        <p>Because you are an Unreal Engine & Unity developer, <strong>JetBrains Rider</strong> is your optimal environment. Rider embeds the entire <strong>WebStorm engine</strong> natively:</p>
+        <ul>
+          <li><strong>Zero configuration</strong>: Full CSS variable autocomplete, HTML5 tag inspection, and JavaScript navigation.</li>
+          <li><strong>Git Integration</strong>: World-class visual changelist diffing and branch management.</li>
+          <li><strong>How to open</strong>: Open Rider &rarr; <em>File &rarr; Open</em> &rarr; select folder <code>D:\Project\portfolio-engine</code>.</li>
+        </ul>
+      </div>
+
+      <div class="card amber-edge">
+        <div class="card-header">
+          <span class="card-title">VS Code + Live Server</span>
+          <span class="card-tag tag-amber">BEST FOR HOT-RELOAD</span>
+        </div>
+        <p>Ultra-lightweight industry standard for modern web programming with 1-second startup time:</p>
+        <ul>
+          <li><strong>Install Extension</strong>: <em>"Live Server"</em> (by Ritwick Dey).</li>
+          <li><strong>Instant Preview</strong>: Right-click <code>index.html</code> &rarr; click <strong>"Open with Live Server"</strong>.</li>
+          <li><strong>Hot-Reload</strong>: Any edit saved in HTML, CSS, or JS immediately refreshes in your browser.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: SYSTEM ARCHITECTURE -->
+  <div class="section">
+    <div class="section-title"><span class="num">02 //</span> REQUEST LIFECYCLE & DATA FLOW</div>
+    
+    <div class="flow-box">
+      <div><span class="step-title">[1. VISITOR CLIENT]</span> Browser requests <code>https://mayankmanjul.com/</code></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow">▼</span></div>
+      <div><span class="step-title">[2. CLOUDFLARE EDGE]</span> Worker Router (<code>worker.js</code>) serves cached static assets (<code>index.html</code>, <code>styles/*</code>, <code>scripts/*</code>) via <code>env.ASSETS</code></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow">▼</span></div>
+      <div><span class="step-title">[3. CLIENT RUNTIME]</span> Browser executes HUD Telemetry, Web Audio Synthesizer, and Netcode Simulation Canvas</div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow">▼</span></div>
+      <div><span class="step-title">[4. CONTACT TRANSMISSION]</span> User clicks "Dispatch Secure Transmission" &rarr; JavaScript issues <code>fetch('/api/contact')</code></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow">▼</span></div>
+      <div><span class="step-title">[5. RESEND API DISPATCH]</span> <code>worker.js</code> validates payload, authenticates via <code>RESEND_API_KEY</code>, dispatches email to <code>mayankmanjul@live.com</code></div>
+    </div>
+
+    <div class="callout tip">
+      <span style="font-size: 14pt;">⚡</span>
+      <div><strong>Zero Desktop Mail Client Popups:</strong> Inquiries are transmitted silently over HTTPS edge APIs. The visitor never leaves your site, and Outlook / desktop mail apps are completely bypassed.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: REPOSITORY FILE STRUCTURE -->
+  <div class="section">
+    <div class="section-title"><span class="num">03 //</span> FILE-BY-FILE CODEBASE BLUEPRINT</div>
+    
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 25%;">File / Path</th>
+          <th style="width: 15%;">Domain</th>
+          <th>Purpose & Where to Make Changes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>index.html</code></td>
+          <td><span class="card-tag tag-cyan">MARKUP</span></td>
+          <td><strong>Master Page Backbone</strong>. Contains all 8 HUD sections, project cards, metric badges, SVG icons, resume links, and modal blueprint templates.</td>
+        </tr>
+        <tr>
+          <td><code>styles/main.css</code></td>
+          <td><span class="card-tag tag-amber">DESIGN SYSTEM</span></td>
+          <td><strong>Global CSS Tokens</strong> (<code>:root</code> colors, typography scales, container max-widths, high-contrast <code>:focus-visible</code> rings, and accessibility skip links).</td>
+        </tr>
+        <tr>
+          <td><code>styles/hud-theme.css</code></td>
+          <td><span class="card-tag tag-amber">THEMES & FX</span></td>
+          <td><strong>Cyberpunk Aesthetic</strong>. Controls 4 active color themes (Slate Cyan, Amber Gold, Matrix Green, Crimson Red), scanlines, glows, and <code>prefers-reduced-motion</code>.</td>
+        </tr>
+        <tr>
+          <td><code>styles/components.css</code></td>
+          <td><span class="card-tag tag-amber">COMPONENTS</span></td>
+          <td><strong>Modular UI Panels</strong>. Radar chart frame, shipped project grid cards, experience timeline items, contact cards, and technical spec dialog modals.</td>
+        </tr>
+        <tr>
+          <td><code>styles/mobile.css</code></td>
+          <td><span class="card-tag tag-amber">MOBILE &lt;=768px</span></td>
+          <td><strong>Mobile Optimized Viewport</strong>. Converts multi-column desktop grids into smooth, battery-efficient accordion decks and disables heavy canvas particles.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <span>MAYANK MANJUL // PORTFOLIO ENGINE ARCHITECTURE MANUAL</span>
+    <span>PAGE 1 OF 2</span>
+  </div>
+
+  <!-- ================= PAGE 2 ================= -->
+  <div class="page-break"></div>
+
+  <!-- SECTION 4: JAVASCRIPT CONTROLLERS -->
+  <div class="section" style="margin-top: 10px;">
+    <div class="section-title"><span class="num">04 //</span> JAVASCRIPT LOGIC CONTROLLERS (<code>scripts/</code>)</div>
+    
+    <div class="grid-2">
+      <div class="card cyan-edge">
+        <div class="card-header">
+          <span class="card-title">scripts/main.js</span>
+          <span class="card-tag tag-cyan">CORE CONTROLLER</span>
+        </div>
+        <p>The central orchestrator of interactive HUD events:</p>
+        <ul>
+          <li><strong>Uptime & Telemetry</strong>: Calculates live uptime clock and simulated frame time.</li>
+          <li><strong>Scrollspy</strong>: Detects section scroll position and updates top nav indices (<code>01</code> to <code>08</code>).</li>
+          <li><strong>Theme Engine</strong>: Toggles body theme class and saves user selection to <code>localStorage</code>.</li>
+          <li><strong>Contact API Dispatch</strong>: Collects form data and issues asynchronous <code>fetch('/api/contact')</code>.</li>
+        </ul>
+      </div>
+
+      <div class="card emerald-edge">
+        <div class="card-header">
+          <span class="card-title">scripts/sound-fx.js</span>
+          <span class="card-tag tag-emerald">AUDIO SYNTHESIZER</span>
+        </div>
+        <p>Procedural Web Audio API sound generator:</p>
+        <ul>
+          <li><strong>Zero Audio Files</strong>: Synthesizes custom sine and square waves at runtime (tactile clicks, laser chimes).</li>
+          <li><strong>Safe Browsing</strong>: Respects browser autoplay restrictions; remains muted until the user clicks the top bar audio toggle.</li>
+        </ul>
+      </div>
+
+      <div class="card emerald-edge">
+        <div class="card-header">
+          <span class="card-title">scripts/physics-sandbox.js</span>
+          <span class="card-tag tag-emerald">NETCODE SIMULATION</span>
+        </div>
+        <p>Interactive 2D physics & netcode lab:</p>
+        <ul>
+          <li>Demonstrates client-side prediction, server authoritative reconciliation, jitter buffers, and simulated packet loss.</li>
+        </ul>
+      </div>
+
+      <div class="card purple-edge">
+        <div class="card-header">
+          <span class="card-title">worker.js & build.js</span>
+          <span class="card-tag tag-purple">CLOUDFLARE EDGE</span>
+        </div>
+        <p>Serverless Edge Router & deployment hook:</p>
+        <ul>
+          <li><strong><code>worker.js</code></strong>: Routes <code>/api/contact</code> and falls back to static files.</li>
+          <li><strong><code>build.js</code></strong>: Automatically injects <code>RESEND_API_KEY</code> during Cloudflare deploy while keeping GitHub repository clean.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: LOCAL TESTING & DEPLOYMENT WORKFLOW -->
+  <div class="section">
+    <div class="section-title"><span class="num">05 //</span> LOCAL DEVELOPMENT & GIT DEPLOYMENT WORKFLOW</div>
+    
+    <div class="grid-2">
+      <div class="card amber-edge">
+        <div class="card-header">
+          <span class="card-title">Running Locally (5 Seconds)</span>
+          <span class="card-tag tag-amber">DEV WORKFLOW</span>
+        </div>
+        <p>No npm installs or build steps needed. Run directly in PowerShell:</p>
+        <pre>python -m http.server 8080</pre>
+        <p>Then open <code>http://localhost:8080</code> in Chrome to test changes in real time.</p>
+      </div>
+
+      <div class="card cyan-edge">
+        <div class="card-header">
+          <span class="card-title">Pushing Updates to Production</span>
+          <span class="card-tag tag-cyan">DEPLOYMENT</span>
+        </div>
+        <p>Deploying changes to <code>mayankmanjul.com</code> is a standard 3-command git workflow:</p>
+        <pre>git add .
+git commit -m "feat: update project details"
+git push origin main</pre>
+        <p>Cloudflare automatically detects the push, runs <code>build.js</code>, and publishes the update live in ~60 seconds.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: QUICK REFERENCE CHEAT SHEET -->
+  <div class="section">
+    <div class="section-title"><span class="num">06 //</span> QUICK EDIT CHEAT SHEET</div>
+    
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 32%;">What You Want to Update</th>
+          <th style="width: 28%;">File Location</th>
+          <th>What to Edit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Update Resume PDF URL</strong></td>
+          <td><code>index.html</code></td>
+          <td>Search for <code>drive.google.com</code> and update the Google Drive URL on lines 152, 275, and 1862.</td>
+        </tr>
+        <tr>
+          <td><strong>Add / Edit Shipped Game</strong></td>
+          <td><code>index.html</code></td>
+          <td>Search for <code>id="projects"</code> (Line ~345). Copy any <code>&lt;article class="project-card"&gt;</code> block to add a new game.</td>
+        </tr>
+        <tr>
+          <td><strong>Edit Career Experience</strong></td>
+          <td><code>index.html</code></td>
+          <td>Search for <code>id="experience"</code> (Line ~1300). Edit role titles, company names, or bullet points.</td>
+        </tr>
+        <tr>
+          <td><strong>Customize Theme Colors</strong></td>
+          <td><code>styles/hud-theme.css</code></td>
+          <td>Look at lines 1–60. Adjust the hex values for <code>--theme-accent</code> and <code>--theme-accent-secondary</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>Change Form Target Email</strong></td>
+          <td><code>worker.js</code></td>
+          <td>Search for <code>to: ["mayankmanjul+personal@live.com"]</code> on line ~51.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout note" style="margin-top: 10px;">
+      <span style="font-size: 14pt;">🔒</span>
+      <div><strong>Security Rule:</strong> Never hardcode API keys or secrets into git files. Always manage private tokens inside the Cloudflare Dashboard under <em>Settings &rarr; Variables and secrets</em>.</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>MAYANK MANJUL // PORTFOLIO ENGINE ARCHITECTURE MANUAL</span>
+    <span>PAGE 2 OF 2 • COMPILED &amp; VERIFIED</span>
+  </div>
+
+</body>
+</html>
